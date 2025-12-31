@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Christian N. Kerr</title>
+
+<style>
+:root{
+  --bg:#bfbfbf; --panel:#b7b7b7; --paper:#fff; --paper2:#f7f7f7; --ink:#000;
+  --hi:#fff; --deep:#000; --accent:#ff7a00;
+
+  --mono: ui-monospace, Menlo, Monaco, Consolas, monospace;
+
+  --rail:220px; --gap:12px; --btn:64px; --view:min(86vmin,720px);
+
+  --stroke:2px; --pad:10px; --shadow:0 1px 0 rgba(0,0,0,.25);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:var(--mono); color:var(--ink);
+  image-rendering:pixelated;
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 2px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 1px,transparent 1px 2px),
+    repeating-linear-gradient(45deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px),
+    var(--bg);
+  overflow:hidden; /* page doesn't scroll; stage does */
+}
+
+.frame{
+  height:100svh;
+  display:grid;
+  grid-template-columns:var(--rail) 1fr;
+  gap:18px; padding:18px;
+  align-items:start;
+}
+
+.win{
+  background:var(--panel);
+  padding:var(--pad);
+  border:var(--stroke) solid;
+  border-color:var(--hi) var(--deep) var(--deep) var(--hi);
+  box-shadow:var(--shadow);
+}
+aside.win{position:sticky;top:18px}
+.stage{height:100%;min-height:0;overflow:auto;scroll-behavior:smooth}
+
+/* tabs */
+input[type="radio"]{display:none}
+.panel{display:none}
+#home:checked~.frame #p-home,
+#writing:checked~.frame #p-writing,
+#research:checked~.frame #p-research,
+#contact:checked~.frame #p-contact{display:block}
+
+/* home button */
+.nameBtn{
+  display:block; width:100%;
+  text-align:center;
+  font-weight:800; font-size:12px; letter-spacing:.08em;
+  padding:8px;
+  background:var(--paper);
+  border:2px solid #000;
+  cursor:pointer; user-select:none;
+  margin-bottom:var(--gap);
+}
+#home:checked~.frame aside .nameBtn{background:var(--accent)}
+
+/* controls */
+.controls{display:grid;justify-items:center;gap:var(--gap)}
+
+/* compass */
+.compass{
+  width:var(--btn); height:var(--btn);
+  background:#FFF3A0; /* bright yellow */
+  border:2px solid #000;
+  position:relative;
+  display:grid; place-items:center;
+}
+.compass svg{
+  width:52px; height:52px;
+  shape-rendering:crispEdges;
+  image-rendering:pixelated;
+}
+.zones{
+  position:absolute; inset:0;
+  display:grid;
+  grid-template:repeat(3,1fr)/repeat(3,1fr);
+}
+.zone{background:none;border:0;cursor:pointer}
+
+/* nav buttons */
+.btns{display:grid;grid-template-columns:var(--btn);gap:10px;justify-content:center}
+.btn{
+  width:var(--btn); height:var(--btn);
+  display:grid; place-items:center;
+  background:var(--paper2);
+  border:2px solid;
+  border-color:var(--hi) var(--deep) var(--deep) var(--hi);
+  box-shadow:var(--shadow);
+  cursor:pointer; user-select:none;
+}
+.btn:active{transform:translate(1px,1px)}
+.glyph{font-size:32px;font-weight:900;line-height:1}
+
+/* active tab highlight */
+#writing:checked~.frame .btns label[for="writing"],
+#research:checked~.frame .btns label[for="research"],
+#contact:checked~.frame .btns label[for="contact"]{
+  background:var(--accent);
+  border-color:var(--deep) var(--hi) var(--hi) var(--deep);
+}
+
+/* clock */
+.clock{
+  width:100%;
+  background:#fff;
+  border:2px solid #000;
+  padding:8px 10px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+.clockLine{font-size:12px;font-weight:800;letter-spacing:.06em}
+.clockSub{margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.04em;opacity:.95}
+
+/* home viewport */
+.wrap{width:var(--view);max-width:100%}
+.viewport{
+  width:100%; aspect-ratio:1/1;
+  overflow:scroll; background:#000; border:2px solid #000;
+  scrollbar-width:none; scroll-behavior:smooth;
+}
+.viewport::-webkit-scrollbar{width:0;height:0}
+.canvas{width:220%;height:220%;min-width:1100px;min-height:1100px;position:relative}
+.canvas img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.overlayRow{margin-top:8px;display:flex;align-items:center;justify-content:flex-end;gap:10px}
+.caption{
+  max-width:360px;background:#fff;border:2px solid #000;
+  padding:6px 8px;font-size:11px;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.pager{display:flex;gap:6px}
+.pbtn{
+  width:34px;height:28px;display:grid;place-items:center;
+  background:var(--paper2);
+  border:2px solid;
+  border-color:var(--hi) var(--deep) var(--deep) var(--hi);
+  box-shadow:var(--shadow);
+  cursor:pointer; user-select:none;
+}
+.pbtn:active{transform:translate(1px,1px)}
+
+/* lists */
+.list{
+  width:var(--view);max-width:100%;
+  background:#fff;border:2px solid #000;
+  padding:14px 14px 16px;
+  font-size:13px;line-height:1.35;
+  box-shadow:var(--shadow);
+}
+.list h2{margin:0 0 10px;font-size:14px;letter-spacing:.08em}
+.rule{height:2px;background:#000;margin:10px 0 12px}
+.spacer{height:14px}
+.list a{color:#000;text-decoration:underline}
+.list a:hover{text-decoration:none}
+
+/* bullet entries */
+.items{margin-top:10px}
+.item{position:relative;padding:6px 0 6px 16px}
+.item::before{content:"•";position:absolute;left:0;top:6px;font-weight:900}
+.item .top{display:inline}
+.item .title{font-weight:500} /* slightly less bold */
+.item .meta{margin-left:6px;font-size:11px;opacity:.9}
+
+/* Fact-checking: always 2-line layout for clean wrapping */
+.item.fc .top{display:block}
+.item.fc .meta{display:block;margin:4px 0 0 0}
+
+/* contact quote */
+.quote{margin-top:12px;font-size:12px;color:#444}
+
+/* mobile */
+@media (max-width:820px){
+  :root{--rail:1fr;--btn:56px;--view:min(92vmin,720px)}
+  .frame{grid-template-columns:1fr}
+  aside.win{position:static}
+  .controls{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+  .btns{grid-template-columns:repeat(3,var(--btn));gap:8px;justify-content:center}
+  .clock{flex-basis:100%}
+}
+@media (max-width:420px){
+  :root{--btn:48px}
+  .glyph{font-size:28px}
+  .caption{max-width:70%;font-size:10px}
+}
+</style>
+</head>
+
+<body>
+<input id="home" checked type="radio" name="tab">
+<input id="writing" type="radio" name="tab">
+<input id="research" type="radio" name="tab">
+<input id="contact" type="radio" name="tab">
+
+<div class="frame">
+  <aside class="win" aria-label="Sidebar">
+    <label class="nameBtn" for="home" title="Home" aria-label="Home">Christian N. Kerr</label>
+
+    <div class="controls">
+      <div class="compass" aria-label="D-pad">
+        <!-- blocky 4-arrow icon -->
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <rect x="29" y="14" width="6" height="36" fill="#000"/>
+          <rect x="14" y="29" width="36" height="6" fill="#000"/>
+
+          <rect x="26" y="6" width="12" height="6" fill="#000"/>
+          <rect x="23" y="12" width="18" height="6" fill="#000"/>
+
+          <rect x="26" y="52" width="12" height="6" fill="#000"/>
+          <rect x="23" y="46" width="18" height="6" fill="#000"/>
+
+          <rect x="6" y="26" width="6" height="12" fill="#000"/>
+          <rect x="12" y="23" width="6" height="18" fill="#000"/>
+
+          <rect x="52" y="26" width="6" height="12" fill="#000"/>
+          <rect x="46" y="23" width="6" height="18" fill="#000"/>
+
+          <rect x="28" y="28" width="8" height="8" fill="#FFF3A0" stroke="#000" stroke-width="2"/>
+        </svg>
+
+        <div class="zones" id="zones">
+          <button class="zone" data-pan="0,0"   aria-label="Northwest"></button>
+          <button class="zone" data-pan=".5,0"  aria-label="North"></button>
+          <button class="zone" data-pan="1,0"   aria-label="Northeast"></button>
+          <button class="zone" data-pan="0,.5"  aria-label="West"></button>
+          <button class="zone" data-pan=".5,.5" aria-label="Center"></button>
+          <button class="zone" data-pan="1,.5"  aria-label="East"></button>
+          <button class="zone" data-pan="0,1"   aria-label="Southwest"></button>
+          <button class="zone" data-pan=".5,1"  aria-label="South"></button>
+          <button class="zone" data-pan="1,1"   aria-label="Southeast"></button>
+        </div>
+      </div>
+
+      <div class="btns" id="navBtns" aria-label="Navigation">
+        <label class="btn" for="writing"  title="Writing"  aria-label="Writing"><div class="glyph">写</div></label>
+        <label class="btn" for="research" title="Research" aria-label="Research"><div class="glyph">研</div></label>
+        <label class="btn" for="contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></label>
+      </div>
+
+      <div class="clock" aria-label="Current date and time">
+        <div class="clockLine" id="clockTime">—</div>
+        <div class="clockLine clockSub" id="clockDate">—</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="stage" id="stage" aria-label="Stage">
+    <section class="panel" id="p-home">
+      <div class="win wrap">
+        <div class="viewport" id="viewport">
+          <div class="canvas" id="canvas">
+            <img id="hero" src="conjurer.jpg" alt="">
+          </div>
+        </div>
+
+        <div class="overlayRow" aria-label="Image controls">
+          <div class="caption" id="caption">—</div>
+          <div class="pager">
+            <button class="pbtn" id="prev" type="button" aria-label="Previous image" title="Previous">◀</button>
+            <button class="pbtn" id="next" type="button" aria-label="Next image" title="Next">▶</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="p-writing">
+      <div class="list">
+        <h2>WRITING</h2>
+        <div class="rule"></div>
+        <div class="items" id="items-writing" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="p-research">
+      <div class="list">
+        <h2>RESEARCH</h2>
+        <div class="rule"></div>
+        <div class="items" id="items-research" aria-live="polite"></div>
+
+        <div class="spacer"></div>
+
+        <h2>FACT-CHECKING</h2>
+        <div class="rule"></div>
+        <div class="items" id="items-factChecking" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="p-contact">
+      <div class="list">
+        <h2>CONTACT</h2>
+        <div class="rule"></div>
+        <p>
+          Location: Brooklyn, New York, USA<br>
+          Email: <a href="mailto:christian.n.kerr@gmail.com">christian.n.kerr@gmail.com</a><br>
+          Socials:
+          <a href="https://www.youtube.com/@CNKERR..." target="_blank" rel="noopener">YouTube</a>,
+          <a href="https://x.com/cnkerr" target="_blank" rel="noopener">X</a>,
+          <a href="https://www.instagram.com/cnkerr" target="_blank" rel="noopener">Instagram</a>
+        </p>
+        <p class="quote">
+          "I celebrate myself, and sing myself, / And what I assume you shall assume, / For every atom belonging to me as good belongs to you." —WW
+        </p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const stage = document.getElementById("stage");
+  const resetStageTop = () => stage.scrollTo({ top: 0, behavior: "auto" });
+
+  // Home pan
+  const v = document.getElementById("viewport");
+  const c = document.getElementById("canvas");
+  const pan = (x,y) => v.scrollTo({
+    left: (c.scrollWidth - v.clientWidth) * x,
+    top:  (c.scrollHeight - v.clientHeight) * y,
+    behavior: "smooth"
+  });
+
+  const activeTab = () => (document.querySelector('input[name="tab"]:checked')?.id || "home");
+  const scrollStage = (dir, fast=false) =>
+    stage.scrollBy({ top: dir * (fast ? 380 : 160), behavior: "smooth" });
+
+  // Compass click: home pans; others scroll stage
+  document.getElementById("zones").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pan]");
+    if (!b) return;
+    const [x,y] = b.dataset.pan.split(",").map(Number);
+
+    if (activeTab() === "home") return void pan(x,y);
+
+    if (x === 0.5 && y === 0.5) return void stage.scrollTo({ top: 0, behavior: "smooth" });
+    if (y < 0.5) return void scrollStage(-1, y === 0);
+    if (y > 0.5) return void scrollStage( 1, y === 1);
+  });
+
+  // Slideshow
+  const img = document.getElementById("hero");
+  const cap = document.getElementById("caption");
+  const slides = [
+    { src: "conjurer.jpg", alt: 'H. Bosch, "The Conjurer"' },
+    { src: "icarus.jpg",   alt: 'Bruegel, "Landscape w/ the Fall..."' }
+  ];
+  let slideIndex = Number(localStorage.getItem("slideIndex") || 0) || 0;
+
+  const showSlide = (n) => {
+    slideIndex = (n + slides.length) % slides.length;
+    img.src = slides[slideIndex].src;
+    img.alt = slides[slideIndex].alt || "";
+    cap.textContent = slides[slideIndex].alt || "";
+    localStorage.setItem("slideIndex", String(slideIndex));
+    requestAnimationFrame(() => pan(.5,.5));
+  };
+
+  document.getElementById("prev").addEventListener("click", () => showSlide(slideIndex - 1));
+  document.getElementById("next").addEventListener("click", () => showSlide(slideIndex + 1));
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") showSlide(slideIndex - 1);
+    if (e.key === "ArrowRight") showSlide(slideIndex + 1);
+  });
+
+  // Tabs: remember + reset stage position
+  ["home","writing","research","contact"].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener("change", () => {
+      if (!el.checked) return;
+      localStorage.setItem("tab", id);
+      resetStageTop();
+      if (id === "home") requestAnimationFrame(() => pan(.5,.5));
+    });
+  });
+  const savedTab = localStorage.getItem("tab");
+  if (savedTab && document.getElementById(savedTab)) document.getElementById(savedTab).checked = true;
+
+  // Clock (America/New_York; label shown as EST per your request)
+  const clockTime = document.getElementById("clockTime");
+  const clockDate = document.getElementById("clockDate");
+  const tick = () => {
+    const now = new Date();
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+    }).formatToParts(now);
+
+    const get = (t) => parts.find(p => p.type === t)?.value || "00";
+    clockTime.textContent = `${get("hour")}:${get("minute")}:${get("second")} EST`;
+
+    clockDate.textContent = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      weekday:"short", year:"numeric", month:"short", day:"2-digit"
+    }).format(now);
+  };
+  tick();
+  setInterval(tick, 1000);
+
+  // Data
+  const DATA = {
+    writing: [
+      { title:"Taryn Simon Mines the Empty Aesthetics of Diplomacy", outlet:"Hyperallergic", year:2016, url:"http://hyperallergic.com/282066/taryn-simon-mines-the-empty-aesthetics-of-diplomacy/" },
+      { title:"Rolling Through Barbara Kruger's Slick Skatepark Installation", outlet:"Hyperallergic", year:2017, url:"https://hyperallergic.com/410095/barbara-kruger-les-coleman-skatepark-performa/" },
+      { title:"The Power of Protest Art and the Dignity of the Protester", outlet:"Hyperallergic", year:2017, url:"https://hyperallergic.com/the-power-of-protest-art-and-the-dignity-of-the-protester/" },
+      { title:"A Collaborative Reading of 'Song of Myself'", outlet:"Hyperallergic", year:2017, url:"https://hyperallergic.com/373782/a-collaborative-reading-of-whitmans-song-of-myself-all-across-alabama/" },
+      { title:"Imagining a Sustainable Skateboard", outlet:"Village Psychic", year:2022, url:"https://www.villagepsychic.net/blog/imagining-a-sustainable-skateboard?rq=kerr" },
+      { title:"Climate Change: the Ultimate Skatestopper", outlet:"Village Psychic", year:2020, url:"https://www.villagepsychic.net/blog//climate-change-the-ultimate-skatestopper" },
+      { title:"Considering the Ideal Skate Outfit", outlet:"Village Psychic", year:2020, url:"https://www.villagepsychic.net/blog/what-is-the-ultimate-skate-silhouette" },
+      { title:"The Activists of Crimson Tide Country", outlet:"The New Yorker", year:2016, url:"http://www.newyorker.com/news/sporting-scene/the-activists-of-crimson-tide-country" },
+      { title:"Best of 2021: Trung, 'RESPECTFULLY'", outlet:"Quartersnacks", year:2021, url:"https://quartersnacks.com/2021/12/the-best-skate-videos-parts-of-2021-qs-readers-poll-results/" },
+      { title:"Best of 2022: Tyshawn, 'The General'", outlet:"Quartersnacks", year:2022, url:"https://quartersnacks.com/2022/12/the-best-skate-videos-parts-of-2022-qs-readers-poll-results/" },
+      { title:"Best of 2023: Shanahan, 'Double-Up'", outlet:"Quartersnacks", year:2023, url:"https://quartersnacks.com/2023/12/the-best-skate-videos-parts-of-2023-qs-readers-poll-results/" },
+      { title:"Best of 2024: Deedz, 'Uneven'", outlet:"Quartersnacks", year:2024, url:"https://quartersnacks.com/2024/12/the-best-skate-videos-parts-of-2024-qs-readers-poll-results/" },
+      { title:"Best of 2025: Gustav, '3:2'", outlet:"Quartersnacks", year:2025, url:"https://quartersnacks.com/2025/12/the-best-skate-videos-parts-of-2025-qs-readers-poll-results/" },
+      { title:"Waxing Poetic #1: 'Prufrock'", outlet:"Simple Magic", year:2025, url:"https://www.simplemagic.ca/waxing-poetic-1-the-love-song-of-j-alfred-prufrock/" },
+      { title:"Waxing Poetic #2: 'Slam, Dunk & Hook'", outlet:"Simple Magic", year:2025, url:"https://www.simplemagic.ca/waxing-poetic-2-slam-dunk-hook/" },
+      { title:"Waxing Poetic #3: 'The Second Coming'", outlet:"Simple Magic", year:2025, url:"https://www.simplemagic.ca/waxing-poetic-3-the-second-coming/" },
+      { title:"Mark Ronson, Lucky Daye & Audemars Piguet", outlet:"Complex", year:2022, url:"https://www.complex.com/style/a/christiannkerr/mark-ronson-lucky-daye-new-song-too-much-audemars-piguet" },
+      { title:"Li-Ning Wants to Be China's Biggest Skate Brand. Erik Ellington Can Help", outlet:"Complex", year:2021, url:"https://www.complex.com/sneakers/a/christiankerr/li-ning-erik-ellington-signature-model-skateboard-collection" },
+      { title:"Managing Artists Can Be a Chess Match; Ebonie Ward’s a Grandmaster", outlet:"Complex", year:2020, url:"https://www.complex.com/music/a/christiannkerr/how-ebonie-ward-built-her-team" },
+      { title:"Do You See Me Now: Can Fashion Subvert the Surveillance State?", outlet:"Secret Mag", year:2021, url:"https://secretmag.net/2021/11/10/surveillance-fashion-metaverse/" },
+      { title:"Interview with Andrew Considine, WKND Pro", outlet:"Free Skate Mag", year:2022, url:"https://www.freeskatemag.com/2022/01/19/wknds-street-fighters-ii-andrew-considine-interview/" },
+      { title:"Meet the YouTube Stars Disrupting Skateboarding", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/04/24/meet-the-youtube-stars-that-are-disrupting-skateboarding/" },
+      { title:"Remembering David Bowie Through Skate Videos", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/01/11/remembering-david-bowie-through-skate-videos/" },
+      { title:"An Interview with a Professional Fingerboarder", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/12/14/an-interview-with-the-professional-fingerboarder/" },
+      { title:"An Interview with the Guy Who Tried the 13-Flat-13 in the Rain", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/09/02/an-interview-with-the-guy-who-tried-the-13-flat-13-in-the-rain/" },
+      { title:"4 Skateboarding Events the Olympics Can Have", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/08/04/4-skateboarding-events-the-olympics-can-have/" },
+      { title:"Meet America's First Ambassador of Skateboarding, Neftalie Williams", outlet:"Jenkem Mag", year:2017, url:"https://www.jenkemmag.com/home/2017/03/01/americas-ambassador-of-skateboarding-neftalie-williams/" },
+      { title:"The Skateboarder's Guide to the 2016 Presidential Election", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/04/18/the-skateboarders-guide-to-the-2016-u-s-presidential-election/" },
+      { title:"The Death & Life of LOVE Park, the Great American Skate Plaza", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/03/11/the-death-and-life-of-great-american-skate-plazas/" },
+      { title:"7 Tricks to Make You Look Better at Skating Than You Really Are", outlet:"Jenkem Mag", year:2020, url:"https://www.jenkemmag.com/home/2020/09/10/7-tricks-make-look-better-at-skating-than-you-really-are/" },
+      { title:"A Skater's Guide to Attending a Protest", outlet:"Jenkem Mag", year:2020, url:"https://www.jenkemmag.com/home/2020/06/04/skaters-guide-attending-protest/" },
+      { title:"Is it Safe to Skate in the Time of Coronavirus?", outlet:"Jenkem Mag", year:2020, url:"https://www.jenkemmag.com/home/2020/03/17/safe-skate-time-coronavirus/" },
+      { title:"Appreciating the Latin American Immigrants that Shaped Skateboarding", outlet:"Jenkem Mag", year:2019, url:"https://www.jenkemmag.com/home/2019/08/09/appreciating-latinx-immigrants-shaped-skateboarding/" }
+    ],
+    research: [
+      { title:"House of Gates", outlet:"Nicholas Kulish (FSG)", year:2026, url:"https://www.nytimes.com/by/nicholas-kulish", italic:true },
+      { title:"“The Betrayal”", outlet:"George Packer (The Atlantic)", year:2022, url:"https://www.theatlantic.com/magazine/archive/2022/03/biden-afghanistan-exit-american-allies-abandoned/621307/" },
+      { title:"Truly Like Lightning", outlet:"David Duchovny (FSG)", year:2018, url:"https://us.macmillan.com/books/9781250791108/trulylikelightning/", italic:true },
+      { title:"Our Man", outlet:"George Packer (Knopf)", year:2018, url:"https://www.penguinrandomhouse.com/books/215731/our-man-by-george-packer/", italic:true }
+    ],
+    factChecking: [
+      {
+        title: "The Magic Mountain Saved My Life",
+        author: "George Packer",
+        publication: "The Atlantic",
+        date: "Dec 2024",
+        url: "https://www.theatlantic.com/magazine/archive/2024/12/thomas-mann-magic-mountain-cultural-political-relevance/680400/"
+      },
+      {
+        title: "No One Gave a Speech Like Patrick Henry",
+        author: "Drew Gilpin Faust",
+        publication: "The Atlantic",
+        date: "Nov 2025",
+        url: "https://www.theatlantic.com/magazine/archive/2025/11/patrick-henry-revolutionary-orator/684308/"
+      },
+      {
+        title: "The Many Lives of Eliza Schuyler",
+        author: "Jane Kamensky",
+        publication: "The Atlantic",
+        date: "Nov 2025",
+        url: "https://www.theatlantic.com/magazine/archive/2025/11/american-revolution-women-eliza-schuyler-abigail-adams/684331/"
+      },
+      {
+        title: "The Judgments of Muriel Spark",
+        author: "Judith Shulevitz",
+        publication: "The Atlantic",
+        date: "Sep 2025",
+        url: "https://www.theatlantic.com/magazine/archive/2025/09/muriel-spark-religion-writing/683550/"
+      },
+      {
+        title: "The Insurrection Problem",
+        author: "Jeffrey Rosen",
+        publication: "The Atlantic",
+        date: "Nov 2025",
+        url: "https://www.theatlantic.com/magazine/archive/2025/11/shays-rebellion-hamilton-jefferson-political-ideologies/684319/"
+      },
+      {
+        title: "What I Learned from Sammy Davis Jr.",
+        author: "Questlove",
+        publication: "The Atlantic",
+        date: "Dec 2025",
+        url: "https://www.theatlantic.com/magazine/2025/12/questlove-sammy-davis-jr-career/684605/"
+      }
+    ]
+  };
+
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+
+  // Fact-checking date parser (e.g., "Nov 2025")
+  const parseMonthYear = (s) => {
+    const str = String(s || "").trim();
+    const m = str.match(/^([A-Za-z]{3,})\s+(\d{4})$/);
+    if (!m) return 0;
+
+    const month = m[1].slice(0,3).toLowerCase();
+    const year = Number(m[2]);
+
+    const months = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+    if (!(month in months) || !Number.isFinite(year)) return 0;
+
+    return new Date(year, months[month], 1).getTime();
+  };
+
+  const render = (section) => {
+    const out = document.getElementById(`items-${section}`);
+    if (!out) return;
+
+    const items = (DATA[section] || []).slice().sort((a,b) => {
+      if (section === "factChecking") {
+        return parseMonthYear(b.date) - parseMonthYear(a.date); // newest first
+      }
+      const ay = a.year ?? 0, by = b.year ?? 0;
+      if (typeof ay === "number" && typeof by === "number") return by - ay;
+      return String(by).localeCompare(String(ay));
+    });
+
+    if (!items.length){
+      out.innerHTML = `<div class="item"><div class="meta">No items yet.</div></div>`;
+      return;
+    }
+
+    if (section === "factChecking"){
+      out.innerHTML = items.map(item => {
+        const title = esc(item.title);
+        const author = esc(item.author);
+        const pub = esc(item.publication);
+        const date = esc(item.date);
+        const url = item.url ? String(item.url) : "";
+
+        const titleText = `“${title}”`;
+        const titleHtml = url
+          ? `<a class="title" href="${esc(url)}" target="_blank" rel="noopener">${titleText}</a>`
+          : `<span class="title">${titleText}</span>`;
+
+        return `
+          <div class="item fc">
+            <div class="top">
+              ${titleHtml}
+              <span class="meta">— ${author}${pub ? ` · <em>${pub}</em>` : ""}${date ? ` · ${date}` : ""}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+      return;
+    }
+
+    // default render for writing/research
+    out.innerHTML = items.map(item => {
+      const title = esc(item.title || "");
+      const outlet = esc(item.outlet || "");
+      const year = item.year ? esc(item.year) : "";
+      const url = item.url ? String(item.url) : "";
+
+      const t = item.italic ? `<em>${title}</em>` : title;
+
+      const titleHtml = url
+        ? `<a class="title" href="${esc(url)}" target="_blank" rel="noopener">${t}</a>`
+        : `<span class="title">${t}</span>`;
+
+      const outletHtml = section === "writing" ? `<em>${outlet}</em>` : outlet;
+
+      return `
+        <div class="item">
+          <div class="top">
+            ${titleHtml}
+            <span class="meta">— ${outletHtml}${year ? ` · ${year}` : ""}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  };
+
+  window.addEventListener("load", () => {
+    resetStageTop();
+    showSlide(slideIndex);
+    pan(.5,.5);
+    render("writing");
+    render("research");
+    render("factChecking");
+  });
+})();
+</script>
+</body>
+</html>
