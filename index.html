@@ -21,7 +21,10 @@
 html,body{height:100%}
 body{
   margin:0; font-family:var(--mono); color:var(--ink);
-  image-rendering:pixelated;
+
+  /* Do NOT pixelate the whole page (hurts mobile image quality) */
+  image-rendering:auto;
+
   background:
     repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 2px),
     repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 1px,transparent 1px 2px),
@@ -48,13 +51,9 @@ body{
 aside.win{position:sticky;top:18px}
 .stage{height:100%;min-height:0;overflow:auto;scroll-behavior:smooth}
 
-/* tabs */
-input[type="radio"]{display:none}
+/* panels */
 .panel{display:none}
-#home:checked~.frame #p-home,
-#writing:checked~.frame #p-writing,
-#research:checked~.frame #p-research,
-#contact:checked~.frame #p-contact{display:block}
+.panel.isActive{display:block}
 
 /* home button */
 .nameBtn{
@@ -66,8 +65,10 @@ input[type="radio"]{display:none}
   border:2px solid #000;
   cursor:pointer; user-select:none;
   margin-bottom:var(--gap);
+  color:inherit;
+  text-decoration:none;
 }
-#home:checked~.frame aside .nameBtn{background:var(--accent)}
+.nameBtn.isActive{background:var(--accent)}
 
 /* controls */
 .controls{display:grid;justify-items:center;gap:var(--gap)}
@@ -75,11 +76,9 @@ input[type="radio"]{display:none}
 /* compass */
 .compass{
   width:var(--btn); height:var(--btn);
-  background:#FFF3A0; /* bright yellow */
+  background:#FFF3A0;
   border:2px solid #000;
   position:relative;
-
-  /* mobile-safe centering */
   display:flex;
   align-items:center;
   justify-content:center;
@@ -88,7 +87,7 @@ input[type="radio"]{display:none}
   width:52px; height:52px;
   display:block;
   shape-rendering:crispEdges;
-  image-rendering:pixelated;
+  image-rendering:pixelated; /* keep pixel vibe for icon only */
 }
 .zones{
   position:absolute; inset:0;
@@ -107,14 +106,16 @@ input[type="radio"]{display:none}
   border-color:var(--hi) var(--deep) var(--deep) var(--hi);
   box-shadow:var(--shadow);
   cursor:pointer; user-select:none;
+
+  /* because these are <a> now */
+  color:inherit;
+  text-decoration:none;
 }
 .btn:active{transform:translate(1px,1px)}
 .glyph{font-size:32px;font-weight:900;line-height:1}
 
-/* active tab highlight */
-#writing:checked~.frame .btns label[for="writing"],
-#research:checked~.frame .btns label[for="research"],
-#contact:checked~.frame .btns label[for="contact"]{
+/* active nav highlight */
+.btn.isActive{
   background:var(--accent);
   border-color:var(--deep) var(--hi) var(--hi) var(--deep);
 }
@@ -131,27 +132,30 @@ input[type="radio"]{display:none}
 .clockLine{font-size:12px;font-weight:800;letter-spacing:.06em}
 
 /* home viewport */
-.wrap{
-  width:var(--view);
-  max-width:100%;
-  margin:0;
-}
+.wrap{width:var(--view);max-width:100%;margin:0}
 .viewport{
   width:100%;
   aspect-ratio:1/1;
-  overflow:scroll; background:#000; border:2px solid #000;
-  scrollbar-width:none; scroll-behavior:smooth;
+  overflow:scroll;
+  border:2px solid #000;
+
+  /* remove black “bars” entirely */
+  background:transparent;
+
+  scrollbar-width:none;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling: touch;
 }
 @media (min-width:1100px){
-  #p-home .viewport{ aspect-ratio:3 / 2; }
+  #p-home .viewport{aspect-ratio:3 / 2;}
 }
 .viewport::-webkit-scrollbar{width:0;height:0}
 .canvas{width:220%;height:220%;min-width:1100px;min-height:1100px;position:relative}
-.canvas img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-/* Make images render smoothly (especially on mobile) */
 .canvas img{
-  image-rendering:auto;
-  -ms-interpolation-mode:bicubic;
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;       /* ALWAYS cover = no letterbox bars */
+  image-rendering:auto;   /* smooth on mobile */
 }
 .overlayRow{margin-top:8px;display:flex;align-items:center;justify-content:flex-end;gap:10px}
 .caption{
@@ -220,33 +224,23 @@ input[type="radio"]{display:none}
 </head>
 
 <body>
-<input id="home" checked type="radio" name="tab">
-<input id="writing" type="radio" name="tab">
-<input id="research" type="radio" name="tab">
-<input id="contact" type="radio" name="tab">
-
-<div class="frame">
+<div class="frame" id="root">
   <aside class="win" aria-label="Sidebar">
-    <label class="nameBtn" for="home" title="Home" aria-label="Home">Christian N. Kerr</label>
+    <a class="nameBtn" id="linkHomeTop" href="/home" data-route="/home" title="Home" aria-label="Home">Christian N. Kerr</a>
 
     <div class="controls">
       <div class="compass" aria-label="D-pad">
         <svg viewBox="0 0 64 64" aria-hidden="true">
           <rect x="29" y="14" width="6" height="36" fill="#000"/>
           <rect x="14" y="29" width="36" height="6" fill="#000"/>
-
           <rect x="26" y="6" width="12" height="6" fill="#000"/>
           <rect x="23" y="12" width="18" height="6" fill="#000"/>
-
           <rect x="26" y="52" width="12" height="6" fill="#000"/>
           <rect x="23" y="46" width="18" height="6" fill="#000"/>
-
           <rect x="6" y="26" width="6" height="12" fill="#000"/>
           <rect x="12" y="23" width="6" height="18" fill="#000"/>
-
           <rect x="52" y="26" width="6" height="12" fill="#000"/>
           <rect x="46" y="23" width="6" height="18" fill="#000"/>
-
           <rect x="28" y="28" width="8" height="8" fill="#FFF3A0" stroke="#000" stroke-width="2"/>
         </svg>
 
@@ -264,9 +258,9 @@ input[type="radio"]{display:none}
       </div>
 
       <div class="btns" id="navBtns" aria-label="Navigation">
-        <label class="btn" for="writing"  title="Writing"  aria-label="Writing"><div class="glyph">写</div></label>
-        <label class="btn" for="research" title="Research" aria-label="Research"><div class="glyph">研</div></label>
-        <label class="btn" for="contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></label>
+        <a class="btn" id="linkWriting"  href="/writing"  data-route="/writing"  title="Writing"  aria-label="Writing"><div class="glyph">写</div></a>
+        <a class="btn" id="linkResearch" href="/research" data-route="/research" title="Research" aria-label="Research"><div class="glyph">研</div></a>
+        <a class="btn" id="linkContact"  href="/contact"  data-route="/contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></a>
       </div>
 
       <div class="clock" aria-label="Current date and time">
@@ -350,17 +344,16 @@ input[type="radio"]{display:none}
     behavior: "smooth"
   });
 
-  const activeTab = () => (document.querySelector('input[name="tab"]:checked')?.id || "home");
   const scrollStage = (dir, fast=false) =>
     stage.scrollBy({ top: dir * (fast ? 380 : 160), behavior: "smooth" });
 
-  // --- Home auto-fit sizing (fixes your “bottom border not visible” on phones) ---
+  // --- Home auto-fit sizing ---
   const homeWrap = document.getElementById("homeWrap");
   const homeOverlay = document.getElementById("homeOverlay");
 
   const fitHome = () => {
     if (!homeWrap || !homeOverlay || !v) return;
-    if (activeTab() !== "home") return;
+    if (!document.getElementById("p-home").classList.contains("isActive")) return;
 
     const stageW = stage.clientWidth;
     const stageH = stage.clientHeight;
@@ -378,13 +371,10 @@ input[type="radio"]{display:none}
     const chrome = 44;
 
     if (isMobile) {
-      // match control panel width on mobile
       homeWrap.style.width = maxByW + "px";
-
       const viewportW = maxByW;
       const viewportH = Math.max(220, Math.floor(maxByH - chrome));
       const side = Math.min(viewportW, viewportH);
-
       v.style.width = "100%";
       v.style.height = side + "px";
       return;
@@ -397,7 +387,7 @@ input[type="radio"]{display:none}
     homeWrap.style.width = width + "px";
     v.style.width = "100%";
     v.style.height = Math.floor(width / aspect) + "px";
-  }; // <-- CRITICAL: this closing brace fixes the “nothing works” bug
+  };
 
   window.addEventListener("resize", () => requestAnimationFrame(fitHome), { passive:true });
 
@@ -407,7 +397,8 @@ input[type="radio"]{display:none}
     if (!b) return;
     const [x,y] = b.dataset.pan.split(",").map(Number);
 
-    if (activeTab() === "home") return void pan(x,y);
+    const onHome = document.getElementById("p-home").classList.contains("isActive");
+    if (onHome) return void pan(x,y);
 
     if (x === 0.5 && y === 0.5) return void stage.scrollTo({ top: 0, behavior: "smooth" });
     if (y < 0.5) return void scrollStage(-1, y === 0);
@@ -441,50 +432,25 @@ input[type="radio"]{display:none}
     if (e.key === "ArrowRight") showSlide(slideIndex + 1);
   });
 
-  // Tabs: remember + reset stage position
-  ["home","writing","research","contact"].forEach(id => {
-    const el = document.getElementById(id);
-    el.addEventListener("change", () => {
-      if (!el.checked) return;
-      localStorage.setItem("tab", id);
-      resetStageTop();
-      if (id === "home") {
-        requestAnimationFrame(() => {
-          fitHome();
-          pan(.5,.5);
-        });
-      }
-    });
-  });
-
-  const savedTab = localStorage.getItem("tab");
-  if (savedTab && document.getElementById(savedTab)) document.getElementById(savedTab).checked = true;
-
   // Clock (America/New_York; YYYY.MM.DDTHH:MM:SS:ET)
   const clockStamp = document.getElementById("clockStamp");
   const tick = () => {
     const now = new Date();
     const parts = new Intl.DateTimeFormat("en-US", {
       timeZone: "America/New_York",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
       hour12: false
     }).formatToParts(now);
 
     const get = (t) => parts.find(p => p.type === t)?.value || "00";
-
     clockStamp.textContent =
-      `${get("year")}.${get("month")}.${get("day")}T` +
-      `${get("hour")}:${get("minute")}:${get("second")}:ET`;
+      `${get("year")}.${get("month")}.${get("day")}T${get("hour")}:${get("minute")}:${get("second")}:ET`;
   };
   tick();
   setInterval(tick, 1000);
 
-  // Data (RESTORED)
+  // Data (unchanged)
   const DATA = {
     writing: [
       { title:"Taryn Simon Mines the Empty Aesthetics of Diplomacy", outlet:"Hyperallergic", year:2016, url:"http://hyperallergic.com/282066/taryn-simon-mines-the-empty-aesthetics-of-diplomacy/" },
@@ -545,13 +511,10 @@ input[type="radio"]{display:none}
     const str = String(s || "").trim();
     const m = str.match(/^([A-Za-z]{3,})\s+(\d{4})$/);
     if (!m) return 0;
-
     const month = m[1].slice(0,3).toLowerCase();
     const year = Number(m[2]);
-
     const months = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
     if (!(month in months) || !Number.isFinite(year)) return 0;
-
     return new Date(year, months[month], 1).getTime();
   };
 
@@ -578,12 +541,10 @@ input[type="radio"]{display:none}
         const pub = esc(item.publication);
         const date = esc(item.date);
         const url = item.url ? String(item.url) : "";
-
         const titleText = `“${title}”`;
         const titleHtml = url
           ? `<a class="title" href="${esc(url)}" target="_blank" rel="noopener">${titleText}</a>`
           : `<span class="title">${titleText}</span>`;
-
         return `
           <div class="item fc">
             <div class="top">
@@ -601,13 +562,10 @@ input[type="radio"]{display:none}
       const outlet = esc(item.outlet || "");
       const year = item.year ? esc(item.year) : "";
       const url = item.url ? String(item.url) : "";
-
       const t = item.italic ? `<em>${title}</em>` : title;
-
       const titleHtml = url
         ? `<a class="title" href="${esc(url)}" target="_blank" rel="noopener">${t}</a>`
         : `<span class="title">${t}</span>`;
-
       const outletHtml = section === "writing" ? `<em>${outlet}</em>` : outlet;
 
       return `
@@ -621,14 +579,96 @@ input[type="radio"]{display:none}
     }).join("");
   };
 
-  window.addEventListener("load", () => {
+  // -------- Router (/home, /writing, /research, /contact) --------
+  const panels = {
+    home: document.getElementById("p-home"),
+    writing: document.getElementById("p-writing"),
+    research: document.getElementById("p-research"),
+    contact: document.getElementById("p-contact"),
+  };
+
+  const links = {
+    home: document.getElementById("linkHomeTop"),
+    writing: document.getElementById("linkWriting"),
+    research: document.getElementById("linkResearch"),
+    contact: document.getElementById("linkContact"),
+  };
+
+  const normalizePath = (p) => {
+    const path = (p || "/").split("?")[0].split("#")[0];
+    if (path === "/" || path === "/home") return "/home";
+    if (path === "/writing") return "/writing";
+    if (path === "/research") return "/research";
+    if (path === "/contact") return "/contact";
+    return "/home";
+  };
+
+  const pathToKey = (path) => {
+    const p = normalizePath(path);
+    return p.replace("/",""); // "home" | "writing" | "research" | "contact"
+  };
+
+  const setActive = (key) => {
+    Object.entries(panels).forEach(([k,el]) => el.classList.toggle("isActive", k === key));
+    Object.entries(links).forEach(([k,el]) => el.classList.toggle("isActive", k === key));
+
     resetStageTop();
+    if (key === "home") {
+      requestAnimationFrame(() => {
+        fitHome();
+        pan(.5,.5);
+      });
+    }
+  };
+
+  const navigate = (path, {replace=false} = {}) => {
+    const key = pathToKey(path);
+    const finalPath = "/" + key; // ensures /home etc
+    if (replace) history.replaceState({key}, "", finalPath);
+    else history.pushState({key}, "", finalPath);
+    setActive(key);
+  };
+
+  // Intercept internal nav clicks
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a[data-route]");
+    if (!a) return;
+    const href = a.getAttribute("href") || "/home";
+    // same-origin only
+    if (href.startsWith("http")) return;
+    e.preventDefault();
+    navigate(href);
+  });
+
+  window.addEventListener("popstate", () => {
+    setActive(pathToKey(location.pathname));
+  });
+
+  // If we arrived via 404 redirect, pull ?p=/writing and restore the path
+  const params = new URLSearchParams(location.search);
+  const p = params.get("p");
+  if (p) {
+    const restored = normalizePath(p);
+    history.replaceState({}, "", restored);
+  }
+
+  // Always default cnkerr.com (/) to /home
+  if (location.pathname === "/") {
+    navigate("/home", { replace:true });
+  } else {
+    setActive(pathToKey(location.pathname));
+  }
+
+  // Initial renders + home setup
+  window.addEventListener("load", () => {
     showSlide(slideIndex);
-    fitHome();
-    pan(.5,.5);
     render("writing");
     render("research");
     render("factChecking");
+    requestAnimationFrame(() => {
+      fitHome();
+      pan(.5,.5);
+    });
   });
 })();
 </script>
