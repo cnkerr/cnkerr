@@ -262,7 +262,7 @@ input[type="radio"]{display:none}
       <div class="win wrap">
         <div class="viewport" id="viewport">
           <div class="canvas" id="canvas">
-            <img id="hero" src="conjurer.jpg" alt="">
+            <img id="hero" src="market.jpg" alt="Snyders, The Market">
           </div>
         </div>
 
@@ -353,8 +353,10 @@ input[type="radio"]{display:none}
   const img = document.getElementById("hero");
   const cap = document.getElementById("caption");
   const slides = [
+    { src: " market.jpg", alt: 'Snyders, "Market Scene"' },
+    { src: "flowers.jpg", alt: 'Bruegel the Younger, "Basket of Flowers"' },
     { src: "conjurer.jpg", alt: 'H. Bosch, "The Conjurer"' },
-    { src: "icarus.jpg",   alt: 'Bruegel, "Landscape w/ the Fall..."' }
+    { src: "icarus.jpg",   alt: 'Bruegel the Elder, "Landscape w/ the Fall..."' }
   ];
   let slideIndex = Number(localStorage.getItem("slideIndex") || 0) || 0;
 
@@ -387,7 +389,7 @@ input[type="radio"]{display:none}
   const savedTab = localStorage.getItem("tab");
   if (savedTab && document.getElementById(savedTab)) document.getElementById(savedTab).checked = true;
 
-  // Clock (America/New_York; label shown as EST per your request)
+  // Clock (America/New_York; label shown as EST)
   const clockTime = document.getElementById("clockTime");
   const clockDate = document.getElementById("clockDate");
   const tick = () => {
