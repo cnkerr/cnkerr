@@ -85,6 +85,11 @@ input[type="radio"]{display:none}
   shape-rendering:crispEdges;
   image-rendering:pixelated;
 }
+.compass{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 .zones{
   position:absolute; inset:0;
   display:grid;
@@ -117,7 +122,7 @@ input[type="radio"]{display:none}
 /* clock */
 .clock{
   width:100%;
-  background:#fff;
+  background:#cfe8ff; /* light blue */
   border:2px solid #000;
   padding:8px 10px;
   text-align:center;
@@ -127,11 +132,22 @@ input[type="radio"]{display:none}
 .clockSub{margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.04em;opacity:.95}
 
 /* home viewport */
-.wrap{width:var(--view);max-width:100%}
+.wrap{
+  width:var(--view);
+  max-width:100%;
+  margin:0;
+}
 .viewport{
-  width:100%; aspect-ratio:1/1;
+  width:100%;
+  aspect-ratio:1/1;
   overflow:scroll; background:#000; border:2px solid #000;
   scrollbar-width:none; scroll-behavior:smooth;
+}
+/* Desktop-wide: make home viewport landscape */
+@media (min-width:1100px){
+  #p-home .viewport{
+    aspect-ratio:3 / 2;
+  }
 }
 .viewport::-webkit-scrollbar{width:0;height:0}
 .canvas{width:220%;height:220%;min-width:1100px;min-height:1100px;position:relative}
@@ -251,22 +267,21 @@ input[type="radio"]{display:none}
       </div>
 
       <div class="clock" aria-label="Current date and time">
-        <div class="clockLine" id="clockTime">—</div>
-        <div class="clockLine clockSub" id="clockDate">—</div>
+        <div class="clockLine" id="clockStamp">—</div>
       </div>
     </div>
   </aside>
 
   <main class="stage" id="stage" aria-label="Stage">
     <section class="panel" id="p-home">
-      <div class="win wrap">
+      <div class="win wrap" id="homeWrap">
         <div class="viewport" id="viewport">
           <div class="canvas" id="canvas">
             <img id="hero" src="market.jpg" alt="Snyders, The Market">
           </div>
         </div>
 
-        <div class="overlayRow" aria-label="Image controls">
+        <div class="overlayRow" id="homeOverlay" aria-label="Image controls">
           <div class="caption" id="caption">—</div>
           <div class="pager">
             <button class="pbtn" id="prev" type="button" aria-label="Previous image" title="Previous">◀</button>
@@ -336,6 +351,45 @@ input[type="radio"]{display:none}
   const scrollStage = (dir, fast=false) =>
     stage.scrollBy({ top: dir * (fast ? 380 : 160), behavior: "smooth" });
 
+  // --- Home auto-fit sizing (wide gets wider; short+narrow stays fully visible) ---
+  const homeWrap = document.getElementById("homeWrap");
+  const homeOverlay = document.getElementById("homeOverlay");
+
+  const fitHome = () => {
+    if (!homeWrap || !homeOverlay || !v) return;
+    if (activeTab() !== "home") return;
+
+    // Measure available space inside stage
+    const stageW = stage.clientWidth;
+    const stageH = stage.clientHeight;
+
+    // Reserve space for caption/pager row + a safety margin
+    const overlayH = homeOverlay.offsetHeight || 0;
+    const safety = 28;
+
+  const maxByW = stageW - 6;
+const maxByH = stageH - overlayH - safety;
+
+// Match CSS aspect-ratio (desktop = landscape, otherwise square)
+const isWide = window.matchMedia("(min-width:1100px)").matches;
+const aspect = isWide ? (3 / 2) : 1;
+
+// Height-first sizing (protects short screens)
+const height = Math.max(260, Math.floor(maxByH));
+let width = Math.floor(height * aspect);
+
+// Clamp width so it never exceeds available space
+width = Math.min(width, maxByW);
+
+homeWrap.style.width = width + "px";
+v.style.width = "100%";
+v.style.height = Math.floor(width / aspect) + "px";
+
+  };
+
+  // Refit on resize (next frame to ensure fresh measurements)
+  window.addEventListener("resize", () => requestAnimationFrame(fitHome), { passive:true });
+
   // Compass click: home pans; others scroll stage
   document.getElementById("zones").addEventListener("click", (e) => {
     const b = e.target.closest("[data-pan]");
@@ -353,7 +407,7 @@ input[type="radio"]{display:none}
   const img = document.getElementById("hero");
   const cap = document.getElementById("caption");
   const slides = [
-    { src: " market.jpg", alt: 'Snyders, "Market Scene"' },
+    { src: "market.jpg", alt: 'Snyders, "Market Scene"' },   /* fixed: removed leading space */
     { src: "flowers.jpg", alt: 'Bruegel the Younger, "Basket of Flowers"' },
     { src: "conjurer.jpg", alt: 'H. Bosch, "The Conjurer"' },
     { src: "icarus.jpg",   alt: 'Bruegel the Elder, "Landscape w/ the Fall..."' }
@@ -383,32 +437,43 @@ input[type="radio"]{display:none}
       if (!el.checked) return;
       localStorage.setItem("tab", id);
       resetStageTop();
-      if (id === "home") requestAnimationFrame(() => pan(.5,.5));
+
+      if (id === "home") {
+        requestAnimationFrame(() => {
+          fitHome();
+          pan(.5,.5);
+        });
+      }
     });
   });
+
   const savedTab = localStorage.getItem("tab");
   if (savedTab && document.getElementById(savedTab)) document.getElementById(savedTab).checked = true;
 
-  // Clock (America/New_York; label shown as EST)
-  const clockTime = document.getElementById("clockTime");
-  const clockDate = document.getElementById("clockDate");
-  const tick = () => {
-    const now = new Date();
-    const parts = new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/New_York",
-      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
-    }).formatToParts(now);
+// Clock (America/New_York; YYYY.MM.DDTHH:MM:SS:ET)
+const clockStamp = document.getElementById("clockStamp");
+const tick = () => {
+  const now = new Date();
 
-    const get = (t) => parts.find(p => p.type === t)?.value || "00";
-    clockTime.textContent = `${get("hour")}:${get("minute")}:${get("second")} EST`;
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  }).formatToParts(now);
 
-    clockDate.textContent = new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/New_York",
-      weekday:"short", year:"numeric", month:"short", day:"2-digit"
-    }).format(now);
-  };
-  tick();
-  setInterval(tick, 1000);
+  const get = (t) => parts.find(p => p.type === t)?.value || "00";
+
+  clockStamp.textContent =
+    `${get("year")}.${get("month")}.${get("day")}T` +
+    `${get("hour")}:${get("minute")}:${get("second")}:ET`;
+};
+tick();
+setInterval(tick, 1000);
 
   // Data
   const DATA = {
@@ -436,7 +501,7 @@ input[type="radio"]{display:none}
       { title:"Interview with Andrew Considine, WKND Pro", outlet:"Free Skate Mag", year:2022, url:"https://www.freeskatemag.com/2022/01/19/wknds-street-fighters-ii-andrew-considine-interview/" },
       { title:"Meet the YouTube Stars Disrupting Skateboarding", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/04/24/meet-the-youtube-stars-that-are-disrupting-skateboarding/" },
       { title:"Remembering David Bowie Through Skate Videos", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/01/11/remembering-david-bowie-through-skate-videos/" },
-      { title:"An Interview with a Professional Fingerboarder", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/12/14/an-interview-with-the-professional-fingerboarder/" },
+      { title:"An Interview with a Professional Fingerboarder", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/12/14/an-interview-with-a-professional-fingerboarder/" },
       { title:"An Interview with the Guy Who Tried the 13-Flat-13 in the Rain", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/09/02/an-interview-with-the-guy-who-tried-the-13-flat-13-in-the-rain/" },
       { title:"4 Skateboarding Events the Olympics Can Have", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/08/04/4-skateboarding-events-the-olympics-can-have/" },
       { title:"Meet America's First Ambassador of Skateboarding, Neftalie Williams", outlet:"Jenkem Mag", year:2017, url:"https://www.jenkemmag.com/home/2017/03/01/americas-ambassador-of-skateboarding-neftalie-williams/" },
@@ -454,48 +519,12 @@ input[type="radio"]{display:none}
       { title:"Our Man", outlet:"George Packer (Knopf)", year:2018, url:"https://www.penguinrandomhouse.com/books/215731/our-man-by-george-packer/", italic:true }
     ],
     factChecking: [
-      {
-        title: "The Magic Mountain Saved My Life",
-        author: "George Packer",
-        publication: "The Atlantic",
-        date: "Dec 2024",
-        url: "https://www.theatlantic.com/magazine/archive/2024/12/thomas-mann-magic-mountain-cultural-political-relevance/680400/"
-      },
-      {
-        title: "No One Gave a Speech Like Patrick Henry",
-        author: "Drew Gilpin Faust",
-        publication: "The Atlantic",
-        date: "Nov 2025",
-        url: "https://www.theatlantic.com/magazine/archive/2025/11/patrick-henry-revolutionary-orator/684308/"
-      },
-      {
-        title: "The Many Lives of Eliza Schuyler",
-        author: "Jane Kamensky",
-        publication: "The Atlantic",
-        date: "Nov 2025",
-        url: "https://www.theatlantic.com/magazine/archive/2025/11/american-revolution-women-eliza-schuyler-abigail-adams/684331/"
-      },
-      {
-        title: "The Judgments of Muriel Spark",
-        author: "Judith Shulevitz",
-        publication: "The Atlantic",
-        date: "Sep 2025",
-        url: "https://www.theatlantic.com/magazine/archive/2025/09/muriel-spark-religion-writing/683550/"
-      },
-      {
-        title: "The Insurrection Problem",
-        author: "Jeffrey Rosen",
-        publication: "The Atlantic",
-        date: "Nov 2025",
-        url: "https://www.theatlantic.com/magazine/archive/2025/11/shays-rebellion-hamilton-jefferson-political-ideologies/684319/"
-      },
-      {
-        title: "What I Learned from Sammy Davis Jr.",
-        author: "Questlove",
-        publication: "The Atlantic",
-        date: "Dec 2025",
-        url: "https://www.theatlantic.com/magazine/2025/12/questlove-sammy-davis-jr-career/684605/"
-      }
+      { title:"The Magic Mountain Saved My Life", author:"George Packer", publication:"The Atlantic", date:"Dec 2024", url:"https://www.theatlantic.com/magazine/archive/2024/12/thomas-mann-magic-mountain-cultural-political-relevance/680400/" },
+      { title:"No One Gave a Speech Like Patrick Henry", author:"Drew Gilpin Faust", publication:"The Atlantic", date:"Nov 2025", url:"https://www.theatlantic.com/magazine/archive/2025/11/patrick-henry-revolutionary-orator/684308/" },
+      { title:"The Many Lives of Eliza Schuyler", author:"Jane Kamensky", publication:"The Atlantic", date:"Nov 2025", url:"https://www.theatlantic.com/magazine/archive/2025/11/american-revolution-women-eliza-schuyler-abigail-adams/684331/" },
+      { title:"The Judgments of Muriel Spark", author:"Judith Shulevitz", publication:"The Atlantic", date:"Sep 2025", url:"https://www.theatlantic.com/magazine/archive/2025/09/muriel-spark-religion-writing/683550/" },
+      { title:"The Insurrection Problem", author:"Jeffrey Rosen", publication:"The Atlantic", date:"Nov 2025", url:"https://www.theatlantic.com/magazine/archive/2025/11/shays-rebellion-hamilton-jefferson-political-ideologies/684319/" },
+      { title:"What I Learned from Sammy Davis Jr.", author:"Questlove", publication:"The Atlantic", date:"Dec 2025", url:"https://www.theatlantic.com/magazine/2025/12/questlove-sammy-davis-jr-career/684605/" }
     ]
   };
 
@@ -590,6 +619,7 @@ input[type="radio"]{display:none}
   window.addEventListener("load", () => {
     resetStageTop();
     showSlide(slideIndex);
+    fitHome();         // ensure the home module fits (esp. short windows)
     pan(.5,.5);
     render("writing");
     render("research");
