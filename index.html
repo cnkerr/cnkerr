@@ -141,6 +141,9 @@ aside.win{position:sticky;top:18px}
 }
 .clockBtn:active{transform:translate(1px,1px)}
 .clockLine{font-size:12px;font-weight:800;letter-spacing:.06em}
+.clockBtn{ color:#000; }
+.clockBtn .clockLine{ color:#000; }
+
 
 /* home viewport */
 .wrap{width:var(--view);max-width:100%;margin:0}
@@ -270,13 +273,16 @@ em{font-style:italic}
     calc(18px + env(safe-area-inset-left));
   background:rgba(0,0,0,.28);
   z-index:999;
+
+  align-items:center;      /* NEW */
+  justify-content:center;  /* NEW */
 }
-.modal.isOpen{display:block}
+.modal.isOpen{ display:flex; } /* CHANGE from display:block */
 .modal .win{
-  max-width:min(920px, 100%);
-  margin:0 auto;
-  background:#fff;
+  width:min(920px, 100%);
+  margin:0;                /* remove auto margin */
 }
+
 
 .modalHead{
   display:flex; align-items:center; justify-content:space-between;
@@ -314,6 +320,11 @@ em{font-style:italic}
 .navBtn{width:42px; text-align:center; padding:6px 0}
 .navBtn:active,
 .closeBtn:active{transform:translate(1px,1px)}
+.closeBtn, .navBtn{
+  color:#000;
+  text-decoration:none;
+}
+
 
 .quoteBox{
   border:2px solid #000;
@@ -584,9 +595,6 @@ em{font-style:italic}
 
   /*** ===========================
        DATA GOES HERE
-       Paste your full:
-       const DATA = { ... };
-       block right below this line
        =========================== ***/
 
   // Data
@@ -879,21 +887,22 @@ em{font-style:italic}
     if (e.key === "ArrowRight") nextQuote();
   });
 
-  // press + hold >= 1000ms
-  let holdTimer = null;
-  const HOLD_MS = 1000;
+let clickCount = 0;
+let clickTimer = null;
+const CLICK_WINDOW_MS = 650; // time allowed between clicks
 
-  const startHold = (e) => {
-    e.preventDefault();
-    clearTimeout(holdTimer);
-    holdTimer = setTimeout(openModal, HOLD_MS);
-  };
-  const endHold = () => { clearTimeout(holdTimer); holdTimer = null; };
+clockBtn.addEventListener("click", () => {
+  clickCount += 1;
+  clearTimeout(clickTimer);
 
-  clockBtn.addEventListener("pointerdown", startHold);
-  clockBtn.addEventListener("pointerup", endHold);
-  clockBtn.addEventListener("pointercancel", endHold);
-  clockBtn.addEventListener("pointerleave", endHold);
+  if (clickCount >= 3) {
+    clickCount = 0;
+    openModal();
+    return;
+  }
+
+  clickTimer = setTimeout(() => { clickCount = 0; }, CLICK_WINDOW_MS);
+});
 
   window.addEventListener("load", () => {
     showSlide(slideIndex);
