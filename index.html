@@ -127,7 +127,7 @@ aside.win{position:sticky;top:18px}
   border-color:var(--deep) var(--hi) var(--hi) var(--deep);
 }
 
-/* clock */
+/* clock (acts like a button via JS long-press) */
 .clock{
   width:100%;
   background:#cfe8ff;
@@ -135,7 +135,11 @@ aside.win{position:sticky;top:18px}
   padding:8px 10px;
   text-align:center;
   box-shadow:var(--shadow);
+  user-select:none;
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
 }
+.clock:active{transform:translate(1px,1px)}
 .clockLine{font-size:12px;font-weight:800;letter-spacing:.06em}
 
 /* home viewport */
@@ -208,7 +212,7 @@ aside.win{position:sticky;top:18px}
 }
 .prompt{opacity:.95}
 
-/* promptLine exists on ALL sizes (your template always uses it) */
+/* promptLine exists on ALL sizes */
 .promptLine{
   display:flex;
   align-items:baseline;
@@ -255,6 +259,94 @@ em{font-style:italic}
 
 /* contact quote */
 .quote{margin-top:12px;font-size:12px;color:#444}
+
+/* ===== THOUGHTS modal ===== */
+.modal{
+  position:fixed; inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:
+    calc(18px + env(safe-area-inset-top))
+    calc(18px + env(safe-area-inset-right))
+    calc(18px + env(safe-area-inset-bottom))
+    calc(18px + env(safe-area-inset-left));
+  background:rgba(0,0,0,.35);
+  z-index:9999;
+}
+.modal.isOpen{display:flex}
+
+.modalInner{
+  width:min(720px, 92vw);
+  max-height:min(78svh, 680px);
+  display:grid;
+  grid-template-rows:auto 1fr;
+}
+
+.modalHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:var(--panel);
+  padding:10px;
+  border:2px solid;
+  border-color:var(--hi) var(--deep) var(--deep) var(--hi);
+  box-shadow:var(--shadow);
+}
+.modalTitle{
+  font-weight:900;
+  letter-spacing:.10em;
+  font-size:12px;
+}
+.modalClose{
+  width:34px;height:28px;
+  display:grid;place-items:center;
+  background:var(--paper2);
+  border:2px solid;
+  border-color:var(--hi) var(--deep) var(--deep) var(--hi);
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+.modalClose:active{transform:translate(1px,1px)}
+
+.term{
+  margin-top:10px;
+  background:#0b0f0b;
+  color:#aaffaa;
+  border:2px solid #000;
+  box-shadow:var(--shadow);
+  padding:10px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  font-variant-numeric: tabular-nums;
+}
+
+.termNav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+.termIndex{
+  flex:1 1 auto;
+  text-align:center;
+  font-size:12px;
+  letter-spacing:.08em;
+  opacity:.75;
+  font-variant-numeric: tabular-nums;
+  padding:2px 6px;
+}
+
+.termRule{height:1px;background:rgba(170,255,170,.28);margin:8px 0}
+.termLine{display:block; line-height:1.35}
+.termPrompt{opacity:.9}
+.termDim{opacity:.62}
+.termQuote{color:#d8ffd8}
+
+/* prevent the modal links from inheriting your blue link rules */
+.term a{color:inherit;text-decoration:none}
 
 /* ===== MOBILE LAYOUT (sidebar goes to top) ===== */
 @media (max-width:820px){
@@ -340,7 +432,7 @@ em{font-style:italic}
         <a class="btn" id="linkContact"  href="/contact"  data-route="/contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></a>
       </div>
 
-      <div class="clock" aria-label="Current date and time">
+      <div class="clock" id="clockBox" role="button" tabindex="0" aria-label="Current date and time (hold to open)">
         <div class="clockLine" id="clockStamp">—</div>
       </div>
     </div>
@@ -407,10 +499,29 @@ em{font-style:italic}
   </main>
 </div>
 
+<!-- THOUGHTS modal -->
+<div class="modal" id="timeModal" aria-hidden="true">
+  <div class="modalInner">
+    <div class="modalHead">
+      <div class="modalTitle" id="timeTitle">THOUGHTS.ON.TIME</div>
+      <button class="modalClose" id="timeClose" type="button" aria-label="Close" title="Close">✕</button>
+    </div>
+
+    <div class="term" id="timeFeed" tabindex="0" aria-label="Quotes viewer">
+      <div class="termNav">
+        <button class="pbtn" id="timePrev" type="button" aria-label="Previous quote" title="Previous">◀</button>
+        <div class="termIndex" id="timeIndex">—</div>
+        <button class="pbtn" id="timeNext" type="button" aria-label="Next quote" title="Next">▶</button>
+      </div>
+      <div class="termRule"></div>
+      <div id="timeCard"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 (() => {
   const stage = document.getElementById("stage");
-  const resetStageTop = () => stage.scrollTo({ top: 0, behavior: "auto" });
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
@@ -579,6 +690,15 @@ em{font-style:italic}
       { title:"The Judgments of Muriel Spark", author:"Judith Shulevitz", publication:"The Atlantic", date:"Sep 2025", url:"https://www.theatlantic.com/magazine/archive/2025/09/muriel-spark-religion-writing/683550/" },
       { title:"The Insurrection Problem", author:"Jeffrey Rosen", publication:"The Atlantic", date:"Nov 2025", url:"https://www.theatlantic.com/magazine/archive/2025/11/shays-rebellion-hamilton-jefferson-political-ideologies/684319/" },
       { title:"What I Learned from Sammy Davis Jr.", author:"Questlove", publication:"The Atlantic", date:"Dec 2025", url:"https://www.theatlantic.com/magazine/2025/12/questlove-sammy-davis-jr-career/684605/" }
+    ],
+
+     /* THOUGHTS.ON.TIME feed (fill these in) */
+    timeQuotes: [
+      { quote:"When the shadow of the sash appeared on the curtains it was between seven and eight oclock and then I was in time again, hearing the watch. It was Grandfather’s and when Father gave it to me he said, Quentin, I give you the mausoleum of all hope and desire; it’s rather excrutiatingly apt that you will use it to gain the reducto absurdum of all human experience which can fit your individual needs no better than it fitted his or his father’s. I give it to you not that you may remember time, but that you might forget it now and then for a moment and not spend all your breath trying to conquer it. Because no battle is ever won he said. They are not even fought. The field only reveals to man his own folly and despair, and victory is an illusion of philosophers and fools.", work:"The Sound and the Fury", author:"Faulkner" },
+      { quote:"Thus the whirligig of time brings in his revenges.", work:"Twelfth Night", author:"Shakespeare" },
+      { quote:"Thus we play the fools with the time, and the spirits of the wise sit in the clouds and mock us.", work:"King Henry IV", author:"Shakespeare" },
+      { quote:"'T is the breathing time of day with me.", work:"Hamlet", author:"Shakespeare" },
+      { quote:"Millions of spiritual creatures walk the earth / Unseen, both when we wake and when we sleep.", work:"Paradise Lost", author:"Milton" }
     ]
   };
 
@@ -661,6 +781,7 @@ em{font-style:italic}
       return;
     }
 
+    // factChecking
     out.innerHTML = items.map(it => {
       const titleQuoted = `<span class="q">${esc(it.title || "")}</span>`;
       const href = it.url ? String(it.url) : "";
@@ -737,6 +858,133 @@ em{font-style:italic}
   if (location.pathname === "/") navigate("/home", { replace:true });
   else setActive(pathToKey(location.pathname));
 
+  // ----- THOUGHTS modal (single-quote viewer + decimal index) -----
+  const modal = document.getElementById("timeModal");
+  const feed = document.getElementById("timeFeed");
+  const closeBtn = document.getElementById("timeClose");
+  const clockBox = document.getElementById("clockBox");
+
+  const prevBtn = document.getElementById("timePrev");
+  const nextBtn = document.getElementById("timeNext");
+  const idxEl = document.getElementById("timeIndex");
+  const cardEl = document.getElementById("timeCard");
+
+  let timeItems = [];
+  let timeIndex = 0;
+
+  const pad2 = (n) => String(n).padStart(2, "0");
+
+  const buildTimeItems = () =>
+    (DATA.timeQuotes || []).filter(q =>
+      (q.quote || "").trim() || (q.work || "").trim() || (q.author || "").trim()
+    );
+
+  const renderTimeCard = () => {
+    if (!timeItems.length){
+      idxEl.textContent = "IDX: 00/00";
+      cardEl.innerHTML = [
+        `<span class="termLine"><span class="termPrompt">&gt;</span> <span class="termDim">No quotes yet.</span></span>`,
+        `<span class="termLine"><span class="termDim">>> Edit DATA.timeQuotes[] to add some.</span></span>`
+      ].join("");
+      prevBtn.disabled = true; nextBtn.disabled = true;
+      prevBtn.style.opacity = ".45"; nextBtn.style.opacity = ".45";
+      return;
+    }
+
+    timeIndex = (timeIndex + timeItems.length) % timeItems.length;
+
+    const q = timeItems[timeIndex];
+    const quote = esc(q.quote || "");
+    const work = esc(q.work || "");
+    const author = esc(q.author || "");
+    const meta = [work, author].filter(Boolean).join(" / ");
+
+    idxEl.textContent = `IDX: ${pad2(timeIndex+1)}/${pad2(timeItems.length)}`;
+
+    cardEl.innerHTML = [
+      `<span class="termLine"><span class="termPrompt">&gt;</span> <span class="termQuote">${quote || "(blank)"}</span></span>`,
+      meta ? `<span class="termLine"><span class="termDim">>> ${meta}</span></span>` : ``
+    ].join("");
+
+    prevBtn.disabled = false; nextBtn.disabled = false;
+    prevBtn.style.opacity = "1"; nextBtn.style.opacity = "1";
+  };
+
+  const openModal = () => {
+    timeItems = buildTimeItems();
+    timeIndex = 0;
+    renderTimeCard();
+    modal.classList.add("isOpen");
+    modal.setAttribute("aria-hidden","false");
+    setTimeout(() => feed.focus(), 0);
+  };
+
+  const closeModal = () => {
+    modal.classList.remove("isOpen");
+    modal.setAttribute("aria-hidden","true");
+  };
+
+  prevBtn.addEventListener("click", () => { timeIndex--; renderTimeCard(); });
+  nextBtn.addEventListener("click", () => { timeIndex++; renderTimeCard(); });
+
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+  // keyboard when open
+  window.addEventListener("keydown", (e) => {
+    if (!modal.classList.contains("isOpen")) return;
+    if (e.key === "Escape") return void closeModal();
+    if (e.key === "ArrowLeft") { timeIndex--; renderTimeCard(); }
+    if (e.key === "ArrowRight"){ timeIndex++; renderTimeCard(); }
+  });
+
+  // swipe left/right on card
+  let sx = 0, sy = 0;
+  cardEl.addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    sx = t.clientX; sy = t.clientY;
+  }, { passive:true });
+
+  cardEl.addEventListener("touchend", (e) => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+    if (Math.abs(dx) < 32 || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < 0) { timeIndex++; renderTimeCard(); }
+    else { timeIndex--; renderTimeCard(); }
+  }, { passive:true });
+
+  // long-press clock (>= 1s) to open
+  let holdTimer = null;
+  const HOLD_MS = 1000;
+
+  const startHold = () => {
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(() => {
+      holdTimer = null;
+      openModal();
+    }, HOLD_MS);
+  };
+  const cancelHold = () => {
+    if (holdTimer) clearTimeout(holdTimer);
+    holdTimer = null;
+  };
+
+  clockBox.addEventListener("mousedown", startHold);
+  clockBox.addEventListener("mouseup", cancelHold);
+  clockBox.addEventListener("mouseleave", cancelHold);
+
+  clockBox.addEventListener("touchstart", startHold, { passive:true });
+  clockBox.addEventListener("touchend", cancelHold, { passive:true });
+  clockBox.addEventListener("touchcancel", cancelHold, { passive:true });
+  clockBox.addEventListener("touchmove", cancelHold, { passive:true });
+
+  // accessibility: Enter/Space opens immediately
+  clockBox.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openModal(); }
+  });
+
+  // Initial renders + home setup
   window.addEventListener("load", () => {
     showSlide(slideIndex);
     render("writing");
