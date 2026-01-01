@@ -51,11 +51,12 @@ body{
   box-shadow:var(--shadow);
 }
 aside.win{position:sticky;top:18px}
+
 .stage{
   height:100%;
   min-height:0;
   overflow:auto;
-  overflow-x:hidden;                 /* avoid any accidental sideways scroll */
+  overflow-x:hidden;
   scroll-behavior:smooth;
   overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;
@@ -189,10 +190,10 @@ aside.win{position:sticky;top:18px}
 .rule{height:2px;background:#000;margin:10px 0 12px}
 .spacer{height:14px}
 
-/* ===== SINGLE-CELL TERMINAL PATH LIST ===== */
+/* ===== terminal rows ===== */
 .items{margin-top:10px}
 .item{
-  padding:6px 0;                     /* tap-friendly lane */
+  padding:6px 0;
   border-top:1px solid rgba(0,0,0,.14);
   font-variant-numeric: tabular-nums;
 }
@@ -203,23 +204,35 @@ aside.win{position:sticky;top:18px}
   align-items:baseline;
   gap:0;
   min-width:0;
-  white-space:nowrap;                /* single-line by default */
-  overflow:hidden;
-  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 .prompt{opacity:.95}
-.pathText{
+
+/* promptLine exists on ALL sizes (your template always uses it) */
+.promptLine{
+  display:flex;
+  align-items:baseline;
+  gap:0;
+  min-width:0;
+  white-space:nowrap;
+}
+
+.titleCell{
   min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
+  white-space:nowrap;
 }
 .sep{opacity:.9}
-em{font-style:italic}
+.metaLine{
+  flex:0 0 auto;
+  white-space:nowrap;
+}
 
 /* Content-only links (not sidebar buttons) */
 .list a,
 .caption a{
-  color:#1f4f8a;                      /* muted blue */
+  color:#1f4f8a;
   text-decoration:none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -233,6 +246,8 @@ em{font-style:italic}
   outline-offset:2px;
 }
 
+em{font-style:italic}
+
 /* quotes helper */
 .q{ quotes: "“" "”" "‘" "’"; }
 .q::before{ content: open-quote; }
@@ -241,31 +256,42 @@ em{font-style:italic}
 /* contact quote */
 .quote{margin-top:12px;font-size:12px;color:#444}
 
-/* mobile */
+/* ===== MOBILE LAYOUT (sidebar goes to top) ===== */
 @media (max-width:820px){
   :root{--rail:1fr;--btn:56px;--view:min(92vmin,720px)}
   .frame{
-    grid-template-columns:1fr;
-    grid-template-rows:auto 1fr;
+    grid-template-columns:1fr !important;
+    grid-template-rows:auto 1fr !important;
   }
-  aside.win{position:static}
+  aside.win{ position:static !important; top:auto !important; }
+
   .controls{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
   .btns{grid-template-columns:repeat(3,var(--btn));gap:8px;justify-content:center}
   .clock{flex-basis:100%}
 
-  /* make content boxes fill stage width on mobile */
   .list, .wrap{width:100%}
 
-  /* clean wrap: typically 2 lines (title can wrap; meta stays together) */
-  .pathRow{display:block; white-space:normal}
-  .pathText{
-    display:inline;
+  /* 2-line terminal behavior:
+     line 1 = "> TITLE" kept together
+     line 2 = ">> META" dimmed and kept together */
+  .pathRow{
+    display:block;
     white-space:normal;
-    overflow:visible;
-    text-overflow:clip;
   }
-  .metaPack{white-space:nowrap}
+  .sep{display:none;}
+
+  .metaLine{
+    display:block;
+    margin-top:2px;
+    opacity:.62;
+    white-space:nowrap;
+  }
+  .metaLine::before{
+    content: ">> ";
+    opacity:.9;
+  }
 }
+
 @media (max-width:420px){
   :root{--btn:48px}
   .glyph{font-size:28px}
@@ -522,23 +548,23 @@ em{font-style:italic}
       { title:"Waxing Poetic #1: 'Prufrock'", outlet:"Simple Magic", year:2025, url:"https://www.simplemagic.ca/waxing-poetic-1-the-love-song-of-j-alfred-prufrock/" },
       { title:"Waxing Poetic #2: 'Slam, Dunk & Hook'", outlet:"Simple Magic", year:2025, url:"https://www.simplemagic.ca/waxing-poetic-2-slam-dunk-hook/" },
       { title:"Waxing Poetic #3: 'The Second Coming'", outlet:"Simple Magic", year:2025, url:"https://www.simplemagic.ca/waxing-poetic-3-the-second-coming/" },
-      { title:"Mark Ronson, Lucky Daye & Audemars Piguet", outlet:"Complex", year:2022, url:"https://www.complex.com/style/a/christiannkerr/mark-ronson-lucky-daye-new-song-too-much-audemars-piguet" },
-      { title:"Li-Ning Wants to Be China's Biggest Skate Brand. Erik Ellington Can Help", outlet:"Complex", year:2021, url:"https://www.complex.com/sneakers/a/christiankerr/li-ning-erik-ellington-signature-model-skateboard-collection" },
-      { title:"Managing Artists Can Be a Chess Match; Ebonie Ward’s a Grandmaster", outlet:"Complex", year:2020, url:"https://www.complex.com/music/a/christiannkerr/how-ebonie-ward-built-her-team" },
-      { title:"Do You See Me Now: Can Fashion Subvert the Surveillance State?", outlet:"Secret Mag", year:2021, url:"https://secretmag.net/2021/11/10/surveillance-fashion-metaverse/" },
-      { title:"Interview with Andrew Considine, WKND Pro", outlet:"Free Skate Mag", year:2022, url:"https://www.freeskatemag.com/2022/01/19/wknds-street-fighters-ii-andrew-considine-interview/" },
+      { title:"Mark Ronson&Lucky Daye for Audemars Piguet", outlet:"Complex", year:2022, url:"https://www.complex.com/style/a/christiannkerr/mark-ronson-lucky-daye-new-song-too-much-audemars-piguet" },
+      { title:"China's Li-Ning Wants Erik Ellington's Help", outlet:"Complex", year:2021, url:"https://www.complex.com/sneakers/a/christiankerr/li-ning-erik-ellington-signature-model-skateboard-collection" },
+      { title:"How Ebonie Ward Manages Future", outlet:"Complex", year:2020, url:"https://www.complex.com/music/a/christiannkerr/how-ebonie-ward-built-her-team" },
+      { title:"Can Fashion Subvert the Surveillance State?", outlet:"Secret Mag", year:2021, url:"https://secretmag.net/2021/11/10/surveillance-fashion-metaverse/" },
+      { title:"A Chat w/ Andrew Considine, WKND Pro", outlet:"Free Skate Mag", year:2022, url:"https://www.freeskatemag.com/2022/01/19/wknds-street-fighters-ii-andrew-considine-interview/" },
       { title:"Meet the YouTube Stars Disrupting Skateboarding", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/04/24/meet-the-youtube-stars-that-are-disrupting-skateboarding/" },
       { title:"Remembering David Bowie Through Skate Videos", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/01/11/remembering-david-bowie-through-skate-videos/" },
-      { title:"An Interview with a Professional Fingerboarder", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/12/14/an-interview-with-a-professional-fingerboarder/" },
-      { title:"An Interview with the Guy Who Tried the 13-Flat-13 in the Rain", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/09/02/an-interview-with-the-guy-who-tried-the-13-flat-13-in-the-rain/" },
+      { title:"Talking to a Professional Fingerboarder", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/12/14/an-interview-with-a-professional-fingerboarder/" },
+      { title:"Finding the Guy Who Tried the 13-Flat-13 in the Rain", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/09/02/an-interview-with-the-guy-who-tried-the-13-flat-13-in-the-rain/" },
       { title:"4 Skateboarding Events the Olympics Can Have", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/08/04/4-skateboarding-events-the-olympics-can-have/" },
-      { title:"Meet America's First Ambassador of Skateboarding, Neftalie Williams", outlet:"Jenkem Mag", year:2017, url:"https://www.jenkemmag.com/home/2017/03/01/americas-ambassador-of-skateboarding-neftalie-williams/" },
+      { title:"Meet Neftalie, US Ambassador of Skateboarding", outlet:"Jenkem Mag", year:2017, url:"https://www.jenkemmag.com/home/2017/03/01/americas-ambassador-of-skateboarding-neftalie-williams/" },
       { title:"The Skateboarder's Guide to the 2016 Presidential Election", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/04/18/the-skateboarders-guide-to-the-2016-u-s-presidential-election/" },
-      { title:"The Death & Life of LOVE Park, the Great American Skate Plaza", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/03/11/the-death-and-life-of-great-american-skate-plazas/" },
+      { title:"The Death & Life of the Great American Skate Plaza", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/03/11/the-death-and-life-of-great-american-skate-plazas/" },
       { title:"7 Tricks to Make You Look Better at Skating Than You Really Are", outlet:"Jenkem Mag", year:2020, url:"https://www.jenkemmag.com/home/2020/09/10/7-tricks-make-look-better-at-skating-than-you-really-are/" },
       { title:"A Skater's Guide to Attending a Protest", outlet:"Jenkem Mag", year:2020, url:"https://www.jenkemmag.com/home/2020/06/04/skaters-guide-attending-protest/" },
       { title:"Is it Safe to Skate in the Time of Coronavirus?", outlet:"Jenkem Mag", year:2020, url:"https://www.jenkemmag.com/home/2020/03/17/safe-skate-time-coronavirus/" },
-      { title:"Appreciating the Latin American Immigrants that Shaped Skateboarding", outlet:"Jenkem Mag", year:2019, url:"https://www.jenkemmag.com/home/2019/08/09/appreciating-latinx-immigrants-shaped-skateboarding/" }
+      { title:"Appreciating the Latino Immigrants that Shaped Skateboarding", outlet:"Jenkem Mag", year:2019, url:"https://www.jenkemmag.com/home/2019/08/09/appreciating-latinx-immigrants-shaped-skateboarding/" }
     ],
     research: [
       { title:"House of Gates", outlet:"Nicholas Kulish (FSG)", year:2026, url:"https://www.nytimes.com/by/nicholas-kulish", italic:true },
@@ -556,25 +582,6 @@ em{font-style:italic}
     ]
   };
 
-  // Single-cell row
-  const row1 = ({ pathHtml }) => `
-    <div class="item">
-      <div class="pathRow">
-        <span class="prompt">&gt;</span><span class="pathText">${pathHtml}</span>
-      </div>
-    </div>
-  `;
-
-  // "Name (Publisher)" -> "Name(<em>Publisher</em>)"
-  const authorPublisherHtml = (s) => {
-    const str = String(s || "").trim();
-    const m = str.match(/^(.*)\s+\(([^)]+)\)\s*$/);
-    if (!m) return esc(str);
-    const author = esc(m[1].trim());
-    const pub = esc(m[2].trim());
-    return `${author}(<em>${pub}</em>)`;
-  };
-
   const parseMonthYear = (s) => {
     const str = String(s || "").trim();
     const m = str.match(/^([A-Za-z]{3,})\s+(\d{4})$/);
@@ -586,6 +593,27 @@ em{font-style:italic}
     return new Date(year, months[month], 1).getTime();
   };
 
+  const authorPublisherHtml = (s) => {
+    const str = String(s || "").trim();
+    const m = str.match(/^(.*)\s+\(([^)]+)\)\s*$/);
+    if (!m) return esc(str);
+    const author = esc(m[1].trim());
+    const pub = esc(m[2].trim());
+    return `${author}(<em>${pub}</em>)`;
+  };
+
+  const row1 = ({ titleHtml, metaHtml }) => `
+    <div class="item">
+      <div class="pathRow">
+        <div class="promptLine">
+          <span class="prompt">&gt;</span>
+          <span class="titleCell">${titleHtml}</span>
+        </div>
+        ${metaHtml ? `<span class="sep"> / </span><span class="metaLine">${metaHtml}</span>` : ``}
+      </div>
+    </div>
+  `;
+
   const render = (section) => {
     const out = document.getElementById(`items-${section}`);
     if (!out) return;
@@ -596,7 +624,7 @@ em{font-style:italic}
     });
 
     if (!items.length){
-      out.innerHTML = row1({ pathHtml:"No items yet." });
+      out.innerHTML = row1({ titleHtml:"No items yet.", metaHtml:"" });
       return;
     }
 
@@ -610,32 +638,29 @@ em{font-style:italic}
 
         const pub = it.outlet ? `<em>${esc(it.outlet)}</em>` : "";
         const year = it.year ? esc(it.year) : "";
-        const metaPack = [pub, year].filter(Boolean).join("<span class='sep'>/</span>");
-        const pathHtml = `${titleHtml}<span class='sep'>/</span><span class="metaPack">${metaPack}</span>`;
-        return row1({ pathHtml });
+        const metaHtml = [pub, year].filter(Boolean).join(" / ");
+        return row1({ titleHtml, metaHtml });
       }).join("");
       return;
     }
 
     if (section === "research"){
       out.innerHTML = items.map(it => {
-        const tRaw = esc(it.title || "");
-        const titleInner = it.italic ? `<em>${tRaw}</em>` : tRaw;
+        const raw = esc(it.title || "");
+        const inner = it.italic ? `<em>${raw}</em>` : raw;
         const href = it.url ? String(it.url) : "";
         const titleHtml = href
-          ? `<a href="${esc(href)}" target="_blank" rel="noopener">${titleInner}</a>`
-          : titleInner;
+          ? `<a href="${esc(href)}" target="_blank" rel="noopener">${inner}</a>`
+          : inner;
 
         const ap = it.outlet ? authorPublisherHtml(it.outlet) : "";
         const year = it.year ? esc(it.year) : "";
-        const metaPack = [ap, year].filter(Boolean).join("<span class='sep'>/</span>");
-        const pathHtml = `${titleHtml}<span class='sep'>/</span><span class="metaPack">${metaPack}</span>`;
-        return row1({ pathHtml });
+        const metaHtml = [ap, year].filter(Boolean).join(" / ");
+        return row1({ titleHtml, metaHtml });
       }).join("");
       return;
     }
 
-    // factChecking
     out.innerHTML = items.map(it => {
       const titleQuoted = `<span class="q">${esc(it.title || "")}</span>`;
       const href = it.url ? String(it.url) : "";
@@ -647,9 +672,8 @@ em{font-style:italic}
       const pub = it.publication ? `<em>${esc(it.publication)}</em>` : "";
       const ap = author && pub ? `${author}(${pub})` : (author || (pub ? `(${pub})` : ""));
       const date = esc(it.date || "");
-      const metaPack = [ap, date].filter(Boolean).join("<span class='sep'>/</span>");
-      const pathHtml = `${titleHtml}<span class='sep'>/</span><span class="metaPack">${metaPack}</span>`;
-      return row1({ pathHtml });
+      const metaHtml = [ap, date].filter(Boolean).join(" / ");
+      return row1({ titleHtml, metaHtml });
     }).join("");
   };
 
@@ -682,7 +706,7 @@ em{font-style:italic}
   const setActive = (key) => {
     Object.entries(panels).forEach(([k,el]) => el.classList.toggle("isActive", k === key));
     Object.entries(links).forEach(([k,el]) => el.classList.toggle("isActive", k === key));
-    resetStageTop();
+    stage.scrollTo({ top: 0, behavior: "auto" });
     if (key === "home") requestAnimationFrame(() => { fitHome(); pan(.5,.5); });
   };
 
@@ -705,16 +729,14 @@ em{font-style:italic}
 
   window.addEventListener("popstate", () => setActive(pathToKey(location.pathname)));
 
-  // 404 redirect restore (?p=/writing)
+  // 404 restore (?p=/writing)
   const params = new URLSearchParams(location.search);
   const p = params.get("p");
   if (p) history.replaceState({}, "", normalizePath(p));
 
-  // Default / to /home
   if (location.pathname === "/") navigate("/home", { replace:true });
   else setActive(pathToKey(location.pathname));
 
-  // Initial renders + home setup
   window.addEventListener("load", () => {
     showSlide(slideIndex);
     render("writing");
