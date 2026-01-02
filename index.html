@@ -9,11 +9,8 @@
 :root{
   --bg:#bfbfbf; --panel:#b7b7b7; --paper:#fff; --paper2:#f7f7f7; --ink:#000;
   --hi:#fff; --deep:#000; --accent:#ff7a00;
-
   --mono: ui-monospace, Menlo, Monaco, Consolas, monospace;
-
   --rail:220px; --gap:12px; --btn:64px; --view:min(86vmin,720px);
-
   --stroke:2px; --pad:10px; --shadow:0 1px 0 rgba(0,0,0,.25);
 }
 
@@ -129,7 +126,7 @@ aside.win{position:sticky;top:18px}
 /* clock button */
 .clockBtn{
   width:100%;
-  background:var(--paper2);
+  background:#cfe8ff; /* light blue */
   border:2px solid #000;
   padding:8px 10px;
   text-align:center;
@@ -215,21 +212,20 @@ aside.win{position:sticky;top:18px}
 .sep{opacity:.9}
 .metaLine{white-space:nowrap}
 
-/* Whole-section horizontal scroller (below each header area) */
-.hScroll{
+/* ONE scroller per page (moves headers + content together) */
+.pageScroll{
   overflow-x:auto;
   overflow-y:hidden;
   scrollbar-width:none;
   -webkit-overflow-scrolling:touch;
-  margin-top:10px;
 }
-.hScroll::-webkit-scrollbar{width:0;height:0}
-.hInner{
-  width:max-content;
+.pageScroll::-webkit-scrollbar{width:0;height:0}
+.pageInner{
+  width:max-content;        /* make it scrollable horizontally when needed */
   min-width:100%;
 }
 
-/* content links only */
+/* links inside content */
 .list a,
 .caption a{
   color:#1f4f8a;
@@ -250,7 +246,7 @@ em{font-style:italic}
 .q::after{ content: close-quote; }
 .quote{margin-top:12px;font-size:12px;color:#444}
 
-/* MOBILE LAYOUT */
+/* ===== MOBILE LAYOUT ===== */
 @media (max-width:820px){
   :root{--rail:1fr;--btn:56px;--view:min(92vmin,720px)}
   .frame{ grid-template-columns:1fr !important; grid-template-rows:auto 1fr !important; }
@@ -266,7 +262,7 @@ em{font-style:italic}
   .caption{max-width:70%;font-size:10px}
 }
 
-/* THOUGHTS modal */
+/* ===== THOUGHTS modal ===== */
 .modal{
   position:fixed; inset:0;
   display:none;
@@ -277,8 +273,6 @@ em{font-style:italic}
     calc(18px + env(safe-area-inset-left));
   background:rgba(0,0,0,.28);
   z-index:999;
-
-  /* center the window */
   align-items:center;
   justify-content:center;
 }
@@ -329,15 +323,8 @@ em{font-style:italic}
   font-size:12px;
   line-height:1.25;
 }
-.qLine{
-  white-space:pre-wrap;
-  word-break:break-word;
-}
-.qMeta{
-  margin-top:8px;
-  opacity:.65;
-  white-space:pre-wrap;
-}
+.qLine{white-space:pre-wrap; word-break:break-word;}
+.qMeta{margin-top:8px; opacity:.65; white-space:pre-wrap;}
 @media (max-width:520px){
   .modalTitleWrap{flex-direction:column; align-items:flex-start; gap:2px}
 }
@@ -384,7 +371,6 @@ em{font-style:italic}
         <a class="btn" id="linkContact"  href="/contact"  data-route="/contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></a>
       </div>
 
-      <!-- CLOCK BUTTON (triple click opens modal) -->
       <button class="clockBtn" id="clockBtn" type="button" aria-label="Current date and time (triple click for feed)">
         <div class="clockLine" id="clockStamp">—</div>
       </button>
@@ -412,32 +398,29 @@ em{font-style:italic}
 
     <section class="panel" id="p-writing">
       <div class="list">
-        <h2>WRITING</h2>
-        <div class="rule"></div>
-
-        <div class="hScroll" id="scroll-writing">
-          <div class="hInner">
+        <div class="pageScroll" id="scroll-writing">
+          <div class="pageInner">
+            <h2>WRITING</h2>
+            <div class="rule"></div>
             <div class="items" id="items-writing" aria-live="polite"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SIMPLIFIED RESEARCH: one scroller containing Research + Fact-Checking together -->
     <section class="panel" id="p-research">
       <div class="list">
-        <h2>RESEARCH</h2>
-        <div class="rule"></div>
-
-        <div class="hScroll" id="scroll-researchAll">
-          <div class="hInner">
+        <!-- ONE scroller for BOTH sections so they move together -->
+        <div class="pageScroll" id="scroll-researchAll">
+          <div class="pageInner">
+            <h2>RESEARCH</h2>
+            <div class="rule"></div>
             <div class="items" id="items-research" aria-live="polite"></div>
 
             <div class="spacer"></div>
 
             <h2>FACT-CHECKING</h2>
             <div class="rule"></div>
-
             <div class="items" id="items-factChecking" aria-live="polite"></div>
           </div>
         </div>
@@ -550,8 +533,8 @@ em{font-style:italic}
 
   window.addEventListener("resize", () => requestAnimationFrame(fitHome), { passive:true });
 
-  // ===== SUPER SIMPLE: compass L/R scrolls exactly one scroller per page =====
-  const activeScroller = () => {
+  // ===== Compass behavior (SIMPLE + DETERMINISTIC) =====
+  const getActivePageScroller = () => {
     if (document.getElementById("p-writing").classList.contains("isActive")) {
       return document.getElementById("scroll-writing");
     }
@@ -561,7 +544,6 @@ em{font-style:italic}
     return null;
   };
 
-  // Compass click: home pans; others scroll stage + (L/R) horizontal scroller
   document.getElementById("zones").addEventListener("click", (e) => {
     const b = e.target.closest("[data-pan]");
     if (!b) return;
@@ -570,16 +552,16 @@ em{font-style:italic}
     const onHome = document.getElementById("p-home").classList.contains("isActive");
     if (onHome) return void pan(x,y);
 
-    // LEFT/RIGHT = horizontal scroll of the active section body
-    const sc = activeScroller();
-    const dx = 240;
+    // LEFT/RIGHT => scroll the active page scroller
+    const sc = getActivePageScroller();
+    const dx = 260;
     if (sc && x < 0.5) return void sc.scrollBy({ left: -dx, behavior: "smooth" });
     if (sc && x > 0.5) return void sc.scrollBy({ left:  dx, behavior: "smooth" });
 
-    // CENTER = top
+    // CENTER => top
     if (x === 0.5 && y === 0.5) return void stage.scrollTo({ top: 0, behavior: "smooth" });
 
-    // UP/DOWN = stage scroll
+    // UP/DOWN => stage scroll
     if (y < 0.5) return void scrollStage(-1, y === 0);
     if (y > 0.5) return void scrollStage( 1, y === 1);
   });
@@ -629,12 +611,11 @@ em{font-style:italic}
   setInterval(tick, 1000);
 
   /* =========================
-     **DATA GOES HERE**
-     Paste your: const DATA = {...};
-     Must include: writing, research, factChecking
-     Optional: timeQuotes
+     *** DATA GOES HERE ***
+     Paste your: const DATA = { writing:[...], research:[...], factChecking:[...], timeQuotes:[...] };
+     directly below this comment (replace the placeholder object).
   ========================= */
-  // Data
+   // Data
   const DATA = {
     writing: [
       { title:"Taryn Simon Mines the Empty Aesthetics of Diplomacy", outlet:"Hyperallergic", year:2016, url:"http://hyperallergic.com/282066/taryn-simon-mines-the-empty-aesthetics-of-diplomacy/" },
@@ -852,7 +833,7 @@ em{font-style:italic}
   if (location.pathname === "/") navigate("/home", { replace:true });
   else setActive(pathToKey(location.pathname));
 
-  /* THOUGHTS modal */
+  /* ===== THOUGHTS modal ===== */
   const modal = document.getElementById("thoughtsModal");
   const closeThoughts = document.getElementById("closeThoughts");
   const clockBtn = document.getElementById("clockBtn");
@@ -931,7 +912,6 @@ em{font-style:italic}
     clickCount += 1;
     clearTimeout(clickTimer);
     clickTimer = setTimeout(() => { clickCount = 0; }, CLICK_WINDOW_MS);
-
     if (clickCount >= 3){
       clickCount = 0;
       openModal();
