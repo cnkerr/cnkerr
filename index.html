@@ -167,6 +167,36 @@ aside.win{position:sticky;top:18px}
   padding:6px 8px;font-size:11px;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
+/* ===== caption slow scroll (only when overflowing) ===== */
+.caption{ position:relative; }
+.caption .capText{
+  display:inline-block;
+  white-space:nowrap;
+  will-change: transform;
+}
+
+/* only animate when JS adds .isMarquee */
+.caption.isMarquee .capText{
+  padding-left: 100%;
+  animation: capMarquee var(--capDur, 14s) linear infinite;
+}
+
+@keyframes capMarquee{
+  from{ transform: translateX(0); }
+  to{   transform: translateX(-100%); }
+}
+
+/* pause on hover/focus for readability */
+.caption.isMarquee:hover .capText,
+.caption.isMarquee:focus-within .capText{
+  animation-play-state: paused;
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .caption.isMarquee .capText{ animation: none; padding-left:0; transform:none; }
+}
+
 .pager{display:flex;gap:6px}
 .pbtn{
   width:34px;height:28px;display:grid;place-items:center;
@@ -209,7 +239,7 @@ aside.win{position:sticky;top:18px}
 .prompt{opacity:.95}
 .promptLine{display:flex;align-items:baseline;gap:0;white-space:nowrap}
 .titleCell{white-space:nowrap}
-.sep{opacity:.9}
+.sep{opacity:.9; margin:0 4px;}
 .metaLine{white-space:nowrap}
 
 /* ONE scroller per page (moves headers + content together) */
@@ -582,7 +612,25 @@ document.getElementById("zones").addEventListener("click", (e) => {
     slideIndex = (n + slides.length) % slides.length;
     img.src = slides[slideIndex].src;
     img.alt = slides[slideIndex].alt || "";
-    cap.textContent = slides[slideIndex].alt || "";
+    const text = slides[slideIndex].alt || "";
+cap.innerHTML = `<span class="capText">${esc(text)}</span>`;
+cap.classList.remove("isMarquee");
+
+// turn on marquee only if it overflows
+requestAnimationFrame(() => {
+  const span = cap.querySelector(".capText");
+  if (!span) return;
+
+  // measure overflow
+  const overflow = span.scrollWidth > cap.clientWidth + 2;
+  if (!overflow) return;
+
+  // optional: set duration based on text length (simple + deterministic)
+  const dur = Math.min(28, Math.max(10, Math.ceil(span.scrollWidth / 30)));
+  cap.style.setProperty("--capDur", dur + "s");
+  cap.classList.add("isMarquee");
+});
+
     localStorage.setItem("slideIndex", String(slideIndex));
     requestAnimationFrame(() => pan(.5,.5));
   };
@@ -703,7 +751,7 @@ document.getElementById("zones").addEventListener("click", (e) => {
     if (!m) return esc(str);
     const author = esc(m[1].trim());
     const pub = esc(m[2].trim());
-    return `${author}(<em>${pub}</em>)`;
+    return `${author} (<em>${pub}</em>)`;
   };
 
   const row1 = ({ titleHtml, metaHtml }) => `
@@ -775,7 +823,7 @@ document.getElementById("zones").addEventListener("click", (e) => {
 
       const author = esc(it.author || "");
       const pub = it.publication ? `<em>${esc(it.publication)}</em>` : "";
-      const ap = author && pub ? `${author}(${pub})` : (author || (pub ? `(${pub})` : ""));
+      const ap = author && pub ? `${author} (${pub})` : (author || (pub ? `(${pub})` : ""));
       const date = esc(it.date || "");
       const metaHtml = [ap, date].filter(Boolean).join(" / ");
       return row1({ titleHtml, metaHtml });
