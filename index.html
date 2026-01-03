@@ -126,7 +126,7 @@ aside.win{position:sticky;top:18px}
 /* clock button */
 .clockBtn{
   width:100%;
-  background:#cfe8ff; /* light blue */
+  background:#cfe8ff;
   border:2px solid #000;
   padding:8px 10px;
   text-align:center;
@@ -167,35 +167,6 @@ aside.win{position:sticky;top:18px}
   padding:6px 8px;font-size:11px;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-/* ===== caption slow scroll (only when overflowing) ===== */
-.caption{ position:relative; }
-.caption .capText{
-  display:inline-block;
-  white-space:nowrap;
-  will-change: transform;
-}
-
-/* only animate when JS adds .isMarquee */
-.caption.isMarquee .capText{
-  padding-left: 100%;
-  animation: capMarquee var(--capDur, 14s) linear infinite;
-}
-
-@keyframes capMarquee{
-  from{ transform: translateX(0); }
-  to{   transform: translateX(-100%); }
-}
-
-/* pause on hover/focus for readability */
-.caption.isMarquee:hover .capText,
-.caption.isMarquee:focus-within .capText{
-  animation-play-state: paused;
-}
-
-/* respect reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .caption.isMarquee .capText{ animation: none; padding-left:0; transform:none; }
-}
 
 .pager{display:flex;gap:6px}
 .pbtn{
@@ -222,7 +193,6 @@ aside.win{position:sticky;top:18px}
 .rule{height:2px;background:#000;margin:10px 0 12px}
 .spacer{height:14px}
 
-/* terminal rows (no per-row scrolling) */
 .items{margin-top:10px; width:max-content; min-width:100%}
 .item{
   padding:6px 0;
@@ -242,7 +212,7 @@ aside.win{position:sticky;top:18px}
 .sep{opacity:.9; margin:0 4px;}
 .metaLine{white-space:nowrap}
 
-/* ONE scroller per page (moves headers + content together) */
+/* one horizontal scroller per page */
 .pageScroll{
   overflow-x:auto;
   overflow-y:hidden;
@@ -250,12 +220,8 @@ aside.win{position:sticky;top:18px}
   -webkit-overflow-scrolling:touch;
 }
 .pageScroll::-webkit-scrollbar{width:0;height:0}
-.pageInner{
-  width:max-content;        /* make it scrollable horizontally when needed */
-  min-width:100%;
-}
+.pageInner{width:max-content; min-width:100%}
 
-/* links inside content */
 .list a,
 .caption a{
   color:#1f4f8a;
@@ -276,7 +242,7 @@ em{font-style:italic}
 .q::after{ content: close-quote; }
 .quote{margin-top:12px;font-size:12px;color:#444}
 
-/* ===== MOBILE LAYOUT ===== */
+/* mobile */
 @media (max-width:820px){
   :root{--rail:1fr;--btn:56px;--view:min(92vmin,720px)}
   .frame{ grid-template-columns:1fr !important; grid-template-rows:auto 1fr !important; }
@@ -292,7 +258,7 @@ em{font-style:italic}
   .caption{max-width:70%;font-size:10px}
 }
 
-/* ===== THOUGHTS modal ===== */
+/* thoughts modal */
 .modal{
   position:fixed; inset:0;
   display:none;
@@ -307,33 +273,16 @@ em{font-style:italic}
   justify-content:center;
 }
 .modal.isOpen{display:flex}
-.modal .win{
-  width:min(920px, 100%);
-  background:#fff;
-}
+.modal .win{ width:min(920px, 100%); background:#fff; }
 .modalHead{
   display:flex; align-items:center; justify-content:space-between;
-  gap:10px;
-  margin-bottom:10px;
+  gap:10px; margin-bottom:10px;
 }
-.modalTitleWrap{
-  display:flex; align-items:baseline; gap:10px;
-  min-width:0;
-}
-.modalTitle{
-  font-weight:900; letter-spacing:.08em; font-size:12px;
-  white-space:nowrap;
-}
-.modalIdx{
-  font-weight:900;
-  font-size:12px;
-  letter-spacing:.02em;
-  opacity:.75;
-  white-space:nowrap;
-}
+.modalTitleWrap{ display:flex; align-items:baseline; gap:10px; min-width:0; }
+.modalTitle{ font-weight:900; letter-spacing:.08em; font-size:12px; white-space:nowrap; }
+.modalIdx{ font-weight:900; font-size:12px; opacity:.75; white-space:nowrap; }
 .modalNav{display:flex; gap:8px; align-items:center}
-.navBtn,
-.closeBtn{
+.navBtn,.closeBtn{
   border:2px solid #000;
   background:var(--paper2);
   box-shadow:var(--shadow);
@@ -344,8 +293,7 @@ em{font-style:italic}
   color:#000;
 }
 .navBtn{width:42px; text-align:center; padding:6px 0}
-.navBtn:active,
-.closeBtn:active{transform:translate(1px,1px)}
+.navBtn:active,.closeBtn:active{transform:translate(1px,1px)}
 .quoteBox{
   border:2px solid #000;
   background:#fff;
@@ -364,7 +312,7 @@ em{font-style:italic}
 <body>
 <div class="frame" id="root">
   <aside class="win" aria-label="Sidebar">
-    <a class="nameBtn" id="linkHomeTop" href="/home" data-route="/home" title="Home" aria-label="Home">Christian N. Kerr</a>
+    <a class="nameBtn" id="linkHomeTop" href="#/home" data-route="home" title="Home" aria-label="Home">Christian N. Kerr</a>
 
     <div class="controls">
       <div class="compass" aria-label="D-pad">
@@ -395,10 +343,10 @@ em{font-style:italic}
         </div>
       </div>
 
-      <div class="btns" id="navBtns" aria-label="Navigation">
-        <a class="btn" id="linkWriting"  href="/writing"  data-route="/writing"  title="Writing"  aria-label="Writing"><div class="glyph">写</div></a>
-        <a class="btn" id="linkResearch" href="/research" data-route="/research" title="Research" aria-label="Research"><div class="glyph">研</div></a>
-        <a class="btn" id="linkContact"  href="/contact"  data-route="/contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></a>
+      <div class="btns" aria-label="Navigation">
+        <a class="btn" id="linkWriting"  href="#/writing"  data-route="writing"  title="Writing"  aria-label="Writing"><div class="glyph">写</div></a>
+        <a class="btn" id="linkResearch" href="#/research" data-route="research" title="Research" aria-label="Research"><div class="glyph">研</div></a>
+        <a class="btn" id="linkContact"  href="#/contact"  data-route="contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></a>
       </div>
 
       <button class="clockBtn" id="clockBtn" type="button" aria-label="Current date and time (triple click for feed)">
@@ -412,7 +360,7 @@ em{font-style:italic}
       <div class="win wrap" id="homeWrap">
         <div class="viewport" id="viewport">
           <div class="canvas" id="canvas">
-            <img id="hero" src="market.jpg" alt="Snyders, The Market">
+            <img id="hero" src="" alt="">
           </div>
         </div>
 
@@ -440,7 +388,6 @@ em{font-style:italic}
 
     <section class="panel" id="p-research">
       <div class="list">
-        <!-- ONE scroller for BOTH sections so they move together -->
         <div class="pageScroll" id="scroll-researchAll">
           <div class="pageInner">
             <h2>RESEARCH</h2>
@@ -482,8 +429,8 @@ em{font-style:italic}
   <div class="win">
     <div class="modalHead">
       <div class="modalTitleWrap">
-        <div class="modalTitle" id="thoughtsTitle">Time?</div>
-        <div class="modalIdx" id="thoughtsIdx">00.00</div>
+        <div class="modalTitle">Time?</div>
+        <div class="modalIdx" id="thoughtsIdx">00/00</div>
       </div>
 
       <div class="modalNav">
@@ -500,33 +447,53 @@ em{font-style:italic}
   </div>
 </div>
 
+<!-- Your data file must define: window.DATA_REMOTE = { slides:[], writing:[], research:[], factChecking:[], timeQuotes:[] } -->
+<script src="./data.js"></script>
+
 <script>
 (() => {
-  const stage = document.getElementById("stage");
+  const $ = (id) => document.getElementById(id);
+
+  const stage = $("stage");
+  const v = $("viewport");
+  const c = $("canvas");
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   }[m]));
 
-  // Home pan
-  const v = document.getElementById("viewport");
-  const c = document.getElementById("canvas");
+  // ---------- DATA (from external data.js) ----------
+  const DATA = (window.DATA_REMOTE && typeof window.DATA_REMOTE === "object")
+    ? window.DATA_REMOTE
+    : { slides:[], writing:[], research:[], factChecking:[], timeQuotes:[] };
+
+  // minimal normalizer (keeps site from breaking if something is missing)
+  (function normalize(d){
+    if (!Array.isArray(d.slides)) d.slides = [];
+    if (!Array.isArray(d.writing)) d.writing = [];
+    if (!Array.isArray(d.research)) d.research = [];
+    if (!Array.isArray(d.factChecking)) d.factChecking = [];
+    if (!Array.isArray(d.timeQuotes)) d.timeQuotes = [];
+  })(DATA);
+
+  // ---------- HOME PAN ----------
   const pan = (x,y) => v.scrollTo({
     left: (c.scrollWidth - v.clientWidth) * x,
     top:  (c.scrollHeight - v.clientHeight) * y,
     behavior: "smooth"
   });
 
+  // ---------- STAGE SCROLL ----------
   const scrollStage = (dir, fast=false) =>
     stage.scrollBy({ top: dir * (fast ? 380 : 160), behavior: "smooth" });
 
-  // --- Home auto-fit sizing ---
-  const homeWrap = document.getElementById("homeWrap");
-  const homeOverlay = document.getElementById("homeOverlay");
+  // ---------- HOME AUTO-FIT ----------
+  const homeWrap = $("homeWrap");
+  const homeOverlay = $("homeOverlay");
 
   const fitHome = () => {
     if (!homeWrap || !homeOverlay || !v) return;
-    if (!document.getElementById("p-home").classList.contains("isActive")) return;
+    if (!$("p-home").classList.contains("isActive")) return;
 
     const stageW = stage.clientWidth;
     const stageH = stage.clientHeight;
@@ -563,87 +530,62 @@ em{font-style:italic}
 
   window.addEventListener("resize", () => requestAnimationFrame(fitHome), { passive:true });
 
-// ===== Compass behavior (DETERMINISTIC) =====
-const getActivePageScroller = () => {
-  if (document.getElementById("p-writing").classList.contains("isActive")) {
-    return document.getElementById("scroll-writing");
-  }
-  if (document.getElementById("p-research").classList.contains("isActive")) {
-    return document.getElementById("scroll-researchAll");
-  }
-  return null;
-};
+  // ---------- COMPASS ----------
+  const getActivePageScroller = () => {
+    if ($("p-writing").classList.contains("isActive")) return $("scroll-writing");
+    if ($("p-research").classList.contains("isActive")) return $("scroll-researchAll");
+    return null;
+  };
 
-document.getElementById("zones").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-pan]");
-  if (!b) return;
-  const [x,y] = b.dataset.pan.split(",").map(Number);
+  $("zones").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pan]");
+    if (!b) return;
+    const [x,y] = b.dataset.pan.split(",").map(Number);
 
-  const onHome = document.getElementById("p-home").classList.contains("isActive");
-  if (onHome) return void pan(x,y);
+    const onHome = $("p-home").classList.contains("isActive");
+    if (onHome) return void pan(x,y);
 
-  // LEFT/RIGHT => horizontal scroll the active page scroller
-  const sc = getActivePageScroller();
-  const dx = 260;
-  if (sc && x < 0.5) return void sc.scrollBy({ left: -dx, behavior: "smooth" });
-  if (sc && x > 0.5) return void sc.scrollBy({ left:  dx, behavior: "smooth" });
+    const sc = getActivePageScroller();
+    const dx = 260;
+    if (sc && x < 0.5) return void sc.scrollBy({ left: -dx, behavior: "smooth" });
+    if (sc && x > 0.5) return void sc.scrollBy({ left:  dx, behavior: "smooth" });
 
-  // CENTER => top
-  if (x === 0.5 && y === 0.5) return void stage.scrollTo({ top: 0, behavior: "smooth" });
+    if (x === 0.5 && y === 0.5) return void stage.scrollTo({ top: 0, behavior: "smooth" });
+    if (y < 0.5) return void scrollStage(-1, y === 0);
+    if (y > 0.5) return void scrollStage( 1, y === 1);
+  });
 
-  // UP/DOWN => stage scroll
-  if (y < 0.5) return void scrollStage(-1, y === 0);
-  if (y > 0.5) return void scrollStage( 1, y === 1);
-});
-
-
-  // Slideshow
-  const img = document.getElementById("hero");
-  const cap = document.getElementById("caption");
-  const slides = [
-    { src: "market.jpg", alt: 'Snyders, "Market Scene"' },
-    { src: "flowers.jpg", alt: 'Bruegel the Younger, "Basket of Flowers"' },
-    { src: "conjurer.jpg", alt: 'H. Bosch, "The Conjurer"' },
-    { src: "icarus.jpg",   alt: 'Bruegel the Elder, "Landscape w/ the Fall..."' }
-  ];
+  // ---------- SLIDESHOW ----------
+  const hero = $("hero");
+  const cap = $("caption");
   let slideIndex = Number(localStorage.getItem("slideIndex") || 0) || 0;
 
+  const slides = DATA.slides; // expected: {src, caption}[]
   const showSlide = (n) => {
+    if (!slides.length) {
+      hero.src = "";
+      hero.alt = "";
+      cap.textContent = "—";
+      return;
+    }
     slideIndex = (n + slides.length) % slides.length;
-    img.src = slides[slideIndex].src;
-    img.alt = slides[slideIndex].alt || "";
-    const text = slides[slideIndex].alt || "";
-cap.innerHTML = `<span class="capText">${esc(text)}</span>`;
-cap.classList.remove("isMarquee");
-
-// turn on marquee only if it overflows
-requestAnimationFrame(() => {
-  const span = cap.querySelector(".capText");
-  if (!span) return;
-
-  // measure overflow
-  const overflow = span.scrollWidth > cap.clientWidth + 2;
-  if (!overflow) return;
-
-  // optional: set duration based on text length (simple + deterministic)
-  const dur = Math.min(28, Math.max(10, Math.ceil(span.scrollWidth / 30)));
-  cap.style.setProperty("--capDur", dur + "s");
-  cap.classList.add("isMarquee");
-});
-
+    const s = slides[slideIndex] || {};
+    hero.src = String(s.src || "");
+    hero.alt = String(s.caption || "");
+    cap.textContent = String(s.caption || "—");
     localStorage.setItem("slideIndex", String(slideIndex));
     requestAnimationFrame(() => pan(.5,.5));
   };
 
-  document.getElementById("prev").addEventListener("click", () => showSlide(slideIndex - 1));
-  document.getElementById("next").addEventListener("click", () => showSlide(slideIndex + 1));
+  $("prev").addEventListener("click", () => showSlide(slideIndex - 1));
+  $("next").addEventListener("click", () => showSlide(slideIndex + 1));
   window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") showSlide(slideIndex - 1);
     if (e.key === "ArrowRight") showSlide(slideIndex + 1);
   });
 
-  // Clock (America/New_York)
-  const clockStamp = document.getElementById("clockStamp");
+  // ---------- CLOCK ----------
+  const clockStamp = $("clockStamp");
   const tick = () => {
     const now = new Date();
     const parts = new Intl.DateTimeFormat("en-US", {
@@ -659,81 +601,7 @@ requestAnimationFrame(() => {
   tick();
   setInterval(tick, 1000);
 
-  /* =========================
-     *** DATA GOES HERE ***
-     Paste your: const DATA = { writing:[...], research:[...], factChecking:[...], timeQuotes:[...] };
-     directly below this comment (replace the placeholder object).
-  ========================= */
-  // Data
-  const DATA = {
-    writing: [
-      { title:"Taryn Simon Mines the Empty Aesthetics of Diplomacy", outlet:"Hyperallergic", year:2016, url:"http://hyperallergic.com/282066/taryn-simon-mines-the-empty-aesthetics-of-diplomacy/" },
-      { title:"Rolling Through Barbara Kruger's Slick Skatepark Installation", outlet:"Hyperallergic", year:2017, url:"https://hyperallergic.com/410095/barbara-kruger-les-coleman-skatepark-performa/" },
-      { title:"The Power of Protest Art and the Dignity of the Protester", outlet:"Hyperallergic", year:2017, url:"https://hyperallergic.com/the-power-of-protest-art-and-the-dignity-of-the-protester/" },
-      { title:"A Collaborative Reading of 'Song of Myself'", outlet:"Hyperallergic", year:2017, url:"https://hyperallergic.com/373782/a-collaborative-reading-of-whitmans-song-of-myself-all-across-alabama/" },
-      { title:"Imagining a Sustainable Skateboard", outlet:"Village Psychic", year:2022, url:"https://www.villagepsychic.net/blog/imagining-a-sustainable-skateboard?rq=kerr" },
-      { title:"Climate Change: the Ultimate Skatestopper", outlet:"Village Psychic", year:2020, url:"https://www.villagepsychic.net/blog//climate-change-the-ultimate-skatestopper" },
-      { title:"Considering the Ideal Skate Outfit", outlet:"Village Psychic", year:2020, url:"https://www.villagepsychic.net/blog/what-is-the-ultimate-skate-silhouette" },
-      { title:"The Activists of Crimson Tide Country", outlet:"The New Yorker", year:2016, url:"http://www.newyorker.com/news/sporting-scene/the-activists-of-crimson-tide-country" },
-      { title:"Best of 2021: Trung, 'RESPECTFULLY'", outlet:"Quartersnacks", year:2021, url:"https://quartersnacks.com/2021/12/the-best-skate-videos-parts-of-2021-qs-readers-poll-results/" },
-      { title:"Best of 2022: Tyshawn, 'The General'", outlet:"Quartersnacks", year:2022, url:"https://quartersnacks.com/2022/12/the-best-skate-videos-parts-of-2022-qs-readers-poll-results/" },
-      { title:"Best of 2023: Shanahan, 'Double-Up'", outlet:"Quartersnacks", year:2023, url:"https://quartersnacks.com/2023/12/the-best-skate-videos-parts-of-2023-qs-readers-poll-results/" },
-      { title:"Best of 2024: Deedz, 'Uneven'", outlet:"Quartersnacks", year:2024, url:"https://quartersnacks.com/2024/12/the-best-skate-videos-parts-of-2024-qs-readers-poll-results/" },
-      { title:"Best of 2025: Gustav, '3:2'", outlet:"Quartersnacks", year:2025, url:"https://quartersnacks.com/2025/12/the-best-skate-videos-parts-of-2025-qs-readers-poll-results/" },
-      { title:"Waxing Poetic #1: 'Prufrock'", outlet:"Simple Magic", year:2025, url:"https://www.simplemagic.ca/waxing-poetic-1-the-love-song-of-j-alfred-prufrock/" },
-      { title:"Waxing Poetic #2: 'Slam, Dunk & Hook'", outlet:"Simple Magic", year:2025, url:"https://www.simplemagic.ca/waxing-poetic-2-slam-dunk-hook/" },
-      { title:"Waxing Poetic #3: 'The Second Coming'", outlet:"Simple Magic", year:2025, url:"https://www.simplemagic.ca/waxing-poetic-3-the-second-coming/" },
-      { title:"Mark Ronson&Lucky Daye for Audemars Piguet", outlet:"Complex", year:2022, url:"https://www.complex.com/style/a/christiannkerr/mark-ronson-lucky-daye-new-song-too-much-audemars-piguet" },
-      { title:"China's Li-Ning Wants Erik Ellington's Help", outlet:"Complex", year:2021, url:"https://www.complex.com/sneakers/a/christiankerr/li-ning-erik-ellington-signature-model-skateboard-collection" },
-      { title:"How Ebonie Ward Manages Future", outlet:"Complex", year:2020, url:"https://www.complex.com/music/a/christiannkerr/how-ebonie-ward-built-her-team" },
-      { title:"Can Fashion Subvert the Surveillance State?", outlet:"Secret Mag", year:2021, url:"https://secretmag.net/2021/11/10/surveillance-fashion-metaverse/" },
-      { title:"A Chat w/ Andrew Considine, WKND Pro", outlet:"Free Skate Mag", year:2022, url:"https://www.freeskatemag.com/2022/01/19/wknds-street-fighters-ii-andrew-considine-interview/" },
-      { title:"Meet the YouTube Stars Disrupting Skateboarding", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/04/24/meet-the-youtube-stars-that-are-disrupting-skateboarding/" },
-      { title:"Remembering David Bowie Through Skate Videos", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/01/11/remembering-david-bowie-through-skate-videos/" },
-      { title:"Talking to a Professional Fingerboarder", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/12/14/an-interview-with-a-professional-fingerboarder/" },
-      { title:"Finding the Guy Who Tried the 13-Flat-13 in the Rain", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/09/02/an-interview-with-the-guy-who-tried-the-13-flat-13-in-the-rain/" },
-      { title:"4 Skateboarding Events the Olympics Can Have", outlet:"Jenkem Mag", year:2015, url:"https://www.jenkemmag.com/home/2015/08/04/4-skateboarding-events-the-olympics-can-have/" },
-      { title:"Meet Neftalie, US Ambassador of Skateboarding", outlet:"Jenkem Mag", year:2017, url:"https://www.jenkemmag.com/home/2017/03/01/americas-ambassador-of-skateboarding-neftalie-williams/" },
-      { title:"The Skateboarder's Guide to the 2016 Presidential Election", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/04/18/the-skateboarders-guide-to-the-2016-u-s-presidential-election/" },
-      { title:"The Death & Life of the Great American Skate Plaza", outlet:"Jenkem Mag", year:2016, url:"https://www.jenkemmag.com/home/2016/03/11/the-death-and-life-of-great-american-skate-plazas/" },
-      { title:"7 Tricks to Make You Look Better at Skating Than You Really Are", outlet:"Jenkem Mag", year:2020, url:"https://www.jenkemmag.com/home/2020/09/10/7-tricks-make-look-better-at-skating-than-you-really-are/" },
-      { title:"A Skater's Guide to Attending a Protest", outlet:"Jenkem Mag", year:2020, url:"https://www.jenkemmag.com/home/2020/06/04/skaters-guide-attending-protest/" },
-      { title:"Is it Safe to Skate in the Time of Coronavirus?", outlet:"Jenkem Mag", year:2020, url:"https://www.jenkemmag.com/home/2020/03/17/safe-skate-time-coronavirus/" },
-      { title:"Appreciating the Latino Immigrants that Shaped Skateboarding", outlet:"Jenkem Mag", year:2019, url:"https://www.jenkemmag.com/home/2019/08/09/appreciating-latinx-immigrants-shaped-skateboarding/" },
- { title:"An American in Anshan, China", outlet:"Tumblr", year:2013, url:"https://www.tumblr.com/american-in-anshan-blog/" },
-    ],
-    research: [
-      { title:"House of Gates", outlet:"Nicholas Kulish (FSG)", year:2026, url:"https://www.nytimes.com/by/nicholas-kulish", italic:true },
-      { title:"“The Betrayal”", outlet:"George Packer (The Atlantic)", year:2022, url:"https://www.theatlantic.com/magazine/archive/2022/03/biden-afghanistan-exit-american-allies-abandoned/621307/" },
-      { title:"Truly Like Lightning", outlet:"David Duchovny (FSG)", year:2018, url:"https://us.macmillan.com/books/9781250791108/trulylikelightning/", italic:true },
-      { title:"Our Man", outlet:"George Packer (Knopf)", year:2018, url:"https://www.penguinrandomhouse.com/books/215731/our-man-by-george-packer/", italic:true }
-    ],
-    factChecking: [
-      { title:"The Magic Mountain Saved My Life", author:"George Packer", publication:"The Atlantic", date:"Dec 2024", url:"https://www.theatlantic.com/magazine/archive/2024/12/thomas-mann-magic-mountain-cultural-political-relevance/680400/" },
-      { title:"No One Gave a Speech Like Patrick Henry", author:"Drew Gilpin Faust", publication:"The Atlantic", date:"Nov 2025", url:"https://www.theatlantic.com/magazine/archive/2025/11/patrick-henry-revolutionary-orator/684308/" },
-      { title:"The Many Lives of Eliza Schuyler", author:"Jane Kamensky", publication:"The Atlantic", date:"Nov 2025", url:"https://www.theatlantic.com/magazine/archive/2025/11/american-revolution-women-eliza-schuyler-abigail-adams/684331/" },
-      { title:"The Judgments of Muriel Spark", author:"Judith Shulevitz", publication:"The Atlantic", date:"Sep 2025", url:"https://www.theatlantic.com/magazine/archive/2025/09/muriel-spark-religion-writing/683550/" },
-      { title:"The Insurrection Problem", author:"Jeffrey Rosen", publication:"The Atlantic", date:"Nov 2025", url:"https://www.theatlantic.com/magazine/archive/2025/11/shays-rebellion-hamilton-jefferson-political-ideologies/684319/" },
-      { title:"What I Learned from Sammy Davis Jr.", author:"Questlove", publication:"The Atlantic", date:"Dec 2025", url:"https://www.theatlantic.com/magazine/2025/12/questlove-sammy-davis-jr-career/684605/" }
-    ],
-
-     /* THOUGHTS.ON.TIME feed */
-    timeQuotes: [
-      { quote:"...and then I was in time again, hearing the watch. It was Grandfather’s and when Father gave it to me he said, Quentin, I give you the mausoleum of all hope and desire [...] I give it to you not that you may remember time, but that you might forget it now and then for a moment and not spend all your breath trying to conquer it. Because no battle is ever won he said. They are not even fought. The field only reveals to man his own folly and despair, and victory is an illusion of philosophers and fools.", work:"The Sound and the Fury", author:"Faulkner" },
-      { quote:"Yet the timeless in you is aware of life’s timelessness, / And knows that yesterday is but today’s memory and tomorrow is today’s dream. / And that that which sings and contemplates in you is still dwelling within the bounds of that first moment which scattered the stars into space. / Who among you does not feel that his power to love is boundless?", work:"The Prophet", author:"Khalil Gibran" },      
-      { quote:"Thus the whirligig of time brings in his revenges.", work:"Twelfth Night", author:"Shakespeare" },
-	{ quote:"Thus we play the fools with the time, and the spirits of the wise sit in the clouds and mock us.", work:"King Henry IV", author:"Shakespeare" },  
-	{ quote:"The Moving Finger writes; and, having writ, Moves on: nor all thy Piety nor Wit shall lure it back to cancel half a Line, Nor all thy Tears wash out a Word of it.", work:"Rubáiyát", author:"Omar Khayyám" },
-      { quote:"It ain't no time, it ain't no time, it ain't no time. (Ain't no time.)", work:"Aint No Time", author:"Future" },
-	{ quote:"You can be sure / Some go low to get high / You may hurt 'til you cry / You may die (You may die) / Keep on trying (Keep on trying) / 'Til it's summer, in the city / 'Til it's summer, in the city.", work:"You May Die", author:"Outkast" },
-	{ quote:"Modernity is the transient, the fleeting, the contingent; it is one half of art, the other being the-eternal and the immovable.", work:"The Painter of Modern Life", author:"Baudelaire" },
-	{ quote:"For, lo! the winter is past, the rain is over and gone; the flowers appear on the earth; the time of the singing of birds is come, and the voice of the turtle is heard in our land.", work:"The Song of Solomon", author:"the Bible" },      
-	{ quote:"Millions of spiritual creatures walk the earth / Unseen, both when we wake and when we sleep.", work:"Paradise Lost", author:"Milton" },
-	{ quote:"There is a time for some things, and a time for all things; a time for great things, and a time for small things.)", work:"Don Quixote", author:"Cervantes" }
-    ]
-  };
-
-  // Helpers used by render()
+  // ---------- LIST RENDERING ----------
   const parseMonthYear = (s) => {
     const str = String(s || "").trim();
     const m = str.match(/^([A-Za-z]{3,})\s+(\d{4})$/);
@@ -767,7 +635,7 @@ requestAnimationFrame(() => {
   `;
 
   const render = (section) => {
-    const out = document.getElementById(`items-${section}`);
+    const out = $(`items-${section}`);
     if (!out) return;
 
     const items = (DATA[section] || []).slice().sort((a,b) => {
@@ -830,31 +698,25 @@ requestAnimationFrame(() => {
     }).join("");
   };
 
-  // Router
+  // ---------- ROUTER (hash-based: works on GitHub Pages + custom domains) ----------
   const panels = {
-    home: document.getElementById("p-home"),
-    writing: document.getElementById("p-writing"),
-    research: document.getElementById("p-research"),
-    contact: document.getElementById("p-contact"),
+    home: $("p-home"),
+    writing: $("p-writing"),
+    research: $("p-research"),
+    contact: $("p-contact"),
   };
-
   const links = {
-    home: document.getElementById("linkHomeTop"),
-    writing: document.getElementById("linkWriting"),
-    research: document.getElementById("linkResearch"),
-    contact: document.getElementById("linkContact"),
+    home: $("linkHomeTop"),
+    writing: $("linkWriting"),
+    research: $("linkResearch"),
+    contact: $("linkContact"),
   };
 
-  const normalizePath = (p) => {
-    const path = (p || "/").split("?")[0].split("#")[0];
-    if (path === "/" || path === "/home") return "/home";
-    if (path === "/writing") return "/writing";
-    if (path === "/research") return "/research";
-    if (path === "/contact") return "/contact";
-    return "/home";
+  const normalizeRoute = (hash) => {
+    const raw = String(hash || "");
+    const m = raw.match(/^#\/(home|writing|research|contact)/);
+    return m ? m[1] : "home";
   };
-
-  const pathToKey = (path) => normalizePath(path).replace("/","");
 
   const setActive = (key) => {
     Object.entries(panels).forEach(([k,el]) => el.classList.toggle("isActive", k === key));
@@ -863,42 +725,33 @@ requestAnimationFrame(() => {
     if (key === "home") requestAnimationFrame(() => { fitHome(); pan(.5,.5); });
   };
 
-  const navigate = (path, {replace=false} = {}) => {
-    const key = pathToKey(path);
-    const finalPath = "/" + key;
-    if (replace) history.replaceState({key}, "", finalPath);
-    else history.pushState({key}, "", finalPath);
+  const goto = (key, replace=false) => {
+    const next = `#/` + key;
+    if (replace) history.replaceState({}, "", next);
+    else location.hash = next;
     setActive(key);
   };
 
   document.addEventListener("click", (e) => {
     const a = e.target.closest("a[data-route]");
     if (!a) return;
-    const href = a.getAttribute("href") || "/home";
-    if (href.startsWith("http")) return;
     e.preventDefault();
-    navigate(href);
+    goto(a.dataset.route || "home");
   });
 
-  window.addEventListener("popstate", () => setActive(pathToKey(location.pathname)));
+  window.addEventListener("hashchange", () => {
+    setActive(normalizeRoute(location.hash));
+  });
 
-  const params = new URLSearchParams(location.search);
-  const p = params.get("p");
-  if (p) history.replaceState({}, "", normalizePath(p));
-
-  if (location.pathname === "/") navigate("/home", { replace:true });
-  else setActive(pathToKey(location.pathname));
-
-  /* ===== THOUGHTS modal ===== */
-  const modal = document.getElementById("thoughtsModal");
-  const closeThoughts = document.getElementById("closeThoughts");
-  const clockBtn = document.getElementById("clockBtn");
-
-  const tqQuote = document.getElementById("tqQuote");
-  const tqMeta  = document.getElementById("tqMeta");
-  const tqPrev  = document.getElementById("tqPrev");
-  const tqNext  = document.getElementById("tqNext");
-  const tqIdx   = document.getElementById("thoughtsIdx");
+  // ---------- THOUGHTS MODAL (triple-click clock) ----------
+  const modal = $("thoughtsModal");
+  const clockBtn = $("clockBtn");
+  const tqQuote = $("tqQuote");
+  const tqMeta  = $("tqMeta");
+  const tqPrev  = $("tqPrev");
+  const tqNext  = $("tqNext");
+  const tqIdx   = $("thoughtsIdx");
+  const closeThoughts = $("closeThoughts");
 
   const pad2 = (n) => String(n).padStart(2, "0");
   const fmtIdx = (i, total) => `${pad2(i)}/${pad2(total)}`;
@@ -906,7 +759,7 @@ requestAnimationFrame(() => {
   let qi = Number(localStorage.getItem("timeQuoteIndex") || 0) || 0;
 
   const renderQuote = () => {
-    const quotes = Array.isArray(DATA.timeQuotes) ? DATA.timeQuotes : [];
+    const quotes = DATA.timeQuotes || [];
     const total = quotes.length;
 
     if (!total){
@@ -944,22 +797,18 @@ requestAnimationFrame(() => {
   };
   const isOpen = () => modal.classList.contains("isOpen");
 
-  const prevQuote = () => { qi -= 1; renderQuote(); };
-  const nextQuote = () => { qi += 1; renderQuote(); };
-
-  tqPrev.addEventListener("click", prevQuote);
-  tqNext.addEventListener("click", nextQuote);
+  tqPrev.addEventListener("click", () => { qi -= 1; renderQuote(); });
+  tqNext.addEventListener("click", () => { qi += 1; renderQuote(); });
   closeThoughts.addEventListener("click", closeModal);
   modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
   window.addEventListener("keydown", (e) => {
     if (!isOpen()) return;
     if (e.key === "Escape") closeModal();
-    if (e.key === "ArrowLeft") prevQuote();
-    if (e.key === "ArrowRight") nextQuote();
+    if (e.key === "ArrowLeft") { qi -= 1; renderQuote(); }
+    if (e.key === "ArrowRight"){ qi += 1; renderQuote(); }
   });
 
-  // triple-click on clock
   let clickCount = 0;
   let clickTimer = null;
   const CLICK_WINDOW_MS = 650;
@@ -974,13 +823,17 @@ requestAnimationFrame(() => {
     }
   });
 
-  window.addEventListener("load", () => {
-    showSlide(slideIndex);
-    render("writing");
-    render("research");
-    render("factChecking");
-    requestAnimationFrame(() => { fitHome(); pan(.5,.5); });
-  });
+  // ---------- INIT ----------
+  // Default route + render
+  if (!location.hash) location.hash = "#/home";
+  setActive(normalizeRoute(location.hash));
+
+  render("writing");
+  render("research");
+  render("factChecking");
+
+  showSlide(slideIndex);
+  requestAnimationFrame(() => { fitHome(); pan(.5,.5); });
 })();
 </script>
 </body>
