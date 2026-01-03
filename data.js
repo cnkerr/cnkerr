@@ -1,3 +1,4 @@
+"Use strict";
 window.DATA_REMOTE = {
 slides: [
   { src: "market.jpg",  caption: 'Snyders, "Market Scene"' },
@@ -60,16 +61,17 @@ factChecking: [
     ],
 
 timeQuotes: [
-      { quote:"...and then I was in time again, hearing the watch. It was Grandfather’s and when Father gave it to me he said, Quentin, I give you the mausoleum of all hope and desire [...] I give it to you not that you may remember time, but that you might forget it now and then for a moment and not spend all your breath trying to conquer it. Because no battle is ever won he said. They are not even fought. The field only reveals to man his own folly and despair, and victory is an illusion of philosophers and fools.", work:"The Sound and the Fury", author:"Faulkner" },
-      { quote:"Yet the timeless in you is aware of life’s timelessness, / And knows that yesterday is but today’s memory and tomorrow is today’s dream. / And that that which sings and contemplates in you is still dwelling within the bounds of that first moment which scattered the stars into space. / Who among you does not feel that his power to love is boundless?", work:"The Prophet", author:"Khalil Gibran" },      
+      { quote:"...and then I was in time again, hearing the watch. It was Grandfather's and when Father gave it to me he said, Quentin, I give you the mausoleum of all hope and desire [...] I give it to you not that you may remember time, but that you might forget it now and then for a moment and not spend all your breath trying to conquer it. Because no battle is ever won he said. They are not even fought. The field only reveals to man his own folly and despair, and victory is an illusion of philosophers and fools.", work:"The Sound and the Fury", author:"Faulkner" },
+      { quote:"Yet the timeless in you is aware of life's timelessness, / And knows that yesterday is but today’s memory and tomorrow is today's dream. / And that that which sings and contemplates in you is still dwelling within the bounds of that first moment which scattered the stars into space. / Who among you does not feel that his power to love is boundless?", work:"The Prophet", author:"Khalil Gibran" },      
       { quote:"Thus the whirligig of time brings in his revenges.", work:"Twelfth Night", author:"Shakespeare" },
 	{ quote:"Thus we play the fools with the time, and the spirits of the wise sit in the clouds and mock us.", work:"King Henry IV", author:"Shakespeare" },  
 	{ quote:"The Moving Finger writes; and, having writ, Moves on: nor all thy Piety nor Wit shall lure it back to cancel half a Line, Nor all thy Tears wash out a Word of it.", work:"Rubáiyát", author:"Omar Khayyám" },
-      { quote:"It ain't no time, it ain't no time, it ain't no time. (Ain't no time.)", work:"Aint No Time", author:"Future" },
+      { quote:"It ain't no time, it ain't no time, it ain't no time. (Ain't no time.)", work:"Ain't No Time", author:"Future" },
 	{ quote:"You can be sure / Some go low to get high / You may hurt 'til you cry / You may die (You may die) / Keep on trying (Keep on trying) / 'Til it's summer, in the city / 'Til it's summer, in the city.", work:"You May Die", author:"Outkast" },
 	{ quote:"Modernity is the transient, the fleeting, the contingent; it is one half of art, the other being the-eternal and the immovable.", work:"The Painter of Modern Life", author:"Baudelaire" },
 	{ quote:"For, lo! the winter is past, the rain is over and gone; the flowers appear on the earth; the time of the singing of birds is come, and the voice of the turtle is heard in our land.", work:"The Song of Solomon", author:"the Bible" },      
 	{ quote:"Millions of spiritual creatures walk the earth / Unseen, both when we wake and when we sleep.", work:"Paradise Lost", author:"Milton" },
-	{ quote:"There is a time for some things, and a time for all things; a time for great things, and a time for small things.", work:"Don Quixote", author:"Cervantes" }
+	{ quote:"There is a time for some things, and a time for all things; a time for great things, and a time for small things.", work:"Don Quixote", author:"Cervantes" },
+	{ quote:"From time to time / The clouds give rest / To the moon beholders...", work:"Haiku", author:"Matsuo Bashō" }
     ]
   };
