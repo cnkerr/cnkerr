@@ -1,9 +1,10 @@
 "Use strict";
 window.DATA_REMOTE = {
 slides: [
+  { src: "flowers.jpg", caption: 'Bruegel the Younger, "Basket of Flowers"' },  
   { src: "market.jpg",  caption: 'Snyders, "Market Scene"' },
-  { src: "flowers.jpg", caption: 'Bruegel the Younger, "Basket of Flowers"' },
   { src: "conjurer.jpg",caption: 'H. Bosch, "The Conjurer"' },
+  { src: "tigerhunt.jpg", caption: 'Rubens, "Tiger Hunt"' },
   { src: "icarus.jpg",  caption: 'Bruegel the Elder, "Landscape w/ the Fall..."' }
 ],
 
