@@ -9,7 +9,8 @@ slides: [
 ],
 
 writing: [
-      { title:"Taryn Simon Mines the Empty Aesthetics of Diplomacy", outlet:"Hyperallergic", year:2016, url:"http://hyperallergic.com/282066/taryn-simon-mines-the-empty-aesthetics-of-diplomacy/" },
+      { title:"The Two Hands of Mary Wigman", outlet:"PLANK", year:2026, url:"https://plankskatemag.com/" },
+	  { title:"Taryn Simon Mines the Empty Aesthetics of Diplomacy", outlet:"Hyperallergic", year:2016, url:"http://hyperallergic.com/282066/taryn-simon-mines-the-empty-aesthetics-of-diplomacy/" },
       { title:"Rolling Through Barbara Kruger's Slick Skatepark Installation", outlet:"Hyperallergic", year:2017, url:"https://hyperallergic.com/410095/barbara-kruger-les-coleman-skatepark-performa/" },
       { title:"The Power of Protest Art and the Dignity of the Protester", outlet:"Hyperallergic", year:2017, url:"https://hyperallergic.com/the-power-of-protest-art-and-the-dignity-of-the-protester/" },
       { title:"A Collaborative Reading of 'Song of Myself'", outlet:"Hyperallergic", year:2017, url:"https://hyperallergic.com/373782/a-collaborative-reading-of-whitmans-song-of-myself-all-across-alabama/" },
@@ -58,14 +59,15 @@ factChecking: [
       { title:"The Many Lives of Eliza Schuyler", author:"Jane Kamensky", publication:"The Atlantic", date:"Nov 2025", url:"https://www.theatlantic.com/magazine/archive/2025/11/american-revolution-women-eliza-schuyler-abigail-adams/684331/" },
       { title:"The Judgments of Muriel Spark", author:"Judith Shulevitz", publication:"The Atlantic", date:"Sep 2025", url:"https://www.theatlantic.com/magazine/archive/2025/09/muriel-spark-religion-writing/683550/" },
       { title:"The Insurrection Problem", author:"Jeffrey Rosen", publication:"The Atlantic", date:"Nov 2025", url:"https://www.theatlantic.com/magazine/archive/2025/11/shays-rebellion-hamilton-jefferson-political-ideologies/684319/" },
-      { title:"What I Learned from Sammy Davis Jr.", author:"Questlove", publication:"The Atlantic", date:"Dec 2025", url:"https://www.theatlantic.com/magazine/2025/12/questlove-sammy-davis-jr-career/684605/" }
-    ],
+      { title:"What I Learned from Sammy Davis Jr.", author:"Questlove", publication:"The Atlantic", date:"Dec 2025", url:"https://www.theatlantic.com/magazine/2025/12/questlove-sammy-davis-jr-career/684605/" },
+	{ title:"How Bad Bunny Did It", author:"Spencer Kornhaber", publication:"The Atlantic", date:"Feb 2026", url:"https://www.theatlantic.com/magazine/2026/02/bad-bunny-super-bowl-cultural-significance/685508/" }
+],
 
 timeQuotes: [
       { quote:"...and then I was in time again, hearing the watch. It was Grandfather's and when Father gave it to me he said, Quentin, I give you the mausoleum of all hope and desire [...] I give it to you not that you may remember time, but that you might forget it now and then for a moment and not spend all your breath trying to conquer it. Because no battle is ever won he said. They are not even fought. The field only reveals to man his own folly and despair, and victory is an illusion of philosophers and fools.", work:"The Sound and the Fury", author:"Faulkner" },
-      { quote:"Yet the timeless in you is aware of life's timelessness, / And knows that yesterday is but today’s memory and tomorrow is today's dream. / And that that which sings and contemplates in you is still dwelling within the bounds of that first moment which scattered the stars into space. / Who among you does not feel that his power to love is boundless?", work:"The Prophet", author:"Khalil Gibran" },      
-      { quote:"Thus the whirligig of time brings in his revenges.", work:"Twelfth Night", author:"Shakespeare" },
-	{ quote:"Thus we play the fools with the time, and the spirits of the wise sit in the clouds and mock us.", work:"King Henry IV", author:"Shakespeare" },  
+      { quote:"Thus we play the fools with the time, and the spirits of the wise sit in the clouds and mock us.", work:"King Henry IV", author:"Shakespeare" }, 
+	{ quote:"Yet the timeless in you is aware of life's timelessness, / And knows that yesterday is but today’s memory and tomorrow is today's dream. / And that that which sings and contemplates in you is still dwelling within the bounds of that first moment which scattered the stars into space. / Who among you does not feel that his power to love is boundless?", work:"The Prophet", author:"Khalil Gibran" },      
+      { quote:"Thus the whirligig of time brings in his revenges.", work:"Twelfth Night", author:"Shakespeare" }, 
 	{ quote:"The Moving Finger writes; and, having writ, Moves on: nor all thy Piety nor Wit shall lure it back to cancel half a Line, Nor all thy Tears wash out a Word of it.", work:"Rubáiyát", author:"Omar Khayyám" },
       { quote:"It ain't no time, it ain't no time, it ain't no time. (Ain't no time.)", work:"Ain't No Time", author:"Future" },
 	{ quote:"You can be sure / Some go low to get high / You may hurt 'til you cry / You may die (You may die) / Keep on trying (Keep on trying) / 'Til it's summer, in the city / 'Til it's summer, in the city.", work:"You May Die", author:"Outkast" },
