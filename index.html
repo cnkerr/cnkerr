@@ -481,6 +481,45 @@ em{font-style:italic}
 .tqNavBtn[disabled]{ opacity:.45; cursor:default; }
 .tqNavBtn[disabled]:active{ transform:none; }
 
+/* =========================================================
+   ABOUT: mobile layout polish
+========================================================= */
+#aboutDialog .tqQuoteBox{
+  /* About slides benefit from a little more readable spacing */
+  padding:16px 18px;
+}
+
+#aboutDialog #aboutText.tqQuote{
+  /* Keep About text a touch more readable than Time quotes */
+  line-height:1.35;
+  font-size:14px;
+}
+
+/* Narrow screens: reduce chrome, increase readability */
+@media (max-width: 600px){
+  #aboutDialog[open]{
+    width:96vw;
+    max-height:94svh;
+  }
+  #aboutDialog .tqModal{
+    padding:10px;
+    max-height:94svh;
+  }
+  #aboutDialog .tqBar{
+    gap:10px;
+  }
+  #aboutDialog .tqTitle{
+    font-size:13px;
+  }
+  #aboutDialog #aboutText.tqQuote{
+    font-size:16px;
+    line-height:1.45;
+  }
+  #aboutDialog .tqQuoteBox{
+    padding:12px 12px;
+  }
+}
+
 /* NOTE MODAL HEADER: prev/led/next on the left */
 .noteBar{ justify-content:space-between; }
 .noteNavLeft{
@@ -1678,6 +1717,34 @@ em{font-style:italic}
     var aboutSlides = Array.isArray(DATA.aboutSlides) ? DATA.aboutSlides : [];
     var ai = Number(localStorage.getItem("aboutSlideIndex") || 0) || 0;
 
+function fitAboutAscii(){
+  if (!aboutText) return;
+
+  var pre = aboutText.querySelector("pre.ascii");
+  if (!pre) return;
+
+  // Store the original font size once
+  if (!pre.dataset.baseFont){
+    var base = parseFloat(getComputedStyle(pre).fontSize) || 8;
+    pre.dataset.baseFont = String(base);
+  }
+
+  // Reset to base size to measure scrollWidth accurately
+  var baseFont = parseFloat(pre.dataset.baseFont) || 8;
+  pre.style.fontSize = baseFont + "px";
+
+  // Compute scale needed to fit within the About text box
+  var boxW = aboutText.clientWidth || 0;
+  var contentW = pre.scrollWidth || 0;
+  if (!boxW || !contentW) return;
+
+  var scale = Math.min(1, (boxW - 2) / contentW);
+  var newFont = Math.max(3.5, baseFont * scale); // clamp so it doesn't become unreadable
+
+  pre.style.fontSize = newFont.toFixed(2) + "px";
+  pre.style.lineHeight = "1.0";
+}
+
 function renderAboutSlide(){
   var total = aboutSlides.length;
 
@@ -1692,7 +1759,6 @@ function renderAboutSlide(){
 
   var title = String(s.title || "").trim();
 
-  // Prefer s.html if present; otherwise fall back to s.text/s.body as plain text.
   var hasHTML = (s.html != null && String(s.html).trim() !== "");
   var rawText = String(s.text || s.body || "").trim();
   var rawHTML = hasHTML ? String(s.html).trim() : "";
@@ -1701,15 +1767,17 @@ function renderAboutSlide(){
 
   if (aboutText){
     if (hasHTML){
-      // Render trusted HTML (no terminal > prefix)
       aboutText.innerHTML = rawHTML;
     } else {
-      // Render as terminal-style text
       aboutText.textContent = "> " + (rawText || "(empty)");
     }
   }
 
   localStorage.setItem("aboutSlideIndex", String(ai));
+
+  // After rendering, auto-fit ASCII if present
+  // (Timeout lets the browser lay out the new HTML first.)
+  setTimeout(fitAboutAscii, 0);
 }
 
     function openAboutDialog(){
@@ -1741,6 +1809,10 @@ function renderAboutSlide(){
         if (e.target === aboutDialog) closeAboutDialog();
       });
     }
+
+    window.addEventListener("resize", function(){
+  if (aboutDialog && aboutDialog.open) fitAboutAscii();
+});
 
     window.addEventListener("keydown", function(e){
       if (!aboutDialog || !aboutDialog.hasAttribute("open")) return;
