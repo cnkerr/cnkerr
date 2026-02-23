@@ -6,16 +6,25 @@
 <title>Christian N. Kerr</title>
 
 <style>
+/* =========================================================
+   CSS: TOKENS / BASE
+========================================================= */
 :root{
   --bg:#bfbfbf; --panel:#b7b7b7; --paper:#fff; --paper2:#f7f7f7; --ink:#000;
   --hi:#fff; --deep:#000; --accent:#ff7a00;
   --mono: ui-monospace, Menlo, Monaco, Consolas, monospace;
-  --rail:220px; --gap:12px; --btn:64px; --view:min(86vmin,720px);
+  --rail:220px; --gap:12px; --btn:64px;
   --stroke:2px; --pad:10px; --shadow:0 1px 0 rgba(0,0,0,.25);
+
+  /* subtle scrollbar sizing */
+  --sb:8px;
+  --sbThumb:rgba(0,0,0,.18);
+  --sbThumbHover:rgba(0,0,0,.28);
 }
 
 *{box-sizing:border-box}
 html,body{height:100%}
+[hidden]{ display:none !important; }
 body{
   margin:0; font-family:var(--mono); color:var(--ink);
   background:
@@ -23,9 +32,16 @@ body{
     repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 1px,transparent 1px 2px),
     repeating-linear-gradient(45deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px),
     var(--bg);
-  overflow:hidden;
+  overflow:auto;
 }
 
+@media (prefers-reduced-motion: reduce){
+  *{ scroll-behavior:auto !important; }
+}
+
+/* =========================================================
+   CSS: LAYOUT SHELL
+========================================================= */
 .frame{
   height:100svh;
   display:grid;
@@ -39,6 +55,16 @@ body{
   align-items:start;
 }
 
+/* MOBILE / NARROW: sidebar becomes top bar */
+@media (max-width:820px){
+  .frame{
+    grid-template-columns:1fr;
+    grid-template-rows:auto 1fr;
+    gap:12px;
+  }
+  aside.win{ position:relative; top:auto; }
+}
+
 .win{
   background:var(--panel);
   padding:var(--pad);
@@ -48,21 +74,21 @@ body{
 }
 aside.win{position:sticky;top:18px}
 
+/* Stage never scrolls; each page box scrolls (prevents double scrollbars). */
 .stage{
   height:100%;
   min-height:0;
-  overflow:auto;
-  overflow-x:hidden;
-  scroll-behavior:smooth;
-  overscroll-behavior:contain;
+  overflow:hidden;
   -webkit-overflow-scrolling:touch;
 }
 
 /* panels */
-.panel{display:none}
-.panel.isActive{display:block}
+.panel{display:none; content-visibility:auto; contain-intrinsic-size:800px}
+.panel.isActive{display:block; height:100%; content-visibility:visible}
 
-/* home button */
+/* =========================================================
+   CSS: NAV + CLOCK
+========================================================= */
 .nameBtn{
   display:block; width:100%;
   text-align:center;
@@ -77,34 +103,16 @@ aside.win{position:sticky;top:18px}
 }
 .nameBtn.isActive{background:var(--accent)}
 
-/* controls */
 .controls{display:grid;justify-items:center;gap:var(--gap)}
 
-/* compass */
-.compass{
-  width:var(--btn); height:var(--btn);
-  background:#FFF3A0;
-  border:2px solid #000;
-  position:relative;
-  display:flex;
-  align-items:center;
+.btns{
+  display:grid;
+  grid-template-columns: var(--btn);
+  grid-auto-rows: var(--btn);
+  gap:10px;
   justify-content:center;
 }
-.compass svg{
-  width:52px; height:52px;
-  display:block;
-  shape-rendering:crispEdges;
-  image-rendering:pixelated;
-}
-.zones{
-  position:absolute; inset:0;
-  display:grid;
-  grid-template:repeat(3,1fr)/repeat(3,1fr);
-}
-.zone{background:none;border:0;cursor:pointer}
 
-/* nav buttons */
-.btns{display:grid;grid-template-columns:var(--btn);gap:10px;justify-content:center}
 .btn{
   width:var(--btn); height:var(--btn);
   display:grid; place-items:center;
@@ -123,7 +131,21 @@ aside.win{position:sticky;top:18px}
   border-color:var(--deep) var(--hi) var(--hi) var(--deep);
 }
 
-/* clock button */
+/* Blog: standout by default, but use normal active orange when selected */
+#linkNotes:not(.isActive){
+  background:#FFF3A0;
+}
+
+/* TOP BAR state */
+@media (max-width:820px){
+  .btns{
+    grid-template-columns: repeat(4, var(--btn));
+    grid-auto-rows: var(--btn);
+    gap:8px;
+    justify-content:center;
+  }
+}
+
 .clockBtn{
   width:100%;
   background:#cfe8ff;
@@ -139,35 +161,106 @@ aside.win{position:sticky;top:18px}
 .clockBtn:active{transform:translate(1px,1px)}
 .clockLine{font-size:12px;font-weight:800;letter-spacing:.06em}
 
-/* home viewport */
-.wrap{width:var(--view);max-width:100%;margin:0}
-.viewport{
+@media (max-width:820px){
+  aside.win{ padding:8px; }
+  .clockBtn{ padding:6px 8px; }
+  .clockLine{ font-size:11px; }
+}
+
+/* =========================================================
+   CSS: SUBTLE SCROLLBARS (reusable)
+========================================================= */
+.scrollbox{
+  overflow:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+
+  scrollbar-width:thin;
+  scrollbar-color: var(--sbThumb) transparent;
+
+  scrollbar-gutter: stable both-edges;
+}
+.scrollbox::-webkit-scrollbar{ width:var(--sb); height:var(--sb); }
+.scrollbox::-webkit-scrollbar-track{ background:transparent; }
+.scrollbox::-webkit-scrollbar-thumb{
+  background:var(--sbThumb);
+  border-radius:10px;
+  border:3px solid transparent;
+  background-clip: padding-box;
+}
+.scrollbox:hover::-webkit-scrollbar-thumb{ background:var(--sbThumbHover); }
+.scrollbox::-webkit-scrollbar-corner{ background:transparent; }
+
+/* =========================================================
+   CSS: HOME (ART VIEWER)
+========================================================= */
+#p-home .wrap{
   width:100%;
-  aspect-ratio:1/1;
-  overflow:scroll;
+  max-width:100%;
+  margin:0;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+/* Touch devices: allow native panning in both directions. */
+#viewport{ touch-action: pan-x pan-y; }
+
+/* Desktop: we handle drag-to-pan. */
+@media (hover:hover) and (pointer:fine){
+  #viewport{ touch-action:none; }
+}
+
+#viewport{
+  width:100%;
+  flex:1 1 auto;
+  min-height:0;
   border:2px solid #000;
   background:transparent;
-  scrollbar-width:none;
-  scroll-behavior:smooth;
-  -webkit-overflow-scrolling: touch;
+  outline:none;
+  position:relative;
 }
-@media (min-width:1100px){
-  #p-home .viewport{aspect-ratio:3 / 2;}
+#viewport:focus-visible{ outline:2px solid #000; outline-offset:3px; }
+
+#canvas{
+  width: max(220%, 900px);
+  height: max(220%, 900px);
+  position:relative;
+  background:transparent;
 }
-.viewport::-webkit-scrollbar{width:0;height:0}
-.canvas{width:220%;height:220%;min-width:1100px;min-height:1100px;position:relative}
-.canvas img{
+#canvas img{
   position:absolute; inset:0;
   width:100%; height:100%;
   object-fit:cover;
-}
-.overlayRow{margin-top:8px;display:flex;align-items:center;justify-content:flex-end;gap:10px}
-.caption{
-  max-width:360px;background:#fff;border:2px solid #000;
-  padding:6px 8px;font-size:11px;line-height:1.2;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
 }
 
+@media (hover:hover) and (pointer:fine){
+  #viewport{ cursor:grab; }
+  #viewport.isGrabbing{ cursor:grabbing; }
+}
+
+#homeOverlay{
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.caption{
+  max-width:420px;
+  background:#fff;
+  border:2px solid #000;
+  padding:6px 8px;
+  font-size:11px;
+  line-height:1.2;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .pager{display:flex;gap:6px}
 .pbtn{
   width:34px;height:28px;display:grid;place-items:center;
@@ -181,57 +274,61 @@ aside.win{position:sticky;top:18px}
 }
 .pbtn:active{transform:translate(1px,1px)}
 
-/* list box */
+/* =========================================================
+   CSS: CONTENT PAGES
+========================================================= */
 .list{
-  width:var(--view);max-width:100%;
-  background:#fff;border:2px solid #000;
+  width:100%;
+  height:100%;
+  margin:0;
+  background:#fff;
+  border:2px solid #000;
   padding:14px 14px 16px;
-  font-size:13px;line-height:1.2;
+  font-size:13px;
+  line-height:1.2;
   box-shadow:var(--shadow);
+
+  display:flex;
+  flex-direction:column;
+  min-height:0;
 }
+
+.pageScroll{ flex:1 1 auto; min-height:0; }
+
+.pageInner{
+  width:max-content;
+  min-width:100%;
+  padding-right:18px;
+  padding-bottom:14px;
+}
+
 .list h2{margin:0 0 10px;font-size:14px;letter-spacing:.08em}
 .rule{height:2px;background:#000;margin:10px 0 12px}
 .spacer{height:14px}
 
-.items{margin-top:10px; width:max-content; min-width:100%}
+/* FIXED: removed invalid "margin: left -8px;" (browser ignored it) */
+.items{ margin-top:10px; width:max-content; min-width:100% }
+
 .item{
   padding:6px 0;
   border-top:1px solid rgba(0,0,0,.14);
   font-variant-numeric: tabular-nums;
 }
 .item:first-child{border-top:0}
-.pathRow{
-  display:flex;
-  align-items:baseline;
-  gap:0;
-  white-space:nowrap;
-}
+.pathRow{display:flex;align-items:baseline;gap:0;white-space:nowrap}
 .prompt{opacity:.95}
 .promptLine{display:flex;align-items:baseline;gap:0;white-space:nowrap}
 .titleCell{white-space:nowrap}
 .sep{opacity:.9; margin:0 4px;}
 .metaLine{white-space:nowrap}
 
-/* one horizontal scroller per page */
-.pageScroll{
-  overflow-x:auto;
-  overflow-y:hidden;
-  scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;
-}
-.pageScroll::-webkit-scrollbar{width:0;height:0}
-.pageInner{width:max-content; min-width:100%}
-
-.list a,
-.caption a{
+.list a, .caption a{
   color:#1f4f8a;
   text-decoration:none;
   -webkit-tap-highlight-color: transparent;
 }
-.list a:visited,
-.caption a:visited{ color:#1f4f8a; }
-.list a:focus,
-.caption a:focus{
+.list a:visited, .caption a:visited{ color:#1f4f8a; }
+.list a:focus, .caption a:focus{
   outline:2px solid #000;
   outline-offset:2px;
 }
@@ -240,72 +337,246 @@ em{font-style:italic}
 .q{ quotes: "“" "”" "‘" "’"; }
 .q::before{ content: open-quote; }
 .q::after{ content: close-quote; }
-.quote{margin-top:12px;font-size:12px;color:#444}
 
-/* mobile */
-@media (max-width:820px){
-  :root{--rail:1fr;--btn:56px;--view:min(92vmin,720px)}
-  .frame{ grid-template-columns:1fr !important; grid-template-rows:auto 1fr !important; }
-  aside.win{ position:static !important; top:auto !important; }
-  .controls{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
-  .btns{grid-template-columns:repeat(3,var(--btn));gap:8px;justify-content:center}
-  .clockBtn{flex-basis:100%}
-  .list, .wrap{width:100%}
+/* CONTACT: no scroll; wrap within the box */
+#p-contact .list{ overflow:hidden; }
+#p-contact p{ white-space:normal; overflow-wrap:anywhere; }
+
+/* =========================================================
+   CSS: BLOG — HEADER TOOLS + LED
+========================================================= */
+.notesHdr{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
 }
+.notesTools{ display:flex; gap:8px; }
+.notesMiniBtn{
+  width:26px;
+  height:20px;
+  background:#c4c4c4;
+  border:1px solid #000;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  padding:0;
+  display:grid;
+  place-items:center;
+  font-size:14px;
+  line-height:1;
+  color:#000;
+  font-family:inherit;
+}
+.notesMiniBtn:active{ transform:translate(1px,1px); }
+.notesMiniBtn.isOn{
+  background: var(--accent);
+  border-color: var(--deep) var(--hi) var(--hi) var(--deep);
+}
+
+.led{
+  display:inline-block;
+  width:7px;
+  height:7px;
+  border:1px solid #000;
+  margin-right:8px;
+  vertical-align:middle;
+  box-shadow:var(--shadow);
+}
+
+/* BLOG: keep ">" aligned AND keep LED fully visible */
+#p-notes .pathRow .promptLine{
+  position:relative;
+  padding-left:18px;
+}
+#p-notes .pathRow .promptLine .led{
+  position:absolute;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+  margin:0;
+}
+
+/* LED colors */
+.led-zine{ background:#990066; }
+.led-video{ background:#FF6600; }
+.led-photo{ background:#fdfb8c; }
+.led-pdf{ background:#ffffff; }
+.led-article{ background:#669900; }
+.led-other{ background:#777; }
+
+/* =========================================================
+   CSS: DIALOGS (TimeQuotes + Notes + About)
+========================================================= */
+#timeDialog, #noteDialog, #aboutDialog{
+  border:0;
+  padding:0;
+  background:transparent;
+}
+#timeDialog::backdrop, #noteDialog::backdrop, #aboutDialog::backdrop{
+  background:rgba(0,0,0,.35);
+}
+#timeDialog[open], #noteDialog[open], #aboutDialog[open]{
+  position:fixed;
+  inset:0;
+  margin:auto;
+  width:min(1200px, 92vw);
+  max-height:92vh;
+}
+
+.tqModal{
+  background:#000;
+  border:2px solid #000;
+  box-shadow:var(--shadow);
+  padding:14px 14px 12px;
+  overflow:auto;
+  max-height:92vh;
+}
+.tqBar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:12px;
+}
+
+.tqTitle{
+  font-weight:900;
+  font-size:14px;
+  letter-spacing:.02em;
+  color:#fff;
+}
+.tqIdx{
+  margin-left:18px;
+  font-weight:300;
+  font-size:11px;
+  color:#fff;
+  opacity:.7;
+}
+.tqNav{display:flex;align-items:center;gap:10px}
+.tqNavBtn{
+  width:40px;
+  height:25px;
+  background:#c4c4c4;
+  border:1px solid #000;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  font-family:inherit;
+  font-weight:900;
+}
+.tqCloseBtn{
+  width:40px;
+  height:25px;
+  background:#c4c4c4;
+  border:1px solid #000;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  font-size:22px;
+  line-height:1;
+  padding:0;
+  display:grid;
+  place-items:center;
+}
+.tqNavBtn:active, .tqCloseBtn:active{ transform:translate(1px,1px); }
+
+.tqNavBtn[disabled]{ opacity:.45; cursor:default; }
+.tqNavBtn[disabled]:active{ transform:none; }
+
+/* NOTE MODAL HEADER: prev/led/next on the left */
+.noteBar{ justify-content:space-between; }
+.noteNavLeft{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:0 0 auto;
+}
+#noteDialog .noteNavLeft .led{
+  width:10px;
+  height:10px;
+  margin:0;
+  box-shadow:var(--shadow);
+}
+
+.noteCaption{
+  border-top:2px solid #000;
+  background:#000;
+  color:#9a9a9a;
+  padding:8px 10px;
+  font-size:10px;
+  line-height:1.25;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+.tqQuoteBox{
+  border:2px solid #000;
+  padding:16px 18px;
+  background:#fff;
+}
+.tqQuote{
+  font-size:12px;
+  line-height:1.15;
+  font-family:var(--mono);
+  white-space:pre-wrap;
+}
+.tqMeta{
+  margin-top:12px;
+  font-size:12px;
+  font-family:var(--mono);
+  color:#555;
+}
+
+/* notes iframe container */
+.noteFrameWrap{
+  border:2px solid #000;
+  background:#fff;
+  overflow:auto;
+}
+#noteImg{ display:block; background:#fff; border:0; }
+#notePdf, #noteFrame{
+  width:100%;
+  height:min(78vh, 760px);
+  border:0;
+  display:block;
+  background:#fff;
+}
+
 @media (max-width:420px){
   :root{--btn:48px}
   .glyph{font-size:28px}
   .caption{max-width:70%;font-size:10px}
+  .tqTitle{font-size:18px}
+  .tqNavBtn{width:66px;height:52px}
+  .tqCloseBtn{width:110px;height:52px}
+  .tqQuote, .tqMeta{font-size:16px}
+  #noteFrame{ height:min(78vh, 680px); }
 }
 
-/* thoughts modal */
-.modal{
-  position:fixed; inset:0;
-  display:none;
-  padding:
-    calc(18px + env(safe-area-inset-top))
-    calc(18px + env(safe-area-inset-right))
-    calc(18px + env(safe-area-inset-bottom))
-    calc(18px + env(safe-area-inset-left));
-  background:rgba(0,0,0,.28);
-  z-index:999;
-  align-items:center;
-  justify-content:center;
+/* ASCII in About module */
+#aboutModule pre.ascii,
+.aboutmodule pre.ascii,
+.aboutModule pre.ascii{
+  font-family: var(--mono, ui-monospace, Menlo, Monaco, Consolas, monospace);
+  font-size: 8px;
+  line-height: 1.0;
+  white-space: pre;
+  margin: 0;
+  overflow: hidden;
 }
-.modal.isOpen{display:flex}
-.modal .win{ width:min(920px, 100%); background:#fff; }
-.modalHead{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:10px; margin-bottom:10px;
+
+/* About ASCII slide styling */
+#aboutText pre.ascii{
+  background:#000;
+  color:#ddd;
+  padding:10px;
+  margin:0;
+  white-space:pre;
+  overflow:auto;
+  max-height:60vh;
 }
-.modalTitleWrap{ display:flex; align-items:baseline; gap:10px; min-width:0; }
-.modalTitle{ font-weight:900; letter-spacing:.08em; font-size:12px; white-space:nowrap; }
-.modalIdx{ font-weight:900; font-size:12px; opacity:.75; white-space:nowrap; }
-.modalNav{display:flex; gap:8px; align-items:center}
-.navBtn,.closeBtn{
-  border:2px solid #000;
-  background:var(--paper2);
-  box-shadow:var(--shadow);
-  cursor:pointer;
-  padding:6px 10px;
-  font-family:inherit;
-  user-select:none;
-  color:#000;
-}
-.navBtn{width:42px; text-align:center; padding:6px 0}
-.navBtn:active,.closeBtn:active{transform:translate(1px,1px)}
-.quoteBox{
-  border:2px solid #000;
-  background:#fff;
-  padding:12px 12px 10px;
-  font-size:12px;
-  line-height:1.25;
-}
-.qLine{white-space:pre-wrap; word-break:break-word;}
-.qMeta{margin-top:8px; opacity:.65; white-space:pre-wrap;}
-@media (max-width:520px){
-  .modalTitleWrap{flex-direction:column; align-items:flex-start; gap:2px}
-}
+
+/* Color mode uses span-per-char */
+#aboutModule pre.ascii.ascii-color span{ white-space: pre; }
+
 </style>
 </head>
 
@@ -315,52 +586,26 @@ em{font-style:italic}
     <a class="nameBtn" id="linkHomeTop" href="#/home" data-route="home" title="Home" aria-label="Home">Christian N. Kerr</a>
 
     <div class="controls">
-      <div class="compass" aria-label="D-pad">
-        <svg viewBox="0 0 64 64" aria-hidden="true">
-          <rect x="29" y="14" width="6" height="36" fill="#000"/>
-          <rect x="14" y="29" width="36" height="6" fill="#000"/>
-          <rect x="26" y="6" width="12" height="6" fill="#000"/>
-          <rect x="23" y="12" width="18" height="6" fill="#000"/>
-          <rect x="26" y="52" width="12" height="6" fill="#000"/>
-          <rect x="23" y="46" width="18" height="6" fill="#000"/>
-          <rect x="6" y="26" width="6" height="12" fill="#000"/>
-          <rect x="12" y="23" width="6" height="18" fill="#000"/>
-          <rect x="52" y="26" width="6" height="12" fill="#000"/>
-          <rect x="46" y="23" width="6" height="18" fill="#000"/>
-          <rect x="28" y="28" width="8" height="8" fill="#FFF3A0" stroke="#000" stroke-width="2"/>
-        </svg>
-
-        <div class="zones" id="zones">
-          <button class="zone" data-pan="0,0"   aria-label="Northwest"></button>
-          <button class="zone" data-pan=".5,0"  aria-label="North"></button>
-          <button class="zone" data-pan="1,0"   aria-label="Northeast"></button>
-          <button class="zone" data-pan="0,.5"  aria-label="West"></button>
-          <button class="zone" data-pan=".5,.5" aria-label="Center"></button>
-          <button class="zone" data-pan="1,.5"  aria-label="East"></button>
-          <button class="zone" data-pan="0,1"   aria-label="Southwest"></button>
-          <button class="zone" data-pan=".5,1"  aria-label="South"></button>
-          <button class="zone" data-pan="1,1"   aria-label="Southeast"></button>
-        </div>
-      </div>
-
       <div class="btns" aria-label="Navigation">
-        <a class="btn" id="linkWriting"  href="#/writing"  data-route="writing"  title="Writing"  aria-label="Writing"><div class="glyph">写</div></a>
+        <a class="btn" id="linkNotes" href="#/notes" data-route="notes" title="Blog" aria-label="Blog"><div class="glyph">博</div></a>
+        <a class="btn" id="linkWriting"  href="#/writing"  data-route="writing"  title="Clips"  aria-label="Clips"><div class="glyph">刊</div></a>
         <a class="btn" id="linkResearch" href="#/research" data-route="research" title="Research" aria-label="Research"><div class="glyph">研</div></a>
-        <a class="btn" id="linkContact"  href="#/contact"  data-route="contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></a>
+        <a class="btn" id="linkContact"  href="#/contact"  data-route="contact"  title="Contact" aria-label="Contact"><div class="glyph">联</div></a>
       </div>
 
-      <button class="clockBtn" id="clockBtn" type="button" aria-label="Current date and time (triple click for feed)">
+      <button class="clockBtn" id="clockBtn" type="button" aria-label="Current date and time">
         <div class="clockLine" id="clockStamp">—</div>
       </button>
     </div>
   </aside>
 
   <main class="stage" id="stage" aria-label="Stage">
+    <!-- HOME -->
     <section class="panel" id="p-home">
       <div class="win wrap" id="homeWrap">
-        <div class="viewport" id="viewport">
+        <div class="viewport scrollbox" id="viewport" tabindex="0" aria-label="Artwork viewer (drag or click to pan)">
           <div class="canvas" id="canvas">
-            <img id="hero" src="" alt="">
+            <img id="hero" src="" alt="" draggable="false" decoding="async" fetchpriority="high">
           </div>
         </div>
 
@@ -374,11 +619,12 @@ em{font-style:italic}
       </div>
     </section>
 
+    <!-- CLIPS -->
     <section class="panel" id="p-writing">
       <div class="list">
-        <div class="pageScroll" id="scroll-writing">
+        <div class="pageScroll scrollbox" id="scroll-writing">
           <div class="pageInner">
-            <h2>WRITING</h2>
+            <h2>CLIPS</h2>
             <div class="rule"></div>
             <div class="items" id="items-writing" aria-live="polite"></div>
           </div>
@@ -386,9 +632,10 @@ em{font-style:italic}
       </div>
     </section>
 
+    <!-- RESEARCH -->
     <section class="panel" id="p-research">
       <div class="list">
-        <div class="pageScroll" id="scroll-researchAll">
+        <div class="pageScroll scrollbox" id="scroll-researchAll">
           <div class="pageInner">
             <h2>RESEARCH</h2>
             <div class="rule"></div>
@@ -404,6 +651,26 @@ em{font-style:italic}
       </div>
     </section>
 
+    <!-- BLOG -->
+    <section class="panel" id="p-notes">
+      <div class="list">
+        <div class="pageScroll scrollbox" id="scroll-notes">
+          <div class="pageInner">
+            <div class="notesHdr">
+              <h2>BLOG</h2>
+              <div class="notesTools" aria-label="Blog sorting controls">
+                <button id="notesSortDate" class="notesMiniBtn" type="button" aria-label="Sort by date">↕</button>
+                <button id="notesSortType" class="notesMiniBtn" type="button" aria-label="Sort by type">≡</button>
+              </div>
+            </div>
+            <div class="rule"></div>
+            <div class="items" id="items-notes" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
     <section class="panel" id="p-contact">
       <div class="list">
         <h2>CONTACT</h2>
@@ -414,467 +681,1168 @@ em{font-style:italic}
           Socials:
           <a href="https://www.youtube.com/@CNKERR..." target="_blank" rel="noopener">YouTube</a>,
           <a href="https://x.com/cnkerr" target="_blank" rel="noopener">X</a>,
-          <a href="https://www.instagram.com/cnkerr" target="_blank" rel="noopener">Instagram</a>
-        </p>
-        <p class="quote">
-          "I celebrate myself, and sing myself, / And what I assume you shall assume, / For every atom belonging to me as good belongs to you." —WW
+          <a href="https://www.instagram.com/cnkerr" target="_blank" rel="noopener">Instagram</a><br>
+
+  Resumé: <a href="assets/kerr_christian_cv.pdf" target="_blank" rel="noopener">kerr_christian_cv</a>
+</p>
+        <p class="quote" style="color:#838383; font-size:8px; line-height:1.25;">
+          "I celebrate myself, and sing myself,<br>And what I assume you shall assume,<br>For every atom belonging to me as good belongs to you." <br>—WW
         </p>
       </div>
     </section>
   </main>
 </div>
 
-<!-- THOUGHTS modal -->
-<div class="modal" id="thoughtsModal" aria-hidden="true">
-  <div class="win">
-    <div class="modalHead">
-      <div class="modalTitleWrap">
-        <div class="modalTitle">Time?</div>
-        <div class="modalIdx" id="thoughtsIdx">00/00</div>
+<!-- TIMEQUOTES dialog -->
+<dialog id="timeDialog" aria-label="Time quotes">
+  <div class="tqModal">
+    <div class="tqBar">
+      <div class="tqTitle">
+        Time? <span class="tqIdx" id="timeIdx">00/00</span>
       </div>
-
-      <div class="modalNav">
-        <button class="navBtn" id="tqPrev" type="button" aria-label="Previous quote">◀</button>
-        <button class="navBtn" id="tqNext" type="button" aria-label="Next quote">▶</button>
-        <button class="closeBtn" id="closeThoughts" type="button" aria-label="Close">CLOSE</button>
+      <div class="tqNav">
+        <button class="tqNavBtn" id="timePrev" type="button" aria-label="Previous quote">&lt;</button>
+        <button class="tqNavBtn" id="timeNext" type="button" aria-label="Next quote">&gt;</button>
+        <button class="tqCloseBtn" id="timeClose" type="button" aria-label="Close">x</button>
       </div>
     </div>
 
-    <div class="quoteBox" aria-live="polite">
-      <div class="qLine" id="tqQuote">&gt; (add quote here)</div>
-      <div class="qMeta" id="tqMeta">&gt;&gt; (work / author)</div>
+    <div class="tqQuoteBox" aria-live="polite">
+      <div class="tqQuote" id="timeQuoteText">—</div>
+      <div class="tqMeta" id="timeQuoteMeta">—</div>
     </div>
   </div>
-</div>
+</dialog>
 
+<!-- ABOUT dialog -->
+<dialog id="aboutDialog" aria-label="About this site">
+  <div class="tqModal">
+    <div class="tqBar">
+      <!-- FIX: dynamic title target -->
+      <div class="tqTitle" id="aboutTitle"></div>
+
+      <div class="tqNav">
+        <button class="tqNavBtn" id="aboutPrev" type="button" aria-label="Previous slide">&lt;</button>
+        <button class="tqNavBtn" id="aboutNext" type="button" aria-label="Next slide">&gt;</button>
+        <button class="tqCloseBtn" id="aboutClose" type="button" aria-label="Close">x</button>
+      </div>
+    </div>
+
+    <div class="tqQuoteBox" aria-live="polite">
+      <div class="tqQuote" id="aboutText">—</div>
+    </div>
+  </div>
+</dialog>
+
+<!-- NOTES dialog -->
+<dialog id="noteDialog" aria-label="Note">
+  <div class="tqModal">
+    <div class="tqBar noteBar">
+      <div class="noteNavLeft" aria-label="Blog navigation">
+        <button class="tqNavBtn" id="notePrev" type="button" aria-label="Previous blog entry">&lt;</button>
+        <span id="noteTypeLed" class="led led-other" aria-hidden="true"></span>
+        <button class="tqNavBtn" id="noteNext" type="button" aria-label="Next blog entry">&gt;</button>
+      </div>
+
+      <div class="tqNav noteNavRight">
+        <button class="tqCloseBtn" id="notePop" type="button" aria-label="Open note in new tab">❒</button>
+        <button class="tqCloseBtn" id="noteClose" type="button" aria-label="Close">x</button>
+      </div>
+    </div>
+
+    <div class="noteFrameWrap" aria-live="polite">
+      <img id="noteImg" alt="" hidden>
+
+      <iframe
+        id="noteFrame"
+        title="Note"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
+
+      <embed id="notePdf" type="application/pdf" hidden>
+      <div id="noteCaption" class="noteCaption" hidden></div>
+    </div>
+  </div>
+</dialog>
 
 <script>
-/*
-  REQUIREMENT:
-  data.js must define:
-  window.DATA_REMOTE = { slides:[], writing:[], research:[], factChecking:[], timeQuotes:[] }
-
-  IMPORTANT:
-  We load data.js first, then boot the app ONLY after it finishes loading.
-  This eliminates the “home images don’t load” race condition.
-*/
+/* =========================================================
+   JS: BOOTSTRAP (loads data.js then starts)
+========================================================= */
 (function loadDataThenBoot(){
-  const boot = () => {
-    (() => {
-      const $ = (id) => document.getElementById(id);
+  function boot(){
+    var $ = function(id){ return document.getElementById(id); };
 
-      const esc = (s) => String(s ?? "").replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[m]));
-
-      const stage = $("stage");
-      const v = $("viewport");
-      const c = $("canvas");
-
-      // --- Pull data (or safe empty fallback) ---
-      const DATA = (window.DATA_REMOTE && typeof window.DATA_REMOTE === "object")
-        ? window.DATA_REMOTE
-        : { slides:[], writing:[], research:[], factChecking:[], timeQuotes:[] };
-
-      // normalize so we never crash on missing keys
-      (function normalize(d){
-        if (!Array.isArray(d.slides)) d.slides = [];
-        if (!Array.isArray(d.writing)) d.writing = [];
-        if (!Array.isArray(d.research)) d.research = [];
-        if (!Array.isArray(d.factChecking)) d.factChecking = [];
-        if (!Array.isArray(d.timeQuotes)) d.timeQuotes = [];
-      })(DATA);
-
-      // --- Home pan ---
-      const pan = (x,y) => v.scrollTo({
-        left: (c.scrollWidth - v.clientWidth) * x,
-        top:  (c.scrollHeight - v.clientHeight) * y,
-        behavior: "smooth"
+    function esc(s){
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function(m){
+        return ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[m];
       });
+    }
 
-      // --- Stage scroll ---
-      const scrollStage = (dir, fast=false) =>
-        stage.scrollBy({ top: dir * (fast ? 380 : 160), behavior: "smooth" });
+    // -------------------------------------------------------
+    // JS: DATA (safe fallback)
+    // -------------------------------------------------------
+    var DATA = (window.DATA_REMOTE && typeof window.DATA_REMOTE === "object")
+      ? window.DATA_REMOTE
+      : { slides:[], writing:[], research:[], factChecking:[], timeQuotes:[], notes:[], aboutSlides: [] };
 
-      // --- Home auto-fit sizing ---
-      const homeWrap = $("homeWrap");
-      const homeOverlay = $("homeOverlay");
+    function ensureArrayKey(obj, key){
+      if (!obj || !Array.isArray(obj[key])) obj[key] = [];
+    }
+    ensureArrayKey(DATA, "slides");
+    ensureArrayKey(DATA, "writing");
+    ensureArrayKey(DATA, "research");
+    ensureArrayKey(DATA, "factChecking");
+    ensureArrayKey(DATA, "timeQuotes");
+    ensureArrayKey(DATA, "notes");
+    ensureArrayKey(DATA, "aboutSlides");
 
-      const fitHome = () => {
-        if (!homeWrap || !homeOverlay || !v) return;
-        if (!$("p-home").classList.contains("isActive")) return;
+    var prefersReducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-        const stageW = stage.clientWidth;
-        const stageH = stage.clientHeight;
+    // -------------------------------------------------------
+    // JS: HOME VIEWER PAN
+    // -------------------------------------------------------
+    var viewport = $("viewport");
+    var canvas = $("canvas");
 
-        const overlayH = homeOverlay.offsetHeight || 0;
-        const safety = 28;
+    function isHomeActive(){
+      var p = $("p-home");
+      return !!(p && p.classList.contains("isActive"));
+    }
 
-        const maxByW = stageW - 6;
-        const maxByH = stageH - overlayH - safety;
+    function panCenter(){
+      if (!viewport || !canvas) return;
+      var maxX = Math.max(0, canvas.scrollWidth  - viewport.clientWidth);
+      var maxY = Math.max(0, canvas.scrollHeight - viewport.clientHeight);
+      viewport.scrollTo({ left: maxX * 0.5, top: maxY * 0.5, behavior:(prefersReducedMotion?"auto":"smooth") });
+    }
 
-        const isWide = window.matchMedia("(min-width:1100px)").matches;
-        const aspect = isWide ? (3/2) : 1;
+    (function enableHomePan(){
+      if (!viewport) return;
+      var fine = window.matchMedia && window.matchMedia("(hover:hover) and (pointer:fine)").matches;
+      if (!fine) return;
 
-        const isMobile = window.matchMedia("(max-width:820px)").matches;
-        const chrome = 44;
+      var isDown = false;
+      var moved = false;
+      var startX = 0, startY = 0;
+      var startSL = 0, startST = 0;
+      var raf = 0;
+      var lastX = 0, lastY = 0;
 
-        if (isMobile) {
-          homeWrap.style.width = maxByW + "px";
-          const viewportH = Math.max(220, Math.floor(maxByH - chrome));
-          const side = Math.min(maxByW, viewportH);
-          v.style.width = "100%";
-          v.style.height = side + "px";
-          return;
-        }
+      function applyMove(){
+        raf = 0;
+        if (!isDown) return;
+        var dx = lastX - startX;
+        var dy = lastY - startY;
+        viewport.scrollLeft = startSL - dx;
+        viewport.scrollTop  = startST - dy;
+      }
 
-        const height = Math.max(260, Math.floor(maxByH));
-        let width = Math.floor(height * aspect);
-        width = Math.min(width, maxByW);
+      viewport.addEventListener("pointerdown", function(e){
+        if (!isHomeActive()) return;
+        if (e.pointerType && e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+        if (e.button != null && e.button !== 0) return;
 
-        homeWrap.style.width = width + "px";
-        v.style.width = "100%";
-        v.style.height = Math.floor(width / aspect) + "px";
-      };
+        isDown = true;
+        moved = false;
 
-      window.addEventListener("resize", () => requestAnimationFrame(fitHome), { passive:true });
+        startX = e.clientX; startY = e.clientY;
+        lastX = startX; lastY = startY;
 
-      // --- Compass behavior (home pans, pages scroll) ---
-      const getActivePageScroller = () => {
-        if ($("p-writing").classList.contains("isActive")) return $("scroll-writing");
-        if ($("p-research").classList.contains("isActive")) return $("scroll-researchAll");
-        return null;
-      };
+        startSL = viewport.scrollLeft;
+        startST = viewport.scrollTop;
 
-      $("zones").addEventListener("click", (e) => {
-        const b = e.target.closest("[data-pan]");
-        if (!b) return;
-        const [x,y] = b.dataset.pan.split(",").map(Number);
+        viewport.classList.add("isGrabbing");
+        viewport.setPointerCapture(e.pointerId);
 
-        const onHome = $("p-home").classList.contains("isActive");
-        if (onHome) return void pan(x,y);
-
-        const sc = getActivePageScroller();
-        const dx = 260;
-        if (sc && x < 0.5) return void sc.scrollBy({ left: -dx, behavior: "smooth" });
-        if (sc && x > 0.5) return void sc.scrollBy({ left:  dx, behavior: "smooth" });
-
-        if (x === 0.5 && y === 0.5) return void stage.scrollTo({ top: 0, behavior: "smooth" });
-        if (y < 0.5) return void scrollStage(-1, y === 0);
-        if (y > 0.5) return void scrollStage( 1, y === 1);
-      });
-
-      // --- Slideshow (requires DATA.slides) ---
-      const hero = $("hero");
-      const cap = $("caption");
-      const prevBtn = $("prev");
-      const nextBtn = $("next");
-
-      let slideIndex = Number(localStorage.getItem("slideIndex") || 0) || 0;
-
-      const slides = DATA.slides; // {src, caption}[]
-      const setHomeEmptyState = (msg) => {
-        hero.removeAttribute("src");
-        hero.alt = "";
-        cap.textContent = msg || "—";
-      };
-
-      const showSlide = (n) => {
-        if (!slides.length) {
-          setHomeEmptyState("No slides yet (add DATA_REMOTE.slides in data.js).");
-          prevBtn.disabled = true;
-          nextBtn.disabled = true;
-          return;
-        }
-        prevBtn.disabled = false;
-        nextBtn.disabled = false;
-
-        slideIndex = (n + slides.length) % slides.length;
-        const s = slides[slideIndex] || {};
-
-        const src = String(s.src || "").trim();
-        const caption = String(s.caption || "").trim();
-
-        if (!src) {
-          setHomeEmptyState("Slide missing src (check DATA_REMOTE.slides).");
-          return;
-        }
-
-        hero.src = src;
-        hero.alt = caption || "";
-        cap.textContent = caption || "—";
-
-        localStorage.setItem("slideIndex", String(slideIndex));
-        requestAnimationFrame(() => pan(.5,.5));
-      };
-
-      prevBtn.addEventListener("click", () => showSlide(slideIndex - 1));
-      nextBtn.addEventListener("click", () => showSlide(slideIndex + 1));
-      window.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowLeft") showSlide(slideIndex - 1);
-        if (e.key === "ArrowRight") showSlide(slideIndex + 1);
-      });
-
-      // --- Clock ---
-      const clockStamp = $("clockStamp");
-      const tick = () => {
-        const now = new Date();
-        const parts = new Intl.DateTimeFormat("en-US", {
-          timeZone: "America/New_York",
-          year: "numeric", month: "2-digit", day: "2-digit",
-          hour: "2-digit", minute: "2-digit", second: "2-digit",
-          hour12: false
-        }).formatToParts(now);
-        const get = (t) => parts.find(p => p.type === t)?.value || "00";
-        clockStamp.textContent =
-          `${get("year")}.${get("month")}.${get("day")}T${get("hour")}:${get("minute")}:${get("second")}:ET`;
-      };
-      tick();
-      setInterval(tick, 1000);
-
-      // --- List rendering ---
-      const parseMonthYear = (s) => {
-        const str = String(s || "").trim();
-        const m = str.match(/^([A-Za-z]{3,})\s+(\d{4})$/);
-        if (!m) return 0;
-        const month = m[1].slice(0,3).toLowerCase();
-        const year = Number(m[2]);
-        const months = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-        if (!(month in months) || !Number.isFinite(year)) return 0;
-        return new Date(year, months[month], 1).getTime();
-      };
-
-      const authorPublisherHtml = (s) => {
-        const str = String(s || "").trim();
-        const m = str.match(/^(.*)\s+\(([^)]+)\)\s*$/);
-        if (!m) return esc(str);
-        const author = esc(m[1].trim());
-        const pub = esc(m[2].trim());
-        return `${author} (<em>${pub}</em>)`;
-      };
-
-      const row1 = ({ titleHtml, metaHtml }) => `
-        <div class="item">
-          <div class="pathRow">
-            <div class="promptLine">
-              <span class="prompt">&gt;</span>
-              <span class="titleCell">${titleHtml}</span>
-            </div>
-            ${metaHtml ? `<span class="sep"> / </span><span class="metaLine">${metaHtml}</span>` : ``}
-          </div>
-        </div>
-      `;
-
-      const render = (section) => {
-        const out = $(`items-${section}`);
-        if (!out) return;
-
-        const items = (DATA[section] || []).slice().sort((a,b) => {
-          if (section === "factChecking") return parseMonthYear(b.date) - parseMonthYear(a.date);
-          return (b.year ?? 0) - (a.year ?? 0);
-        });
-
-        if (!items.length){
-          out.innerHTML = row1({ titleHtml:"No items yet.", metaHtml:"" });
-          return;
-        }
-
-        if (section === "writing"){
-          out.innerHTML = items.map(it => {
-            const title = esc(it.title || "");
-            const href = it.url ? String(it.url) : "";
-            const titleHtml = href
-              ? `<a href="${esc(href)}" target="_blank" rel="noopener">${title}</a>`
-              : title;
-
-            const pub = it.outlet ? `<em>${esc(it.outlet)}</em>` : "";
-            const year = it.year ? esc(it.year) : "";
-            const metaHtml = [pub, year].filter(Boolean).join(" / ");
-            return row1({ titleHtml, metaHtml });
-          }).join("");
-          return;
-        }
-
-        if (section === "research"){
-          out.innerHTML = items.map(it => {
-            const raw = esc(it.title || "");
-            const inner = it.italic ? `<em>${raw}</em>` : raw;
-            const href = it.url ? String(it.url) : "";
-            const titleHtml = href
-              ? `<a href="${esc(href)}" target="_blank" rel="noopener">${inner}</a>`
-              : inner;
-
-            const ap = it.outlet ? authorPublisherHtml(it.outlet) : "";
-            const year = it.year ? esc(it.year) : "";
-            const metaHtml = [ap, year].filter(Boolean).join(" / ");
-            return row1({ titleHtml, metaHtml });
-          }).join("");
-          return;
-        }
-
-        // factChecking
-        out.innerHTML = items.map(it => {
-          const titleQuoted = `<span class="q">${esc(it.title || "")}</span>`;
-          const href = it.url ? String(it.url) : "";
-          const titleHtml = href
-            ? `<a href="${esc(href)}" target="_blank" rel="noopener">${titleQuoted}</a>`
-            : titleQuoted;
-
-          const author = esc(it.author || "");
-          const pub = it.publication ? `<em>${esc(it.publication)}</em>` : "";
-          const ap = author && pub ? `${author} (${pub})` : (author || (pub ? `(${pub})` : ""));
-          const date = esc(it.date || "");
-          const metaHtml = [ap, date].filter(Boolean).join(" / ");
-          return row1({ titleHtml, metaHtml });
-        }).join("");
-      };
-
-      // --- Hash router (works on GitHub Pages + custom domains) ---
-      const panels = {
-        home: $("p-home"),
-        writing: $("p-writing"),
-        research: $("p-research"),
-        contact: $("p-contact"),
-      };
-      const links = {
-        home: $("linkHomeTop"),
-        writing: $("linkWriting"),
-        research: $("linkResearch"),
-        contact: $("linkContact"),
-      };
-
-      const normalizeRoute = (hash) => {
-        const raw = String(hash || "");
-        const m = raw.match(/^#\/(home|writing|research|contact)\b/);
-        return m ? m[1] : "home";
-      };
-
-      const setActive = (key) => {
-        Object.entries(panels).forEach(([k,el]) => el.classList.toggle("isActive", k === key));
-        Object.entries(links).forEach(([k,el]) => el.classList.toggle("isActive", k === key));
-        stage.scrollTo({ top: 0, behavior: "auto" });
-        if (key === "home") requestAnimationFrame(() => { fitHome(); pan(.5,.5); });
-      };
-
-      document.addEventListener("click", (e) => {
-        const a = e.target.closest("a[data-route]");
-        if (!a) return;
         e.preventDefault();
-        const key = a.dataset.route || "home";
-        location.hash = "#/" + key;
+      }, { passive:false });
+
+      viewport.addEventListener("pointermove", function(e){
+        if (!isDown) return;
+        lastX = e.clientX; lastY = e.clientY;
+
+        if (!moved){
+          if (Math.abs(lastX - startX) > 3 || Math.abs(lastY - startY) > 3) moved = true;
+        }
+        if (!raf) raf = requestAnimationFrame(applyMove);
       });
 
-      window.addEventListener("hashchange", () => setActive(normalizeRoute(location.hash)));
+      function endDrag(e){
+        if (!isDown) return;
+        isDown = false;
+        viewport.classList.remove("isGrabbing");
+        try{ viewport.releasePointerCapture(e.pointerId); }catch(_){}
+      }
 
-      // --- Thoughts modal (triple-click clock) ---
-      const modal = $("thoughtsModal");
-      const clockBtn = $("clockBtn");
-      const tqQuote = $("tqQuote");
-      const tqMeta  = $("tqMeta");
-      const tqPrev  = $("tqPrev");
-      const tqNext  = $("tqNext");
-      const tqIdx   = $("thoughtsIdx");
-      const closeThoughts = $("closeThoughts");
+      viewport.addEventListener("pointerup", endDrag);
+      viewport.addEventListener("pointercancel", endDrag);
+      viewport.addEventListener("lostpointercapture", function(){
+        isDown = false;
+        viewport.classList.remove("isGrabbing");
+      });
 
-      const pad2 = (n) => String(n).padStart(2, "0");
-      const fmtIdx = (i, total) => `${pad2(i)}/${pad2(total)}`;
+      viewport.addEventListener("click", function(e){
+        if (!isHomeActive()) return;
+        if (moved) return;
 
-      let qi = Number(localStorage.getItem("timeQuoteIndex") || 0) || 0;
+        var rect = viewport.getBoundingClientRect();
+        var x = e.clientX - rect.left + viewport.scrollLeft;
+        var y = e.clientY - rect.top  + viewport.scrollTop;
 
-      const renderQuote = () => {
-        const quotes = Array.isArray(DATA.timeQuotes) ? DATA.timeQuotes : [];
-        const total = quotes.length;
+        viewport.scrollTo({
+          left: x - viewport.clientWidth/2,
+          top:  y - viewport.clientHeight/2,
+          behavior:(prefersReducedMotion?"auto":"smooth")
+        });
+      });
+    })();
 
-        if (!total){
-          tqQuote.textContent = "> (add quote here)";
-          tqMeta.textContent  = ">> (work / author)";
-          tqIdx.textContent   = fmtIdx(0, 0);
+    // -------------------------------------------------------
+    // JS: HOME SLIDESHOW
+    // -------------------------------------------------------
+    var hero = $("hero");
+    var cap = $("caption");
+    var prevBtn = $("prev");
+    var nextBtn = $("next");
+
+    var slideIndex = Number(localStorage.getItem("slideIndex") || 0) || 0;
+    var slides = DATA.slides;
+
+    function setHomeEmptyState(msg){
+      if (hero) hero.removeAttribute("src");
+      if (hero) hero.alt = "";
+      if (cap) cap.textContent = msg || "—";
+    }
+
+    function showSlide(n){
+      if (!slides.length){
+        setHomeEmptyState("No slides yet (add DATA_REMOTE.slides in data.js).");
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        return;
+      }
+      if (prevBtn) prevBtn.disabled = false;
+      if (nextBtn) nextBtn.disabled = false;
+
+      slideIndex = (n + slides.length) % slides.length;
+      var s = slides[slideIndex] || {};
+      var src = String(s.src || "").trim();
+      var caption = String(s.caption || "").trim();
+
+      if (!src){
+        setHomeEmptyState("Slide missing src (check DATA_REMOTE.slides).");
+        return;
+      }
+
+      hero.src = src;
+      hero.alt = caption || "";
+      cap.textContent = caption || "—";
+
+      localStorage.setItem("slideIndex", String(slideIndex));
+      requestAnimationFrame(panCenter);
+    }
+
+    if (prevBtn) prevBtn.addEventListener("click", function(){ showSlide(slideIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener("click", function(){ showSlide(slideIndex + 1); });
+
+    // -------------------------------------------------------
+    // JS: CLOCK
+    // -------------------------------------------------------
+    var clockStamp = $("clockStamp");
+    function tick(){
+      if (!clockStamp) return;
+      var now = new Date();
+      var parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        hour12: false
+      }).formatToParts(now);
+
+      function get(t){
+        for (var i=0;i<parts.length;i++){
+          if (parts[i].type === t) return parts[i].value;
+        }
+        return "00";
+      }
+      clockStamp.textContent =
+        get("year") + "." + get("month") + "." + get("day") +
+        "T" + get("hour") + ":" + get("minute") + ":" + get("second") + ":ET";
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    // -------------------------------------------------------
+    // JS: LIST HELPERS + RENDER
+    // -------------------------------------------------------
+    function parseMonthYear(s){
+      var str = String(s || "").trim();
+      var m = str.match(/^([A-Za-z]{3,})\s+(\d{4})$/);
+      if (!m) return 0;
+      var mon = m[1].slice(0,3).toLowerCase();
+      var year = Number(m[2]);
+      var months = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+      if (!months.hasOwnProperty(mon) || !Number.isFinite(year)) return 0;
+      return new Date(year, months[mon], 1).getTime();
+    }
+
+    function authorPublisherHtml(s){
+      var str = String(s || "").trim();
+      var m = str.match(/^(.*)\s+\(([^)]+)\)\s*$/);
+      if (!m) return esc(str);
+      var author = esc(m[1].trim());
+      var pub = esc(m[2].trim());
+      return author + " (<em>" + pub + "</em>)";
+    }
+
+    function row1(titleHtml, metaHtml, prefixHtml){
+      var metaPart = metaHtml ? ('<span class="sep"> / </span><span class="metaLine">' + metaHtml + '</span>') : "";
+      var prefix = prefixHtml ? prefixHtml : "";
+      return (
+        '<div class="item">' +
+          '<div class="pathRow">' +
+            '<div class="promptLine">' +
+              prefix +
+              '<span class="prompt">&gt;</span>' +
+              '<span class="titleCell">' + titleHtml + '</span>' +
+            '</div>' +
+            metaPart +
+          '</div>' +
+        '</div>'
+      );
+    }
+
+    function render(section){
+      var out = $("items-" + section);
+      if (!out) return;
+
+      var items = (DATA[section] || []).slice();
+      items.sort(function(a,b){
+        if (section === "factChecking") return parseMonthYear(b.date) - parseMonthYear(a.date);
+        return (b.year || 0) - (a.year || 0);
+      });
+
+      if (!items.length){
+        out.innerHTML = row1("No items yet.", "");
+        return;
+      }
+
+      if (section === "writing"){
+        var htmlW = [];
+        for (var i=0;i<items.length;i++){
+          var it = items[i] || {};
+          var title = esc(it.title || "");
+          var href = it.url ? String(it.url) : "";
+          var titleHtml = href
+            ? ('<a href="' + esc(href) + '" target="_blank" rel="noopener">' + title + '</a>')
+            : title;
+
+          var pub = it.outlet ? ("<em>" + esc(it.outlet) + "</em>") : "";
+          var year = it.year ? esc(it.year) : "";
+          var metaHtml = [pub, year].filter(Boolean).join(" / ");
+          htmlW.push(row1(titleHtml, metaHtml));
+        }
+        out.innerHTML = htmlW.join("");
+        return;
+      }
+
+      if (section === "research"){
+        var htmlR = [];
+        for (var j=0;j<items.length;j++){
+          var it2 = items[j] || {};
+          var raw = esc(it2.title || "");
+          var inner = it2.italic ? ("<em>" + raw + "</em>") : raw;
+          var href2 = it2.url ? String(it2.url) : "";
+          var titleHtml2 = href2
+            ? ('<a href="' + esc(href2) + '" target="_blank" rel="noopener">' + inner + '</a>')
+            : inner;
+
+          var ap = it2.outlet ? authorPublisherHtml(it2.outlet) : "";
+          var year2 = it2.year ? esc(it2.year) : "";
+          var metaHtml2 = [ap, year2].filter(Boolean).join(" / ");
+          htmlR.push(row1(titleHtml2, metaHtml2));
+        }
+        out.innerHTML = htmlR.join("");
+        return;
+      }
+
+      // factChecking
+      var htmlF = [];
+      for (var k=0;k<items.length;k++){
+        var it3 = items[k] || {};
+        var titleQuoted = '<span class="q">' + esc(it3.title || "") + '</span>';
+        var href3 = it3.url ? String(it3.url) : "";
+        var titleHtml3 = href3
+          ? ('<a href="' + esc(href3) + '" target="_blank" rel="noopener">' + titleQuoted + '</a>')
+          : titleQuoted;
+
+        var author = esc(it3.author || "");
+        var pub3 = it3.publication ? ("<em>" + esc(it3.publication) + "</em>") : "";
+        var ap3 = (author && pub3) ? (author + " (" + pub3 + ")") : (author || (pub3 ? ("(" + pub3 + ")") : ""));
+        var date3 = esc(it3.date || "");
+        var metaHtml3 = [ap3, date3].filter(Boolean).join(" / ");
+        htmlF.push(row1(titleHtml3, metaHtml3));
+      }
+      out.innerHTML = htmlF.join("");
+    }
+
+    // -------------------------------------------------------
+    // JS: BLOG (NOTES)
+    // -------------------------------------------------------
+    var itemsNotes   = $("items-notes");
+    var noteDialog   = $("noteDialog");
+    var noteClose    = $("noteClose");
+    var noteFrame    = $("noteFrame");
+    var notePdf      = $("notePdf");
+    var noteImg      = $("noteImg");
+    var notePop      = $("notePop");
+    var noteCaption  = $("noteCaption");
+
+    var notePrevBtn  = $("notePrev");
+    var noteNextBtn  = $("noteNext");
+    var noteTypeLed  = $("noteTypeLed");
+
+    var notesKeyToIndex = new Map();
+    var suppressHashReopen = false;
+
+    var notesSortDateBtn = $("notesSortDate");
+    var notesSortTypeBtn = $("notesSortType");
+
+    var notesSortMode = localStorage.getItem("notesSortMode") || "date";
+    var notesSortDateDir = Number(localStorage.getItem("notesSortDateDir") || -1);
+    var notesSortTypeDir = Number(localStorage.getItem("notesSortTypeDir") || 1);
+
+    function updateNotesSortUI(){
+      if (notesSortDateBtn){
+        notesSortDateBtn.classList.toggle("isOn", notesSortMode === "date");
+        notesSortDateBtn.title = (notesSortDateDir < 0) ? "Date: newest → oldest" : "Date: oldest → newest";
+      }
+      if (notesSortTypeBtn){
+        notesSortTypeBtn.classList.toggle("isOn", notesSortMode === "type");
+        notesSortTypeBtn.title = (notesSortTypeDir > 0) ? "Type: A → Z (within type: newest first)" : "Type: Z → A (within type: newest first)";
+      }
+    }
+
+    if (notesSortDateBtn){
+      notesSortDateBtn.addEventListener("click", function(){
+        if (notesSortMode !== "date") notesSortMode = "date";
+        else notesSortDateDir *= -1;
+
+        localStorage.setItem("notesSortMode", notesSortMode);
+        localStorage.setItem("notesSortDateDir", String(notesSortDateDir));
+        updateNotesSortUI();
+        renderNotesList();
+      });
+    }
+
+    if (notesSortTypeBtn){
+      notesSortTypeBtn.addEventListener("click", function(){
+        if (notesSortMode !== "type") notesSortMode = "type";
+        else notesSortTypeDir *= -1;
+
+        localStorage.setItem("notesSortMode", notesSortMode);
+        localStorage.setItem("notesSortTypeDir", String(notesSortTypeDir));
+        updateNotesSortUI();
+        renderNotesList();
+      });
+    }
+
+    function resetNoteDialogSizing(){
+      if (!noteDialog) return;
+      noteDialog.style.width = "";
+      noteDialog.style.height = "";
+      noteDialog.style.maxWidth = "";
+      noteDialog.style.maxHeight = "";
+      if (noteImg){
+        noteImg.style.width = "";
+        noteImg.style.height = "";
+        noteImg.style.objectFit = "";
+      }
+    }
+
+    function sizeDialogToImage(img){
+      if (!noteDialog || !img || !img.naturalWidth || !img.naturalHeight) return;
+
+      var maxW = Math.min(1200, Math.floor(window.innerWidth * 0.92));
+      var maxH = Math.floor(window.innerHeight * 0.92);
+
+      var modal = noteDialog.querySelector(".tqModal");
+      var bar   = noteDialog.querySelector(".tqBar");
+      var wrap  = noteDialog.querySelector(".noteFrameWrap");
+      if (!modal || !bar || !wrap) return;
+
+      var csModal = window.getComputedStyle(modal);
+      var csBar   = window.getComputedStyle(bar);
+      var csWrap  = window.getComputedStyle(wrap);
+
+      function px(v){ return Math.max(0, parseFloat(v || "0") || 0); }
+
+      var padX = px(csModal.paddingLeft) + px(csModal.paddingRight);
+      var padY = px(csModal.paddingTop) + px(csModal.paddingBottom);
+      var borderModalX = px(csModal.borderLeftWidth) + px(csModal.borderRightWidth);
+      var borderModalY = px(csModal.borderTopWidth) + px(csModal.borderBottomWidth);
+
+      var barH = bar.getBoundingClientRect().height;
+      var barMarginB = px(csBar.marginBottom);
+
+      var wrapBorderX = px(csWrap.borderLeftWidth) + px(csWrap.borderRightWidth);
+      var wrapBorderY = px(csWrap.borderTopWidth) + px(csWrap.borderBottomWidth);
+
+      var chromeW = padX + borderModalX + wrapBorderX;
+      var chromeH = padY + borderModalY + barH + barMarginB + wrapBorderY;
+
+      var availW = Math.max(240, maxW - chromeW);
+      var availH = Math.max(240, maxH - chromeH);
+
+      var iw = img.naturalWidth;
+      var ih = img.naturalHeight;
+
+      var scale = Math.min(1, availW / iw, availH / ih);
+
+      var drawW = Math.max(1, Math.floor(iw * scale));
+      var drawH = Math.max(1, Math.floor(ih * scale));
+
+      img.style.width = drawW + "px";
+      img.style.height = drawH + "px";
+      img.style.objectFit = "contain";
+
+      noteDialog.style.width = Math.min(maxW, drawW + chromeW) + "px";
+      noteDialog.style.height = Math.min(maxH, drawH + chromeH) + "px";
+    }
+
+    function slugify(s){
+      return String(s || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 60);
+    }
+
+    function noteKey(n, idx){
+      if (n && n.id) return String(n.id).trim();
+      if (n && n.file) return slugify(String(n.file));
+      var base = (n && n.date ? String(n.date) : "") + "-" + (n && n.title ? String(n.title) : "");
+      var s = slugify(base);
+      return s || String(idx);
+    }
+
+    function noteKeyFromHash(){
+      var m = String(location.hash || "").match(/^#\/notes\/([^\/?#]+)\b/);
+      return m ? decodeURIComponent(m[1]) : "";
+    }
+
+    function parseISODateStrict(s){
+      var str = String(s || "").trim();
+      var m = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return 0;
+      var y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+      if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return 0;
+      if (mo < 1 || mo > 12 || d < 1 || d > 31) return 0;
+      return Date.UTC(y, mo - 1, d);
+    }
+
+    function fmtNoteMeta(n){
+      var parts = [];
+      var type = String((n && n.type) ? n.type : "").trim();
+      var date = String((n && n.date) ? n.date : "").trim();
+      if (type) parts.push(type);
+      if (date) parts.push(date);
+      return parts.join(" / ") || "—";
+    }
+
+    function noteTypeKey(n){
+      var t = String((n && n.type) ? n.type : "").trim().toLowerCase();
+      if (!t) return "other";
+      if (t === "footnotes") t = "footnote";
+      if (t === "photos") t = "photo";
+      if (t === "images") t = "image";
+      if (t === "article" || t === "footnote") return "article"; // shared
+      return t;
+    }
+
+    function ledClassForType(n){
+      var k = noteTypeKey(n);
+      if (k === "zine")  return "led-zine";
+      if (k === "video") return "led-video";
+      if (k === "photo") return "led-photo";
+      if (k === "pdf")   return "led-pdf";
+      if (k === "article") return "led-article";
+      return "led-other";
+    }
+
+    function getNotesOrder(){
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      var ids = [];
+      for (var i=0;i<notes.length;i++) ids.push(i);
+
+      function ts(i){
+        return parseISODateStrict((notes[i] || {}).date);
+      }
+
+      if (notesSortMode === "type"){
+        ids.sort(function(a,b){
+          var ka = noteTypeKey(notes[a] || {});
+          var kb = noteTypeKey(notes[b] || {});
+          if (ka < kb) return -1 * notesSortTypeDir;
+          if (ka > kb) return  1 * notesSortTypeDir;
+
+          var d = ts(b) - ts(a);
+          if (d) return d;
+
+          return a - b;
+        });
+        return ids;
+      }
+
+      ids.sort(function(a,b){
+        var ta = ts(a), tb = ts(b);
+        var newestFirst = (notesSortDateDir < 0);
+        var d2 = newestFirst ? (tb - ta) : (ta - tb);
+        if (d2) return d2;
+        return a - b;
+      });
+      return ids;
+    }
+
+    var currentNoteLedClass = "led-other";
+
+    function openNoteDialog(title, file, caption){
+      if (!noteDialog) return;
+
+      var f = String(file || "").trim();
+      var lower = f.toLowerCase();
+
+      var fUrl = f;
+      try{ fUrl = new URL(f, location.href).toString(); }
+      catch(_){ fUrl = encodeURI(f); }
+
+      if (noteCaption){
+        var c = String(caption || "").trim();
+        noteCaption.textContent = c;
+        noteCaption.hidden = !c;
+      }
+
+      if (noteTypeLed){ noteTypeLed.className = "led " + (currentNoteLedClass || "led-other"); }
+
+      resetNoteDialogSizing();
+
+      if (noteImg){
+        noteImg.hidden = true;
+        noteImg.onload = null;
+        noteImg.onerror = null;
+        noteImg.removeAttribute("src");
+        noteImg.alt = "";
+      }
+      if (noteFrame){
+        noteFrame.hidden = true;
+        noteFrame.removeAttribute("srcdoc");
+        noteFrame.src = "about:blank";
+      }
+      if (notePdf){
+        notePdf.hidden = true;
+        notePdf.removeAttribute("src");
+      }
+
+      if (notePop){
+        notePop.hidden = !(f && f !== "about:blank");
+        notePop.onclick = function(){
+          if (!f || f === "about:blank") return;
+          window.open(fUrl, "_blank", "noopener");
+        };
+      }
+
+      var noteFrameWrap = document.querySelector('#noteDialog .noteFrameWrap');
+      if (noteFrameWrap) noteFrameWrap.scrollTop = 0;
+
+      try{
+        if (!noteDialog.open){
+          if (typeof noteDialog.showModal === "function") noteDialog.showModal();
+          else noteDialog.setAttribute("open","open");
+        }
+      }catch(_){
+        noteDialog.setAttribute("open","open");
+      }
+
+      setNoteNavEnabled();
+
+      var isImg = /\.(png|jpe?g|gif|webp|bmp|svg)(\?|#|$)/i.test(lower);
+
+      if (isImg && noteImg){
+        noteImg.hidden = false;
+        noteImg.onload = function(){ sizeDialogToImage(noteImg); };
+        noteImg.onerror = function(){
+          if (noteImg) noteImg.hidden = true;
+          if (noteFrame){
+            noteFrame.hidden = false;
+            noteFrame.src = fUrl || "about:blank";
+          }
+        };
+        noteImg.src = fUrl;
+        noteImg.alt = title || "";
+        return;
+      }
+
+      if (lower.endsWith(".pdf")){
+        if (notePdf){
+          notePdf.hidden = false;
+          notePdf.src = fUrl;
+        }
+        return;
+      }
+
+      if (noteFrame){
+        noteFrame.hidden = false;
+        noteFrame.src = fUrl || "about:blank";
+      }
+    }
+
+    function closeNoteDialog(toList){
+      if (!noteDialog) return;
+
+      resetNoteDialogSizing();
+      currentNoteLedClass = "led-other";
+      if (noteTypeLed) noteTypeLed.className = "led led-other";
+
+      if (notePop) notePop.hidden = true;
+
+      if (noteCaption){
+        noteCaption.textContent = "";
+        noteCaption.hidden = true;
+      }
+
+      if (noteImg){
+        noteImg.hidden = true;
+        noteImg.onload = null;
+        noteImg.onerror = null;
+        noteImg.removeAttribute("src");
+        noteImg.alt = "";
+      }
+      if (noteFrame){
+        noteFrame.hidden = true;
+        noteFrame.removeAttribute("srcdoc");
+        noteFrame.src = "about:blank";
+      }
+      if (notePdf){
+        notePdf.hidden = true;
+        notePdf.removeAttribute("src");
+      }
+
+      if (typeof noteDialog.close === "function") noteDialog.close();
+      else noteDialog.removeAttribute("open");
+
+      if (toList){
+        suppressHashReopen = true;
+        location.hash = "#/notes";
+        setTimeout(function(){ suppressHashReopen = false; }, 0);
+      }
+    }
+
+    if (noteClose) noteClose.addEventListener("click", function(){ closeNoteDialog(true); });
+
+    if (noteDialog){
+      noteDialog.addEventListener("click", function(e){
+        if (e.target === noteDialog) closeNoteDialog(true);
+      });
+    }
+
+    window.addEventListener("keydown", function(e){
+      if (!noteDialog || !noteDialog.hasAttribute("open")) return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+
+      if (e.key === "Escape"){ e.preventDefault(); closeNoteDialog(true); return; }
+      if (e.key === "ArrowLeft"){ e.preventDefault(); gotoNoteDelta(-1); return; }
+      if (e.key === "ArrowRight"){ e.preventDefault(); gotoNoteDelta(1); return; }
+    });
+
+    function buildNotesKeyIndex(){
+      notesKeyToIndex.clear();
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      for (var i=0;i<notes.length;i++){
+        notesKeyToIndex.set(noteKey(notes[i] || {}, i), i);
+      }
+    }
+
+    function setNoteNavEnabled(){
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      var ok = notes.length > 1;
+      if (notePrevBtn) notePrevBtn.disabled = !ok;
+      if (noteNextBtn) noteNextBtn.disabled = !ok;
+    }
+
+    function gotoNoteDelta(delta){
+      if (!noteDialog || !noteDialog.hasAttribute("open")) return;
+
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      if (notes.length < 2) return;
+
+      var key = noteKeyFromHash();
+      if (!key) return;
+
+      buildNotesKeyIndex();
+      var idx = notesKeyToIndex.has(key) ? notesKeyToIndex.get(key) : -1;
+      if (idx < 0) return;
+
+      var order = getNotesOrder();
+      var pos = -1;
+      for (var i=0;i<order.length;i++){
+        if (order[i] === idx){ pos = i; break; }
+      }
+      if (pos < 0) return;
+
+      var newPos = (pos + delta + order.length) % order.length;
+      var newIdx = order[newPos];
+      var newKey = noteKey(notes[newIdx] || {}, newIdx);
+
+      suppressHashReopen = true;
+      location.hash = "#/notes/" + encodeURIComponent(newKey);
+      setTimeout(function(){
+        suppressHashReopen = false;
+        refreshNotes();
+      }, 0);
+    }
+
+    if (notePrevBtn) notePrevBtn.addEventListener("click", function(){ gotoNoteDelta(-1); });
+    if (noteNextBtn) noteNextBtn.addEventListener("click", function(){ gotoNoteDelta( 1); });
+
+    function renderNotesList(){
+      if (!itemsNotes) return;
+      buildNotesKeyIndex();
+      updateNotesSortUI();
+
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      var order = getNotesOrder();
+
+      if (!order.length){
+        itemsNotes.innerHTML = row1("No notes yet.", "");
+        return;
+      }
+
+      var html = [];
+      for (var j=0;j<order.length;j++){
+        var idx = order[j];
+        var n = notes[idx] || {};
+        var key = noteKey(n, idx);
+
+        var title = esc(String(n.title || "Untitled").trim() || "Untitled");
+        var meta = esc(fmtNoteMeta(n));
+
+        var href = "#/notes/" + encodeURIComponent(key);
+        var led = '<span class="led ' + esc(ledClassForType(n)) + '" aria-hidden="true"></span>';
+        var titleHtml = '<a href="' + esc(href) + '">' + title + "</a>";
+
+        html.push(row1(titleHtml, meta, led));
+      }
+      itemsNotes.innerHTML = html.join("");
+    }
+
+    function refreshNotes(){
+      renderNotesList();
+      if (suppressHashReopen) return;
+
+      var key = noteKeyFromHash();
+      if (!key){
+        closeNoteDialog(false);
+        return;
+      }
+
+      buildNotesKeyIndex();
+      var idx = notesKeyToIndex.has(key) ? notesKeyToIndex.get(key) : -1;
+
+      if (idx >= 0){
+        var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+        var n = notes[idx] || {};
+        currentNoteLedClass = ledClassForType(n);
+
+        var title = String(n.title || "Untitled").trim() || "Untitled";
+
+        var yt = String(n.youtube || "").trim();
+        var file = "";
+        if (yt){
+          yt = yt.replace(/[^a-zA-Z0-9_-]/g, "");
+          file = "https://www.youtube-nocookie.com/embed/" + yt + "?rel=0";
+        } else {
+          file = String(n.file || "").trim();
+        }
+
+        if (!file){
+          openNoteDialog(title, "about:blank", n.caption);
+          try{
+            noteFrame.src = "about:blank";
+            noteFrame.srcdoc =
+              "<!doctype html><meta charset=utf-8><title>Missing file</title>" +
+              "<style>body{font-family:ui-monospace,Menlo,Monaco,Consolas,monospace;padding:18px}code{background:#eee;padding:2px 4px}</style>" +
+              "<h3>Missing note file</h3><p>This note has no <code>file</code> property.</p>";
+          }catch(_){}
           return;
         }
 
-        qi = ((qi % total) + total) % total;
-        const q = quotes[qi] || {};
-        const text = String(q.quote || "").trim();
-        const work = String(q.work || "").trim();
-        const author = String(q.author || "").trim();
+        openNoteDialog(title, file, n.caption);
+        return;
+      }
 
-        tqQuote.textContent = `> ${text || "(add quote here)"}`;
-        const metaParts = [];
-        if (work) metaParts.push(work);
-        if (author) metaParts.push(author);
-        tqMeta.textContent = `>> ${metaParts.join(" / ") || "(work / author)"}`;
-        tqIdx.textContent = fmtIdx(qi + 1, total);
+      closeNoteDialog(false);
+    }
 
-        localStorage.setItem("timeQuoteIndex", String(qi));
-      };
+    // -------------------------------------------------------
+    // JS: TIMEQUOTES
+    // -------------------------------------------------------
+    var timeDialog = $("timeDialog");
+    var timePrev = $("timePrev");
+    var timeNext = $("timeNext");
+    var timeClose = $("timeClose");
+    var timeQuoteText = $("timeQuoteText");
+    var timeQuoteMeta = $("timeQuoteMeta");
+    var timeIdx = $("timeIdx");
+    var clockBtn = $("clockBtn");
 
-      const openModal = () => {
-        renderQuote();
-        modal.classList.add("isOpen");
-        modal.setAttribute("aria-hidden", "false");
-      };
-      const closeModal = () => {
-        modal.classList.remove("isOpen");
-        modal.setAttribute("aria-hidden", "true");
-      };
-      const isOpen = () => modal.classList.contains("isOpen");
+    var qi = Number(localStorage.getItem("timeQuoteIndex") || 0) || 0;
 
-      tqPrev.addEventListener("click", () => { qi -= 1; renderQuote(); });
-      tqNext.addEventListener("click", () => { qi += 1; renderQuote(); });
-      closeThoughts.addEventListener("click", closeModal);
-      modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+    function pad2(n){ return (n < 10 ? ("0" + n) : String(n)); }
 
-      window.addEventListener("keydown", (e) => {
-        if (!isOpen()) return;
-        if (e.key === "Escape") closeModal();
-        if (e.key === "ArrowLeft") { qi -= 1; renderQuote(); }
-        if (e.key === "ArrowRight"){ qi += 1; renderQuote(); }
+    function renderTimeQuote(){
+      var quotes = Array.isArray(DATA.timeQuotes) ? DATA.timeQuotes : [];
+      var total = quotes.length;
+
+      if (!total){
+        if (timeQuoteText) timeQuoteText.textContent = "> (add quote here)";
+        if (timeQuoteMeta) timeQuoteMeta.textContent  = ">> (work / author)";
+        if (timeIdx) timeIdx.textContent = "00/00";
+        return;
+      }
+
+      qi = ((qi % total) + total) % total;
+      var q = quotes[qi] || {};
+      var text = String(q.quote || "").trim();
+      var work = String(q.work || "").trim();
+      var author = String(q.author || "").trim();
+
+      if (timeQuoteText) timeQuoteText.textContent = "> " + (text || "(add quote here)");
+
+      var metaParts = [];
+      if (work) metaParts.push(work);
+      if (author) metaParts.push(author);
+      if (timeQuoteMeta) timeQuoteMeta.textContent = ">> " + (metaParts.join(" / ") || "(work / author)");
+
+      if (timeIdx) timeIdx.textContent = pad2(qi + 1) + "/" + pad2(total);
+
+      localStorage.setItem("timeQuoteIndex", String(qi));
+    }
+
+    function openTimeDialog(){
+      if (!timeDialog) return;
+      renderTimeQuote();
+      if (typeof timeDialog.showModal === "function") timeDialog.showModal();
+      else timeDialog.setAttribute("open", "open");
+    }
+
+    function closeTimeDialog(){
+      if (!timeDialog) return;
+      if (typeof timeDialog.close === "function") timeDialog.close();
+      else timeDialog.removeAttribute("open");
+    }
+
+    if (timePrev){ timePrev.addEventListener("click", function(){ qi -= 1; renderTimeQuote(); }); }
+    if (timeNext){ timeNext.addEventListener("click", function(){ qi += 1; renderTimeQuote(); }); }
+    if (timeClose){ timeClose.addEventListener("click", closeTimeDialog); }
+
+    if (timeDialog){
+      timeDialog.addEventListener("click", function(e){
+        if (e.target === timeDialog) closeTimeDialog();
       });
+    }
 
-      let clickCount = 0;
-      let clickTimer = null;
-      const CLICK_WINDOW_MS = 650;
+    window.addEventListener("keydown", function(e){
+      if (!timeDialog || !timeDialog.hasAttribute("open")) return;
+      if (e.key === "Escape") closeTimeDialog();
+      if (e.key === "ArrowLeft"){ qi -= 1; renderTimeQuote(); }
+      if (e.key === "ArrowRight"){ qi += 1; renderTimeQuote(); }
+    });
 
-      clockBtn.addEventListener("click", () => {
-        clickCount += 1;
-        clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => { clickCount = 0; }, CLICK_WINDOW_MS);
-        if (clickCount >= 3){
-          clickCount = 0;
-          openModal();
+    if (clockBtn){
+      clockBtn.addEventListener("dblclick", function(){ openTimeDialog(); });
+    }
+
+    // -------------------------------------------------------
+    // JS: ABOUT (nameplate modal)
+    // -------------------------------------------------------
+    var aboutDialog = $("aboutDialog");
+    var aboutPrev = $("aboutPrev");
+    var aboutNext = $("aboutNext");
+    var aboutClose = $("aboutClose");
+    var aboutText = $("aboutText");
+    var aboutTitle = $("aboutTitle");
+
+    var aboutSlides = Array.isArray(DATA.aboutSlides) ? DATA.aboutSlides : [];
+    var ai = Number(localStorage.getItem("aboutSlideIndex") || 0) || 0;
+
+function renderAboutSlide(){
+  var total = aboutSlides.length;
+
+  if (!total){
+    if (aboutTitle) aboutTitle.textContent = "About";
+    if (aboutText) aboutText.textContent = "> (add DATA_REMOTE.aboutSlides in data.js)";
+    return;
+  }
+
+  ai = ((ai % total) + total) % total;
+  var s = aboutSlides[ai] || {};
+
+  var title = String(s.title || "").trim();
+
+  // Prefer s.html if present; otherwise fall back to s.text/s.body as plain text.
+  var hasHTML = (s.html != null && String(s.html).trim() !== "");
+  var rawText = String(s.text || s.body || "").trim();
+  var rawHTML = hasHTML ? String(s.html).trim() : "";
+
+  if (aboutTitle) aboutTitle.textContent = title || "About";
+
+  if (aboutText){
+    if (hasHTML){
+      // Render trusted HTML (no terminal > prefix)
+      aboutText.innerHTML = rawHTML;
+    } else {
+      // Render as terminal-style text
+      aboutText.textContent = "> " + (rawText || "(empty)");
+    }
+  }
+
+  localStorage.setItem("aboutSlideIndex", String(ai));
+}
+
+    function openAboutDialog(){
+      if (!aboutDialog) return;
+      aboutSlides = Array.isArray(DATA.aboutSlides) ? DATA.aboutSlides : [];
+      renderAboutSlide();
+      try{
+        if (!aboutDialog.open){
+          if (typeof aboutDialog.showModal === "function") aboutDialog.showModal();
+          else aboutDialog.setAttribute("open","open");
         }
+      }catch(_){
+        aboutDialog.setAttribute("open","open");
+      }
+    }
+
+    function closeAboutDialog(){
+      if (!aboutDialog) return;
+      if (typeof aboutDialog.close === "function") aboutDialog.close();
+      else aboutDialog.removeAttribute("open");
+    }
+
+    if (aboutPrev) aboutPrev.addEventListener("click", function(){ ai -= 1; renderAboutSlide(); });
+    if (aboutNext) aboutNext.addEventListener("click", function(){ ai += 1; renderAboutSlide(); });
+    if (aboutClose) aboutClose.addEventListener("click", closeAboutDialog);
+
+    if (aboutDialog){
+      aboutDialog.addEventListener("click", function(e){
+        if (e.target === aboutDialog) closeAboutDialog();
+      });
+    }
+
+    window.addEventListener("keydown", function(e){
+      if (!aboutDialog || !aboutDialog.hasAttribute("open")) return;
+      if (e.key === "Escape"){ e.preventDefault(); closeAboutDialog(); }
+      if (e.key === "ArrowLeft"){ e.preventDefault(); ai -= 1; renderAboutSlide(); }
+      if (e.key === "ArrowRight"){ e.preventDefault(); ai += 1; renderAboutSlide(); }
+    });
+
+    // -------------------------------------------------------
+    // JS: ROUTER
+    // -------------------------------------------------------
+    var panels = {
+      home: $("p-home"),
+      writing: $("p-writing"),
+      research: $("p-research"),
+      notes: $("p-notes"),
+      contact: $("p-contact")
+    };
+    var links = {
+      home: $("linkHomeTop"),
+      writing: $("linkWriting"),
+      research: $("linkResearch"),
+      notes: $("linkNotes"),
+      contact: $("linkContact")
+    };
+
+    function normalizeRoute(hash){
+      var raw = String(hash || "");
+      var m = raw.match(/^#\/(home|writing|research|notes|contact)\b/);
+      return m ? m[1] : "home";
+    }
+
+    function setActive(key){
+      Object.keys(panels).forEach(function(k){
+        if (panels[k]) panels[k].classList.toggle("isActive", k === key);
+      });
+      Object.keys(links).forEach(function(k){
+        if (links[k]) links[k].classList.toggle("isActive", k === key);
       });
 
-      // --- INIT ---
-      if (!location.hash) location.hash = "#/home";
-      setActive(normalizeRoute(location.hash));
+      if (key !== "notes") closeNoteDialog(false);
 
-      render("writing");
-      render("research");
-      render("factChecking");
+      if (key === "home") requestAnimationFrame(panCenter);
+      if (key === "notes") requestAnimationFrame(refreshNotes);
+    }
 
-      // slideshow last (so home doesn’t flash blank)
-      showSlide(slideIndex);
+    document.addEventListener("click", function(e){
+      var a = e.target.closest("a[data-route]");
+      if (!a) return;
+      e.preventDefault();
+      var key = a.dataset.route || "home";
+      location.hash = "#/" + key;
+    });
 
-      requestAnimationFrame(() => { fitHome(); pan(.5,.5); });
-    })();
-  };
+    // Home nameplate opens About modal on DOUBLE-CLICK
+    var homeNameplate = $("linkHomeTop");
+    if (homeNameplate){
+      homeNameplate.addEventListener("dblclick", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        location.hash = "#/home";
+        setTimeout(openAboutDialog, 0);
+      });
+    }
 
-  // Load external data.js FIRST, then boot.
-  // IMPORTANT: Do NOT use Date.now() here (causes endless “new URL” and can break caching expectations).
-  const DATA_VERSION = ""; // <- optional: set like "20260103-1" when you want cache-bust
-  const src = "data.js" + (DATA_VERSION ? ("?v=" + encodeURIComponent(DATA_VERSION)) : "");
+    window.addEventListener("hashchange", function(){
+      var r = normalizeRoute(location.hash);
+      setActive(r);
+      if (r === "notes") refreshNotes();
+    });
 
-  const s = document.createElement("script");
+    // -------------------------------------------------------
+    // JS: INIT
+    // -------------------------------------------------------
+    if (!location.hash) location.hash = "#/home";
+    setActive(normalizeRoute(location.hash));
+
+    render("writing");
+    render("research");
+    render("factChecking");
+
+    refreshNotes();
+
+    showSlide(slideIndex);
+    requestAnimationFrame(panCenter);
+  }
+
+  // Load data.js ONCE, then boot.
+  var DATA_VERSION = String(Date.now()); // dev: always fresh
+  var src = "data.js" + (DATA_VERSION ? ("?v=" + encodeURIComponent(DATA_VERSION)) : "");
+
+  var s = document.createElement("script");
   s.src = src;
   s.async = true;
-  s.onload = boot;
-  s.onerror = () => {
+  s.onload = function(){ boot(); };
+  s.onerror = function(){
     console.warn("data.js failed to load — booting with empty DATA_REMOTE.");
     boot();
   };
   document.head.appendChild(s);
 })();
 </script>
+
 </body>
 </html>
