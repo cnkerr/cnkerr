@@ -616,6 +616,122 @@ em{font-style:italic}
 /* Color mode uses span-per-char */
 #aboutModule pre.ascii.ascii-color span{ white-space: pre; }
 
+
+/* =========================================================
+   MOBILE-FIRST DIALOGS + MEDIA (fast, legible, consistent)
+========================================================= */
+
+/* Prevent background scroll when dialogs are open (toggled in JS) */
+body.modalOpen{ overflow:hidden; }
+
+/* Small screens: make dialogs full-screen and maximize legibility */
+@media (max-width:700px){
+  #timeDialog[open], #noteDialog[open], #aboutDialog[open]{
+    inset:0;
+    margin:0;
+    width:100vw;
+    max-height:100svh;
+  }
+  #timeDialog .tqModal, #noteDialog .tqModal, #aboutDialog .tqModal{
+    max-height:100svh;
+    height:100svh;
+    padding:10px;
+    overflow:hidden; /* inner regions scroll */
+  }
+  #timeDialog .tqBar, #noteDialog .tqBar, #aboutDialog .tqBar{
+    margin-bottom:10px;
+  }
+
+  /* tap targets */
+  .tqNavBtn, .tqCloseBtn{
+    min-width:44px;
+    min-height:44px;
+    height:44px;
+  }
+  .tqNavBtn{ width:44px; }
+  .tqCloseBtn{ width:44px; font-size:20px; }
+
+  /* content regions scroll smoothly */
+  #timeDialog .tqQuoteBox,
+  #aboutDialog .tqQuoteBox{
+    overflow:auto;
+    max-height:calc(100svh - 86px);
+    -webkit-overflow-scrolling:touch;
+  }
+  #noteDialog .noteFrameWrap{
+    overflow:auto;
+    max-height:calc(100svh - 86px);
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* embedded media fits the phone */
+  #notePdf, #noteFrame{
+    height:calc(100svh - 130px);
+  }
+
+  .noteCaption{
+    font-size:11px;
+    line-height:1.3;
+  }
+}
+
+/* Consistent YouTube sizing (desktop + mobile) */
+.noteFrameWrap.isVideo{
+  background:#000;
+}
+.noteFrameWrap.isVideo #noteFrame{
+  width:100%;
+  aspect-ratio:16 / 9;
+  height:auto;
+  max-height:min(70vh, 720px);
+  background:#000;
+}
+
+/* Mobile PDF "Open" panel (Option C: embed on desktop, button on mobile) */
+.notePdfMobile{
+  border:2px solid #000;
+  background:#fff;
+  padding:16px 14px;
+  display:grid;
+  gap:12px;
+  align-items:start;
+}
+.notePdfMobile .pdfTitle{
+  font-weight:900;
+  font-size:12px;
+}
+.noteOpenBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:12px 14px;
+  font-family:var(--mono);
+  font-weight:900;
+  letter-spacing:.02em;
+  background:var(--paper2);
+  border:2px solid;
+  border-color:var(--hi) var(--deep) var(--deep) var(--hi);
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  user-select:none;
+}
+.noteOpenBtn:active{
+  transform:translate(1px,1px);
+  border-color:var(--deep) var(--hi) var(--hi) var(--deep);
+}
+.noteOpenBtn .ico{
+  width:18px;
+  height:18px;
+  display:inline-grid;
+  place-items:center;
+  border:1px solid #000;
+  background:#cfe8ff;
+  box-shadow:var(--shadow);
+  font-size:12px;
+  line-height:1;
+}
+
 </style>
 </head>
 
@@ -801,6 +917,13 @@ em{font-style:italic}
       ></iframe>
 
       <embed id="notePdf" type="application/pdf" hidden>
+      <div id="notePdfMobile" class="notePdfMobile" hidden>
+        <div class="pdfTitle" id="notePdfMobileTitle">PDF</div>
+        <button class="noteOpenBtn" id="notePdfMobileBtn" type="button">
+          <span class="ico" aria-hidden="true">▣</span>
+          <span>OPEN PDF</span>
+        </button>
+      </div>
       <div id="noteCaption" class="noteCaption" hidden></div>
     </div>
   </div>
@@ -839,6 +962,17 @@ em{font-style:italic}
     ensureArrayKey(DATA, "aboutSlides");
 
     var prefersReducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    function isCoarsePointer(){
+      return !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+    }
+    function isMobileDialog(){
+      return !!(window.matchMedia && window.matchMedia("(max-width:700px)").matches) || isCoarsePointer();
+    }
+    function setBodyModalOpen(on){
+      document.body.classList.toggle("modalOpen", !!on);
+    }
+
 
     // -------------------------------------------------------
     // JS: HOME VIEWER PAN
@@ -1140,6 +1274,10 @@ em{font-style:italic}
     var notePop      = $("notePop");
     var noteCaption  = $("noteCaption");
 
+    var notePdfMobile = $("notePdfMobile");
+    var notePdfMobileTitle = $("notePdfMobileTitle");
+    var notePdfMobileBtn = $("notePdfMobileBtn");
+
     var notePrevBtn  = $("notePrev");
     var noteNextBtn  = $("noteNext");
     var noteTypeLed  = $("noteTypeLed");
@@ -1384,6 +1522,11 @@ em{font-style:italic}
         notePdf.hidden = true;
         notePdf.removeAttribute("src");
       }
+      if (notePdfMobile){
+        notePdfMobile.hidden = true;
+        if (notePdfMobileBtn) notePdfMobileBtn.onclick = null;
+        if (notePdfMobileTitle) notePdfMobileTitle.textContent = "PDF";
+      }
 
       if (notePop){
         notePop.hidden = !(f && f !== "about:blank");
@@ -1394,7 +1537,10 @@ em{font-style:italic}
       }
 
       var noteFrameWrap = document.querySelector('#noteDialog .noteFrameWrap');
-      if (noteFrameWrap) noteFrameWrap.scrollTop = 0;
+      if (noteFrameWrap){
+        noteFrameWrap.scrollTop = 0;
+        noteFrameWrap.classList.remove("isVideo");
+      }
 
       try{
         if (!noteDialog.open){
@@ -1404,6 +1550,7 @@ em{font-style:italic}
       }catch(_){
         noteDialog.setAttribute("open","open");
       }
+      setBodyModalOpen(true);
 
       setNoteNavEnabled();
 
@@ -1419,12 +1566,22 @@ em{font-style:italic}
             noteFrame.src = fUrl || "about:blank";
           }
         };
+        try{ noteImg.decoding = "async"; noteImg.fetchPriority = "high"; }catch(_){ }
         noteImg.src = fUrl;
         noteImg.alt = title || "";
         return;
       }
 
       if (lower.endsWith(".pdf")){
+        // Option C: embed on desktop, button on mobile
+        if (isMobileDialog() && notePdfMobile){
+          notePdfMobile.hidden = false;
+          if (notePdfMobileTitle) notePdfMobileTitle.textContent = title || "PDF";
+          if (notePdfMobileBtn){
+            notePdfMobileBtn.onclick = function(){ window.open(fUrl, "_blank", "noopener"); };
+          }
+          return;
+        }
         if (notePdf){
           notePdf.hidden = false;
           notePdf.src = fUrl;
@@ -1434,6 +1591,9 @@ em{font-style:italic}
 
       if (noteFrame){
         noteFrame.hidden = false;
+        try{ noteFrame.loading = "eager"; }catch(_){ }
+        var isVideo = /youtube-nocookie\.com\/embed\//i.test(fUrl || "");
+        if (noteFrameWrap && isVideo) noteFrameWrap.classList.add("isVideo");
         noteFrame.src = fUrl || "about:blank";
       }
     }
@@ -1471,6 +1631,7 @@ em{font-style:italic}
 
       if (typeof noteDialog.close === "function") noteDialog.close();
       else noteDialog.removeAttribute("open");
+      setBodyModalOpen(false);
 
       if (toList){
         suppressHashReopen = true;
@@ -1675,12 +1836,14 @@ em{font-style:italic}
       renderTimeQuote();
       if (typeof timeDialog.showModal === "function") timeDialog.showModal();
       else timeDialog.setAttribute("open", "open");
+      setBodyModalOpen(true);
     }
 
     function closeTimeDialog(){
       if (!timeDialog) return;
       if (typeof timeDialog.close === "function") timeDialog.close();
       else timeDialog.removeAttribute("open");
+      setBodyModalOpen(false);
     }
 
     if (timePrev){ timePrev.addEventListener("click", function(){ qi -= 1; renderTimeQuote(); }); }
@@ -1701,7 +1864,11 @@ em{font-style:italic}
     });
 
     if (clockBtn){
-      clockBtn.addEventListener("dblclick", function(){ openTimeDialog(); });
+      // Mobile: single tap opens TimeQuotes. Desktop: keep double-click.
+      clockBtn.addEventListener(isCoarsePointer() ? "click" : "dblclick", function(e){
+        e.preventDefault();
+        openTimeDialog();
+      });
     }
 
     // -------------------------------------------------------
@@ -1740,6 +1907,14 @@ function fitAboutAscii(){
 
   var scale = Math.min(1, (boxW - 2) / contentW);
   var newFont = Math.max(3.5, baseFont * scale); // clamp so it doesn't become unreadable
+
+  // Also constrain by height on short screens
+  var boxH = aboutText.clientHeight || 0;
+  var contentH = pre.scrollHeight || 0;
+  if (boxH && contentH){
+    var scaleH = Math.min(1, (boxH - 2) / contentH);
+    newFont = Math.max(3.5, Math.min(newFont, baseFont * scaleH));
+  }
 
   pre.style.fontSize = newFont.toFixed(2) + "px";
   pre.style.lineHeight = "1.0";
@@ -1798,6 +1973,7 @@ function renderAboutSlide(){
       if (!aboutDialog) return;
       if (typeof aboutDialog.close === "function") aboutDialog.close();
       else aboutDialog.removeAttribute("open");
+      setBodyModalOpen(false);
     }
 
     if (aboutPrev) aboutPrev.addEventListener("click", function(){ ai -= 1; renderAboutSlide(); });
@@ -1876,6 +2052,16 @@ function renderAboutSlide(){
         location.hash = "#/home";
         setTimeout(openAboutDialog, 0);
       });
+
+      // Mobile: single tap opens About when already on Home
+      homeNameplate.addEventListener("click", function(e){
+        if (!isCoarsePointer()) return;
+        var r = normalizeRoute(location.hash);
+        if (r !== "home") return; // first tap just navigates home
+        e.preventDefault();
+        e.stopPropagation();
+        setTimeout(openAboutDialog, 0);
+      });
     }
 
     window.addEventListener("hashchange", function(){
@@ -1901,7 +2087,7 @@ function renderAboutSlide(){
   }
 
   // Load data.js ONCE, then boot.
-  var DATA_VERSION = String(Date.now()); // dev: always fresh
+  var DATA_VERSION = ""; // set to e.g. "2026-02-23" to force-refresh data.js cache
   var src = "data.js" + (DATA_VERSION ? ("?v=" + encodeURIComponent(DATA_VERSION)) : "");
 
   var s = document.createElement("script");
