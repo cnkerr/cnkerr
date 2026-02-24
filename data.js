@@ -3,17 +3,45 @@ window.DATA_REMOTE = {
             src: "assets/slides/flowers.jpg",
             caption: 'Bruegel the Younger, "Basket of Flowers"'
         },
+                {
+            src: "assets/slides/twombly54.jpg",
+            caption: 'Twombly, "Untitled (1954)"'
+        },
+                {
+            src: "assets/slides/newfield.jpg",
+            caption: 'Homer, "The Veteran in a New Field"'
+        },
         {
             src: "assets/slides/market.jpg",
             caption: 'Snyders, "Market Scene"'
+        },
+                        {
+            src: "assets/slides/moonscape.jpg",
+            caption: 'Lichtenstein, "Moonscape"'
+        },
+                                {
+            src: "assets/slides/virginforest.jpg",
+            caption: 'Rousseau, "Virgin Forest w/ Sunset"'
         },
         {
             src: "assets/slides/conjurer.jpg",
             caption: 'H. Bosch, "The Conjurer"'
         },
+                {
+            src: "assets/slides/gulfstream.jpg",
+            caption: 'Homer, "The Gulf Stream"'
+        },
         {
             src: "assets/slides/tigerhunt.jpg",
             caption: 'Rubens, "Tiger Hunt"'
+        },
+                        {
+            src: "assets/slides/marble.jpg",
+            caption: 'Sargent, "Bringing Down Marble..."'
+        },
+                        {
+            src: "assets/slides/dancers.jpg",
+            caption: 'Botero, "The Dancers"'
         },
         {
             src: "assets/slides/icarus.jpg",
@@ -24,11 +52,7 @@ window.DATA_REMOTE = {
 aboutSlides: [
   {
     title: "Who am I?",
-    text: "A professional writer, editor, researcher, and fact-checker; a hobbiest photographer, skateboarder, and poet; caretaker to two rescue cats, Amelia and Peggy; and a dilettante of a dozen other disciplines. I like to live (knowing I will die [impermanence]), laugh (and also cry [suffering]), and, of course, love, too."
-  },
-  {
-    title: "What's up with this site?",
-    text: "This website serves as a public-facing repository of my professional projects and more playful pursuits. It's built using HTML, CSS, Javascript, a lot of head-banging and a little bit of luck."
+    text: "A writer, researcher, fact-checker, editor, photographer, and skateboarder of Southern provenance living in Brooklyn. He has two cats and keeps a clean house, enjoys the music of Future and Faye Wong, the poems of H.D. and Yeats, the smells of lavender and lemongrass, and the prospect of a future in which all people can live in harmony with each other, the Earth and its manifold creatures. He also likes to laugh."
   },
   {
     title: "Here I am in characters...",
@@ -111,6 +135,14 @@ aboutSlides: [
 ,
       '</pre>'
     ].join("\n")
+  },
+    {
+    title: "What is this?",
+    text: "A virtual repository of professional projects and more playful pursuits. To use it, click around! 博 takes you to the Blog; 刊 has links to my published articles and essays; 研 shows my research and fact-checking contributions; and 联 gives you ways to reach out to me. <br> Held together by HTML, Javascript, headaches, “huh?”s, and a good deal of help and hope, this place is a perpetual work in progress."
+  },
+      {
+    title: "What else?",
+    text: "Still here, huh? Please, exit and explore. We have 'one wild and precious life', in the words of Mary Oliver, put it to positive ends. Pretend a better world is just around the bend and spend your time stretching toward that horizon."
   },
 ],
     
