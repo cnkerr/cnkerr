@@ -302,8 +302,17 @@ aside.win{position:sticky;top:18px}
   padding-bottom:14px;
 }
 
-.list h2{margin:0 0 10px;font-size:14px;letter-spacing:.08em}
-.rule{height:2px;background:#000;margin:10px 0 12px}
+.list h2{
+  margin:0 0 8px;
+  font-size:14px;
+  letter-spacing:.08em;
+}
+
+.rule{
+  height:2px;
+  background:#000;
+  margin:0 0 14px;
+}
 .spacer{height:14px}
 
 .items{ margin-top:10px; width:max-content; min-width:100% }
@@ -488,11 +497,6 @@ em{font-style:italic}
   padding:16px 18px;
 }
 
-#aboutDialog #aboutText.tqQuote{
-  line-height:1.35;
-  font-size:14px;
-}
-
 @media (max-width: 600px){
   #aboutDialog[open]{
     width:96vw;
@@ -507,10 +511,6 @@ em{font-style:italic}
   }
   #aboutDialog .tqTitle{
     font-size:13px;
-  }
-  #aboutDialog #aboutText.tqQuote{
-    font-size:16px;
-    line-height:1.45;
   }
   #aboutDialog .tqQuoteBox{
     padding:12px 12px;
@@ -928,8 +928,10 @@ body.modalOpen{ overflow:hidden; }
     </section>
 
     <!-- CONTACT -->
-    <section class="panel" id="p-contact">
-      <div class="list">
+<section class="panel" id="p-contact">
+  <div class="list">
+    <div class="pageScroll scrollbox">
+      <div class="pageInner">
         <h2>CONTACT</h2>
         <div class="rule"></div>
         <p>
