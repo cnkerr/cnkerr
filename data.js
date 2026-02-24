@@ -444,7 +444,7 @@ aboutSlides: [
             id: "ck-peels",
             title: "Kicked out of Claes -Erick Cespedes",
             date: "2026-01-24",
-            caption: "Kicked out of Claes Oldenburg's 'Dropped Bowl with Scattered Slices and Peels' (1990) in Miami, 2026. Photo: Erick Cespedes",
+            caption: "Kicked out of Claes' 'Dropped Bowl with Scattered Slices and Peels' (1990) in Miami, 2026. Photo: Erick Cespedes",
             type: "Photo",
             file: "notes/photos/ckpeels.jpg",
 
@@ -454,7 +454,7 @@ aboutSlides: [
             id: "eastern-pkwy-patrol",
             title: "West Indian Day Patrol",
             date: "2019-09-07",
-            caption: "Police parked along Eastern Pkwy to patrol the West Indian Day Parade in Crown Heights, 2019.",
+            caption: "Police parked for the West Indian Day Parade in Crown Heights, 2019.",
             type: "Photo",
             file: "notes/photos/parade.jpg"
         },
@@ -689,7 +689,7 @@ aboutSlides: [
             id: "caleb-bomb",
             title: "Bombing a Harlem Hill, Caleb Winship",
             date: "2016-07-08",
-            caption: "Caleb Winship bombs a steep, pitted hill in Harlem, 2016.",
+            caption: "Caleb Winship bombs a pitted hill in Harlem, 2016.",
             type: "Photo",
             file: "notes/photos/calebbomb.jpg"
         },
@@ -721,7 +721,7 @@ aboutSlides: [
             id: "ak-bs-tail",
             title: "Backside tail slide, Close up",
             date: "2023-08-23",
-            caption: "Allan Khorsheed backside tailslides a ramp at in Greenpoint, BK, 2023.",
+            caption: "Allan Khorsheed tailslides a ramp at in Greenpoint, BK, 2023.",
             type: "Photo",
             file: "notes/photos/akbstail.jpg"
         },
@@ -729,7 +729,7 @@ aboutSlides: [
             id: "ak-pivot-pr",
             title: "Pivot fakie in PR, Allan Khorsheed",
             date: "2020-01-21",
-            caption: "Allan Khorsheed pivot fakies a qp in Vieques, PR, 2020.",
+            caption: "Allan Khorsheed pivots a qp in Vieques, PR, 2020.",
             type: "Photo",
             file: "notes/photos/akpivothorse.jpg"
         },
@@ -785,7 +785,7 @@ aboutSlides: [
             id: "ollie-brower",
             title: "Ollie at Brower, Paul McQueen",
             date: "2023-11-06",
-            caption: "Paul McQueen floats a frontside ollie off the wedge at Brower Park in Crown Heights, Brooklyn, 2023.",
+            caption: "Paul McQueen floats at Brower Park in Crown Heights, Brooklyn, 2023.",
             type: "Photo",
             file: "notes/photos/paulbrower1.jpg"
         },
@@ -793,7 +793,7 @@ aboutSlides: [
             id: "bs-nb-flushing",
             title: "Back Noseblunt at Flushing, Ted Schmitz",
             date: "2021-12-14",
-            caption: "Ted Schmitz backside noseblunts in front of the Flushing globe, Queens, NY, 2021.",
+            caption: "Ted Schmitz bs noseblunts in front of the Flushing globe, Queens, NY, 2021.",
             type: "Photo",
             file: "notes/photos/tedbsnbflushing.png"
         },
@@ -841,7 +841,7 @@ aboutSlides: [
             id: "markku-slide-beirut",
             title: "Powerslide in Beirut, Marc Antoine Marcoux",
             date: "2017-05-21",
-            caption: "Marc Antoine Marcoux back power-noseblunt-slides on an oily street in Beirut, Lebanon, 2017.",
+            caption: "Marc Antoine Marcoux on an oily street in Beirut, Lebanon, 2017.",
             type: "Photo",
             file: "notes/photos/markkubeirut.png"
         },
@@ -849,7 +849,7 @@ aboutSlides: [
             id: "maysam-bsflip-beirut",
             title: "Backside flip the bench in Beirut, Maysam Faraj",
             date: "2017-05-22",
-            caption: "Maysam Faraj backside flips the mosaic bench on the corniche in Beirut, Lebanon, 2017.",
+            caption: "Maysam Faraj bs flips on the corniche in Beirut, Lebanon, 2017.",
             type: "Photo",
             file: "notes/photos/maysambeirut.png"
         },
@@ -880,7 +880,7 @@ aboutSlides: [
             id: "jam-ck-06",
             title: "Pole jamming in the Gump -Sutherland Boswell",
             date: "2006-04-09",
-            caption: "Rusty pole jam on rocky asphalt in downtown Montgomery, shot by Sutherland Boswell, 2006.",
+            caption: "Rusty pole jam on rocky asphalt in Montgomery, shot by Sutherland Boswell, 2006.",
             type: "Photo",
             file: "notes/photos/polejamck06.jpg"
         },
@@ -896,7 +896,7 @@ aboutSlides: [
             id: "bham-5050-dlaw",
             title: "5050 grind in Birmingham -Daniel Lawson",
             date: "2011-09-09",
-            caption: "5050 grind a barrier in downtown Birmingham, Alabama, shot by Daniel Lawson in 2011.",
+            caption: "5050 grind in downtown Birmingham, Alabama, shot by Daniel Lawson in 2011.",
             type: "Photo",
             file: "notes/photos/bham5050.jpg"
         },
@@ -912,7 +912,7 @@ aboutSlides: [
             id: "no-comply-ck",
             title: "No-Comply a small gap in Birmingham -Daniel Lawson",
             date: "2011-05-28",
-            caption: "No-Comply over the curb and past the grass in Birmingham, Alabama, shot by Daniel Lawson.",
+            caption: "No-Comply in Birmingham, Alabama, shot by Daniel Lawson.",
             type: "Photo",
             file: "notes/photos/nocomplyck.jpg"
         },
