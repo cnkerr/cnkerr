@@ -306,7 +306,6 @@ aside.win{position:sticky;top:18px}
 .rule{height:2px;background:#000;margin:10px 0 12px}
 .spacer{height:14px}
 
-/* FIXED: removed invalid "margin: left -8px;" (browser ignored it) */
 .items{ margin-top:10px; width:max-content; min-width:100% }
 
 .item{
@@ -476,6 +475,7 @@ em{font-style:italic}
   display:grid;
   place-items:center;
 }
+
 .tqNavBtn:active, .tqCloseBtn:active{ transform:translate(1px,1px); }
 
 .tqNavBtn[disabled]{ opacity:.45; cursor:default; }
@@ -485,17 +485,14 @@ em{font-style:italic}
    ABOUT: mobile layout polish
 ========================================================= */
 #aboutDialog .tqQuoteBox{
-  /* About slides benefit from a little more readable spacing */
   padding:16px 18px;
 }
 
 #aboutDialog #aboutText.tqQuote{
-  /* Keep About text a touch more readable than Time quotes */
   line-height:1.35;
   font-size:14px;
 }
 
-/* Narrow screens: reduce chrome, increase readability */
 @media (max-width: 600px){
   #aboutDialog[open]{
     width:96vw;
@@ -602,7 +599,6 @@ em{font-style:italic}
   overflow: hidden;
 }
 
-/* About ASCII slide styling */
 #aboutText pre.ascii{
   background:#000;
   color:#ddd;
@@ -613,69 +609,154 @@ em{font-style:italic}
   max-height:60vh;
 }
 
-/* Color mode uses span-per-char */
 #aboutModule pre.ascii.ascii-color span{ white-space: pre; }
 
-
 /* =========================================================
-   MOBILE-FIRST DIALOGS + MEDIA (fast, legible, consistent)
+   MOBILE: WINDOW MANAGER DIALOGS (floating, consistent)
 ========================================================= */
-
-/* Prevent background scroll when dialogs are open (toggled in JS) */
 body.modalOpen{ overflow:hidden; }
 
-/* Small screens: make dialogs full-screen and maximize legibility */
 @media (max-width:700px){
   #timeDialog[open], #noteDialog[open], #aboutDialog[open]{
+    position:fixed;
     inset:0;
     margin:0;
     width:100vw;
-    max-height:100svh;
-  }
-  #timeDialog .tqModal, #noteDialog .tqModal, #aboutDialog .tqModal{
-    max-height:100svh;
     height:100svh;
-    padding:10px;
-    overflow:hidden; /* inner regions scroll */
+    max-height:none;
+    padding:
+      calc(14px + env(safe-area-inset-top))
+      calc(14px + env(safe-area-inset-right))
+      calc(14px + env(safe-area-inset-bottom))
+      calc(14px + env(safe-area-inset-left));
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
-  #timeDialog .tqBar, #noteDialog .tqBar, #aboutDialog .tqBar{
+
+  #timeDialog .tqModal, #noteDialog .tqModal, #aboutDialog .tqModal{
+    position:relative;
+    left:auto;
+    top:auto;
+    transform:none;
+    margin:0;
+    margin-top:-3svh;
+    width:min(520px, 94vw);
+    max-height:82svh;
+
+    padding:10px;
+    overflow:hidden;
+  }
+
+  #timeDialog .tqTitle, #aboutDialog .tqTitle, #noteDialog .tqTitle{
+    font-size:12px;
+    letter-spacing:.06em;
+  }
+  #timeDialog .tqIdx, #aboutDialog .tqIdx{
+    font-size:10px;
+    opacity:.75;
+    margin-left:10px;
+  }
+  #timeDialog .tqBar, #aboutDialog .tqBar, #noteDialog .tqBar{
+    gap:10px;
     margin-bottom:10px;
   }
 
-  /* tap targets */
   .tqNavBtn, .tqCloseBtn{
-    min-width:44px;
-    min-height:44px;
+    width:44px;
     height:44px;
-  }
-  .tqNavBtn{ width:44px; }
-  .tqCloseBtn{ width:44px; font-size:20px; }
+    padding:0;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    position:relative;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:900;
+    display:grid;
+    place-items:center;
+    color:#000;
+    font-size:16px;
+    line-height:1;
+    -webkit-tap-highlight-color: transparent;
 
-  /* content regions scroll smoothly */
-  #timeDialog .tqQuoteBox,
-  #aboutDialog .tqQuoteBox{
-    overflow:auto;
-    max-height:calc(100svh - 86px);
-    -webkit-overflow-scrolling:touch;
+    z-index:0;
+    isolation:isolate;
   }
+  .tqNavBtn::before, .tqCloseBtn::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:34px;
+    height:24px;
+    transform:translate(-50%,-50%);
+    background:#c4c4c4;
+    border:1px solid #000;
+    box-shadow:var(--shadow);
+    z-index:-1;
+  }
+  .tqCloseBtn{ font-size:18px; }
+  .tqNavBtn:active::before, .tqCloseBtn:active::before{
+    transform:translate(calc(-50% + 1px), calc(-50% + 1px));
+  }
+
+  #timeDialog .tqQuoteBox,
+  #aboutDialog .tqQuoteBox,
   #noteDialog .noteFrameWrap{
     overflow:auto;
-    max-height:calc(100svh - 86px);
     -webkit-overflow-scrolling:touch;
+    max-height:calc(82svh - 64px);
   }
 
-  /* embedded media fits the phone */
+  #timeDialog .tqQuote, #aboutDialog .tqQuote{
+    font-size:12px;
+    line-height:1.25;
+  }
+  #timeDialog .tqMeta{
+    font-size:11px;
+    line-height:1.25;
+  }
+
+  #aboutDialog #aboutText.tqQuote{
+    font-size:12px;
+    line-height:1.25;
+  }
+  #aboutDialog .tqQuoteBox{ padding:12px; }
+
   #notePdf, #noteFrame{
-    height:calc(100svh - 130px);
+    height:min(62svh, 520px);
+  }
+
+  #noteDialog .noteFrameWrap.isImg{
+    background:#000;
+    display:grid;
+    grid-template-rows:auto auto;
+    gap:0;
+  }
+  #noteDialog .noteFrameWrap.isImg #noteImg{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    background:#000;
+    margin:0;
+    display:block;
+  }
+  #noteDialog .noteFrameWrap.isImg.isFill #noteImg{
+    object-fit:cover;
   }
 
   .noteCaption{
-    font-size:11px;
-    line-height:1.3;
+    font-size:10px;
+    line-height:1.25;
+  }
+
+  .notePdfMobile{
+    padding:14px 12px;
   }
 }
 
-/* Consistent YouTube sizing (desktop + mobile) */
+/* Keep consistent YouTube sizing (desktop + mobile) */
 .noteFrameWrap.isVideo{
   background:#000;
 }
@@ -687,49 +768,70 @@ body.modalOpen{ overflow:hidden; }
   background:#000;
 }
 
-/* Mobile PDF "Open" panel (Option C: embed on desktop, button on mobile) */
+/* =========================================================
+   PDF MOBILE PANEL: icon button (terminal-clean)
+========================================================= */
 .notePdfMobile{
   border:2px solid #000;
   background:#fff;
   padding:16px 14px;
   display:grid;
-  gap:12px;
-  align-items:start;
+  grid-template-columns:1fr auto; /* title left, icon right */
+  align-items:center;
+  gap:10px;
 }
+
 .notePdfMobile .pdfTitle{
   font-weight:900;
   font-size:12px;
+  line-height:1.1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
+
+/* hit area (44) with a small keycap face inside */
 .noteOpenBtn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  padding:12px 14px;
-  font-family:var(--mono);
-  font-weight:900;
-  letter-spacing:.02em;
-  background:var(--paper2);
-  border:2px solid;
-  border-color:var(--hi) var(--deep) var(--deep) var(--hi);
-  box-shadow:var(--shadow);
+  width:44px;
+  height:44px;
+  padding:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
   cursor:pointer;
   user-select:none;
-}
-.noteOpenBtn:active{
-  transform:translate(1px,1px);
-  border-color:var(--deep) var(--hi) var(--hi) var(--deep);
-}
-.noteOpenBtn .ico{
-  width:18px;
-  height:18px;
-  display:inline-grid;
+  position:relative;
+  display:grid;
   place-items:center;
+  font-family:var(--mono);
+  color:#000;
+  -webkit-tap-highlight-color: transparent;
+  isolation:isolate;
+}
+
+.noteOpenBtn::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:34px;
+  height:24px;
+  transform:translate(-50%,-50%);
+  background:#c4c4c4;
   border:1px solid #000;
-  background:#cfe8ff;
   box-shadow:var(--shadow);
-  font-size:12px;
+  z-index:-1;
+}
+
+.noteOpenBtn:active::before{
+  transform:translate(calc(-50% + 1px), calc(-50% + 1px));
+}
+
+.noteOpenBtn .ico{
+  display:block;
+  font-size:16px;
   line-height:1;
+  font-weight:900;
 }
 
 </style>
@@ -838,8 +940,8 @@ body.modalOpen{ overflow:hidden; }
           <a href="https://x.com/cnkerr" target="_blank" rel="noopener">X</a>,
           <a href="https://www.instagram.com/cnkerr" target="_blank" rel="noopener">Instagram</a><br>
 
-  Resumé: <a href="assets/kerr_christian_cv.pdf" target="_blank" rel="noopener">kerr_christian_cv</a>
-</p>
+          Resumé: <a href="assets/kerr_christian_cv.pdf" target="_blank" rel="noopener">kerr_christian_cv</a>
+        </p>
         <p class="quote" style="color:#838383; font-size:8px; line-height:1.25;">
           "I celebrate myself, and sing myself,<br>And what I assume you shall assume,<br>For every atom belonging to me as good belongs to you." <br>—WW
         </p>
@@ -873,7 +975,6 @@ body.modalOpen{ overflow:hidden; }
 <dialog id="aboutDialog" aria-label="About this site">
   <div class="tqModal">
     <div class="tqBar">
-      <!-- FIX: dynamic title target -->
       <div class="tqTitle" id="aboutTitle"></div>
 
       <div class="tqNav">
@@ -894,13 +995,13 @@ body.modalOpen{ overflow:hidden; }
   <div class="tqModal">
     <div class="tqBar noteBar">
       <div class="noteNavLeft" aria-label="Blog navigation">
-        <button class="tqNavBtn" id="notePrev" type="button" aria-label="Previous blog entry">&lt;</button>
+        <button class="tqNavBtn" id="notePrev" type="button" aria-label="Previous">&lt;</button>
         <span id="noteTypeLed" class="led led-other" aria-hidden="true"></span>
-        <button class="tqNavBtn" id="noteNext" type="button" aria-label="Next blog entry">&gt;</button>
+        <button class="tqNavBtn" id="noteNext" type="button" aria-label="Next">&gt;</button>
       </div>
 
       <div class="tqNav noteNavRight">
-        <button class="tqCloseBtn" id="notePop" type="button" aria-label="Open note in new tab">❒</button>
+        <button class="tqCloseBtn" id="notePop" type="button" aria-label="Open in new tab">❒</button>
         <button class="tqCloseBtn" id="noteClose" type="button" aria-label="Close">x</button>
       </div>
     </div>
@@ -917,13 +1018,15 @@ body.modalOpen{ overflow:hidden; }
       ></iframe>
 
       <embed id="notePdf" type="application/pdf" hidden>
+
       <div id="notePdfMobile" class="notePdfMobile" hidden>
         <div class="pdfTitle" id="notePdfMobileTitle">PDF</div>
-        <button class="noteOpenBtn" id="notePdfMobileBtn" type="button">
-          <span class="ico" aria-hidden="true">▣</span>
-          <span>OPEN PDF</span>
+        <button class="noteOpenBtn" id="notePdfMobileBtn" type="button"
+                aria-label="Open PDF in new tab" title="Open PDF">
+          <span class="ico" aria-hidden="true">⧉</span>
         </button>
       </div>
+
       <div id="noteCaption" class="noteCaption" hidden></div>
     </div>
   </div>
@@ -973,12 +1076,12 @@ body.modalOpen{ overflow:hidden; }
       document.body.classList.toggle("modalOpen", !!on);
     }
 
-
     // -------------------------------------------------------
     // JS: HOME VIEWER PAN
     // -------------------------------------------------------
     var viewport = $("viewport");
     var canvas = $("canvas");
+    var hero = $("hero");
 
     function isHomeActive(){
       var p = $("p-home");
@@ -990,6 +1093,34 @@ body.modalOpen{ overflow:hidden; }
       var maxX = Math.max(0, canvas.scrollWidth  - viewport.clientWidth);
       var maxY = Math.max(0, canvas.scrollHeight - viewport.clientHeight);
       viewport.scrollTo({ left: maxX * 0.5, top: maxY * 0.5, behavior:(prefersReducedMotion?"auto":"smooth") });
+    }
+
+    /* Keep the huge pan-canvas feel on mobile, but prevent “permanent crop”:
+       resize the canvas to the slide’s aspect ratio (bigger than viewport in both axes). */
+    function setCanvasForSlide(){
+      if (!viewport || !canvas || !hero) return;
+      if (!hero.naturalWidth || !hero.naturalHeight) return;
+
+      var vw = viewport.clientWidth || 0;
+      var vh = viewport.clientHeight || 0;
+      if (!vw || !vh) return;
+
+      var r = hero.naturalWidth / hero.naturalHeight;
+
+      // Drive by the larger of (2.2x viewport) and 900px, then ensure both axes are “huge”.
+      var targetW = Math.max(Math.floor(vw * 2.2), 900);
+      var targetH = Math.floor(targetW / r);
+
+      var minHugeH = Math.max(Math.floor(vh * 2.2), 900);
+      if (targetH < minHugeH){
+        targetH = minHugeH;
+        targetW = Math.floor(targetH * r);
+      }
+
+      canvas.style.width  = targetW + "px";
+      canvas.style.height = targetH + "px";
+
+      requestAnimationFrame(panCenter);
     }
 
     (function enableHomePan(){
@@ -1076,7 +1207,6 @@ body.modalOpen{ overflow:hidden; }
     // -------------------------------------------------------
     // JS: HOME SLIDESHOW
     // -------------------------------------------------------
-    var hero = $("hero");
     var cap = $("caption");
     var prevBtn = $("prev");
     var nextBtn = $("next");
@@ -1110,16 +1240,24 @@ body.modalOpen{ overflow:hidden; }
         return;
       }
 
-      hero.src = src;
-      hero.alt = caption || "";
-      cap.textContent = caption || "—";
+      if (hero){
+        hero.onload = function(){
+          setCanvasForSlide();
+        };
+        hero.src = src;
+        hero.alt = caption || "";
+      }
+      if (cap) cap.textContent = caption || "—";
 
       localStorage.setItem("slideIndex", String(slideIndex));
-      requestAnimationFrame(panCenter);
     }
 
     if (prevBtn) prevBtn.addEventListener("click", function(){ showSlide(slideIndex - 1); });
     if (nextBtn) nextBtn.addEventListener("click", function(){ showSlide(slideIndex + 1); });
+
+    window.addEventListener("resize", function(){
+      setCanvasForSlide();
+    });
 
     // -------------------------------------------------------
     // JS: CLOCK
@@ -1338,10 +1476,32 @@ body.modalOpen{ overflow:hidden; }
         noteImg.style.height = "";
         noteImg.style.objectFit = "";
       }
+
+      var modal = noteDialog.querySelector(".tqModal");
+      var wrap = noteDialog.querySelector(".noteFrameWrap");
+      if (modal){
+        modal.style.width = "";
+        modal.style.height = "";
+        modal.style.maxHeight = "";
+      }
+      if (wrap){
+        wrap.style.maxHeight = "none";
+        wrap.style.overflow = "";
+      }
     }
 
     function sizeDialogToImage(img){
       if (!noteDialog || !img || !img.naturalWidth || !img.naturalHeight) return;
+
+      if (typeof isMobileDialog === "function" && isMobileDialog()){
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.maxHeight = "none";
+        img.style.objectFit = "cover";
+        noteDialog.style.width = "";
+        noteDialog.style.height = "";
+        return;
+      }
 
       var maxW = Math.min(1200, Math.floor(window.innerWidth * 0.92));
       var maxH = Math.floor(window.innerHeight * 0.92);
@@ -1436,7 +1596,7 @@ body.modalOpen{ overflow:hidden; }
       if (t === "footnotes") t = "footnote";
       if (t === "photos") t = "photo";
       if (t === "images") t = "image";
-      if (t === "article" || t === "footnote") return "article"; // shared
+      if (t === "article" || t === "footnote") return "article";
       return t;
     }
 
@@ -1540,6 +1700,8 @@ body.modalOpen{ overflow:hidden; }
       if (noteFrameWrap){
         noteFrameWrap.scrollTop = 0;
         noteFrameWrap.classList.remove("isVideo");
+        noteFrameWrap.classList.remove("isImg");
+        noteFrameWrap.classList.remove("isFill");
       }
 
       try{
@@ -1557,8 +1719,11 @@ body.modalOpen{ overflow:hidden; }
       var isImg = /\.(png|jpe?g|gif|webp|bmp|svg)(\?|#|$)/i.test(lower);
 
       if (isImg && noteImg){
+        if (noteFrameWrap) noteFrameWrap.classList.add("isImg");
         noteImg.hidden = false;
-        noteImg.onload = function(){ sizeDialogToImage(noteImg); };
+        noteImg.onload = function(){
+          sizeDialogToImage(noteImg);
+        };
         noteImg.onerror = function(){
           if (noteImg) noteImg.hidden = true;
           if (noteFrame){
@@ -1573,7 +1738,6 @@ body.modalOpen{ overflow:hidden; }
       }
 
       if (lower.endsWith(".pdf")){
-        // Option C: embed on desktop, button on mobile
         if (isMobileDialog() && notePdfMobile){
           notePdfMobile.hidden = false;
           if (notePdfMobileTitle) notePdfMobileTitle.textContent = title || "PDF";
@@ -1864,7 +2028,6 @@ body.modalOpen{ overflow:hidden; }
     });
 
     if (clockBtn){
-      // Mobile: single tap opens TimeQuotes. Desktop: keep double-click.
       clockBtn.addEventListener(isCoarsePointer() ? "click" : "dblclick", function(e){
         e.preventDefault();
         openTimeDialog();
@@ -1884,76 +2047,69 @@ body.modalOpen{ overflow:hidden; }
     var aboutSlides = Array.isArray(DATA.aboutSlides) ? DATA.aboutSlides : [];
     var ai = Number(localStorage.getItem("aboutSlideIndex") || 0) || 0;
 
-function fitAboutAscii(){
-  if (!aboutText) return;
+    function fitAboutAscii(){
+      if (!aboutText) return;
 
-  var pre = aboutText.querySelector("pre.ascii");
-  if (!pre) return;
+      var pre = aboutText.querySelector("pre.ascii");
+      if (!pre) return;
 
-  // Store the original font size once
-  if (!pre.dataset.baseFont){
-    var base = parseFloat(getComputedStyle(pre).fontSize) || 8;
-    pre.dataset.baseFont = String(base);
-  }
+      if (!pre.dataset.baseFont){
+        var base = parseFloat(getComputedStyle(pre).fontSize) || 8;
+        pre.dataset.baseFont = String(base);
+      }
 
-  // Reset to base size to measure scrollWidth accurately
-  var baseFont = parseFloat(pre.dataset.baseFont) || 8;
-  pre.style.fontSize = baseFont + "px";
+      var baseFont = parseFloat(pre.dataset.baseFont) || 8;
+      pre.style.fontSize = baseFont + "px";
 
-  // Compute scale needed to fit within the About text box
-  var boxW = aboutText.clientWidth || 0;
-  var contentW = pre.scrollWidth || 0;
-  if (!boxW || !contentW) return;
+      var boxW = aboutText.clientWidth || 0;
+      var contentW = pre.scrollWidth || 0;
+      if (!boxW || !contentW) return;
 
-  var scale = Math.min(1, (boxW - 2) / contentW);
-  var newFont = Math.max(3.5, baseFont * scale); // clamp so it doesn't become unreadable
+      var scale = Math.min(1, (boxW - 2) / contentW);
+      var newFont = Math.max(3.5, baseFont * scale);
 
-  // Also constrain by height on short screens
-  var boxH = aboutText.clientHeight || 0;
-  var contentH = pre.scrollHeight || 0;
-  if (boxH && contentH){
-    var scaleH = Math.min(1, (boxH - 2) / contentH);
-    newFont = Math.max(3.5, Math.min(newFont, baseFont * scaleH));
-  }
+      var boxH = aboutText.clientHeight || 0;
+      var contentH = pre.scrollHeight || 0;
+      if (boxH && contentH){
+        var scaleH = Math.min(1, (boxH - 2) / contentH);
+        newFont = Math.max(3.5, Math.min(newFont, baseFont * scaleH));
+      }
 
-  pre.style.fontSize = newFont.toFixed(2) + "px";
-  pre.style.lineHeight = "1.0";
-}
-
-function renderAboutSlide(){
-  var total = aboutSlides.length;
-
-  if (!total){
-    if (aboutTitle) aboutTitle.textContent = "About";
-    if (aboutText) aboutText.textContent = "> (add DATA_REMOTE.aboutSlides in data.js)";
-    return;
-  }
-
-  ai = ((ai % total) + total) % total;
-  var s = aboutSlides[ai] || {};
-
-  var title = String(s.title || "").trim();
-
-  var hasHTML = (s.html != null && String(s.html).trim() !== "");
-  var rawText = String(s.text || s.body || "").trim();
-  var rawHTML = hasHTML ? String(s.html).trim() : "";
-
-  if (aboutTitle) aboutTitle.textContent = title || "About";
-
-  if (aboutText){
-    if (hasHTML){
-      aboutText.innerHTML = rawHTML;
-    } else {
-      aboutText.textContent = "> " + (rawText || "(empty)");
+      pre.style.fontSize = newFont.toFixed(2) + "px";
+      pre.style.lineHeight = "1.0";
     }
-  }
 
-  localStorage.setItem("aboutSlideIndex", String(ai));
+    function renderAboutSlide(){
+      var total = aboutSlides.length;
 
-  // After rendering, auto-fit ASCII if present
-  // (Timeout lets the browser lay out the new HTML first.)
-  setTimeout(fitAboutAscii, 0);
-}
+      if (!total){
+        if (aboutTitle) aboutTitle.textContent = "About";
+        if (aboutText) aboutText.textContent = "> (add DATA_REMOTE.aboutSlides in data.js)";
+        return;
+      }
+
+      ai = ((ai % total) + total) % total;
+      var s = aboutSlides[ai] || {};
+
+      var title = String(s.title || "").trim();
+
+      var hasHTML = (s.html != null && String(s.html).trim() !== "");
+      var rawText = String(s.text || s.body || "").trim();
+      var rawHTML = hasHTML ? String(s.html).trim() : "";
+
+      if (aboutTitle) aboutTitle.textContent = title || "About";
+
+      if (aboutText){
+        if (hasHTML){
+          aboutText.innerHTML = rawHTML;
+        } else {
+          aboutText.textContent = "> " + (rawText || "(empty)");
+        }
+      }
+
+      localStorage.setItem("aboutSlideIndex", String(ai));
+      setTimeout(fitAboutAscii, 0);
+    }
 
     function openAboutDialog(){
       if (!aboutDialog) return;
@@ -1967,6 +2123,7 @@ function renderAboutSlide(){
       }catch(_){
         aboutDialog.setAttribute("open","open");
       }
+      setBodyModalOpen(true);
     }
 
     function closeAboutDialog(){
@@ -1987,8 +2144,8 @@ function renderAboutSlide(){
     }
 
     window.addEventListener("resize", function(){
-  if (aboutDialog && aboutDialog.open) fitAboutAscii();
-});
+      if (aboutDialog && aboutDialog.open) fitAboutAscii();
+    });
 
     window.addEventListener("keydown", function(e){
       if (!aboutDialog || !aboutDialog.hasAttribute("open")) return;
@@ -2057,7 +2214,7 @@ function renderAboutSlide(){
       homeNameplate.addEventListener("click", function(e){
         if (!isCoarsePointer()) return;
         var r = normalizeRoute(location.hash);
-        if (r !== "home") return; // first tap just navigates home
+        if (r !== "home") return;
         e.preventDefault();
         e.stopPropagation();
         setTimeout(openAboutDialog, 0);
@@ -2083,7 +2240,10 @@ function renderAboutSlide(){
     refreshNotes();
 
     showSlide(slideIndex);
-    requestAnimationFrame(panCenter);
+    requestAnimationFrame(function(){
+      setCanvasForSlide();
+      panCenter();
+    });
   }
 
   // Load data.js ONCE, then boot.
