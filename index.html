@@ -151,7 +151,6 @@ aside.win{position:sticky;top:18px}
   background:#cfe8ff;
   border:2px solid #000;
   padding:8px 10px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
   text-align:center;
   box-shadow:var(--shadow);
   cursor:pointer;
@@ -422,8 +421,9 @@ em{font-style:italic}
   background:transparent;
 }
 #timeDialog::backdrop, #noteDialog::backdrop, #aboutDialog::backdrop{
-  background:rgba(0,0,0,.80);
+  background:rgba(0,0,0,.35);
 }
+/* DIALOG OVERLAYS: always full-screen; center inner window reliably */
 #timeDialog[open], #noteDialog[open], #aboutDialog[open]{
   position:fixed;
   inset:0;
@@ -438,7 +438,7 @@ em{font-style:italic}
   justify-content:center;
 }
 
-/* Size the inner window (not the full-screen dialog overlay) */
+/* Size is on the inner window (prevents centering drift when content changes) */
 #timeDialog .tqModal, #noteDialog .tqModal, #aboutDialog .tqModal{
   width:min(1200px, 92vw);
   max-height:92vh;
@@ -511,10 +511,13 @@ em{font-style:italic}
 }
 
 @media (max-width: 600px){
-  #aboutDialog .tqModal{
+  #aboutDialog[open]{
     width:96vw;
     max-height:94svh;
+  }
+  #aboutDialog .tqModal{
     padding:10px;
+    max-height:94svh;
   }
   #aboutDialog .tqBar{
     gap:10px;
@@ -529,6 +532,42 @@ em{font-style:italic}
 
 /* NOTE MODAL HEADER: prev/led/next on the left */
 .noteBar{ justify-content:space-between; }
+
+/* =========================================================
+   NOTES (IMAGE VIEWER): STABLE LAYOUT (NO JS HEIGHT MATH)
+   - Modal becomes a column: header + content
+   - Image notes become a 2-row grid: image (1fr) + caption (auto)
+   Ensures image + caption always visible without clipping.
+========================================================= */
+#noteDialog .tqModal{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden; /* scrolling is managed inside content as needed */
+}
+
+/* Image notes: reserve caption row; image uses remaining space */
+#noteDialog .noteFrameWrap.isImg{
+  background:#000;
+  display:grid;
+  grid-template-rows: 1fr auto;
+  gap:0;
+  overflow:hidden;
+  min-height:0;
+}
+
+#noteDialog .noteFrameWrap.isImg #noteImg{
+  justify-self:center;
+  align-self:center;
+  width:auto;
+  height:auto;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  background:#000;
+  margin:0;
+  display:block;
+}
+
 .noteNavLeft{
   display:flex;
   align-items:center;
@@ -546,47 +585,13 @@ em{font-style:italic}
   border-top:2px solid #000;
   background:#000;
   color:#9a9a9a;
-  padding:8px 10px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  padding:10px 10px calc(10px + env(safe-area-inset-bottom));
   font-size:10px;
   line-height:1.25;
   white-space:normal;
   overflow-wrap:anywhere;
 }
 
-/* Notes images: reserve caption space (desktop + mobile) */
-#noteDialog .noteFrameWrap.isImg{
-  background:#000;
-  display:grid;
-  grid-template-rows: 1fr auto; /* image + caption */
-  gap:0;
-  min-height:0;
-  overflow:hidden;
-}
-#noteDialog .noteFrameWrap.isImg{
-  background:#000;
-  display:grid;
-  grid-template-rows: 1fr auto; /* image + caption */
-  gap:0;
-  overflow:hidden;
-}
-#noteDialog .noteFrameWrap.isImg #noteImg{
-  justify-self:center;
-  align-self:center;
-  max-width:100%;
-  max-height:100%;
-  background:#000;
-  display:block;
-}
-#noteDialog .noteFrameWrap.isImg #noteImg{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  background:#000;
-  margin:0;
-  display:block;
-  min-height:0;
-}
 .tqQuoteBox{
   border:2px solid #000;
   padding:16px 18px;
@@ -605,16 +610,27 @@ em{font-style:italic}
   color:#555;
 }
 
-/* notes iframe container */
+/* notes frame container (PDFs + embeds + articles) */
 .noteFrameWrap{
   border:2px solid #000;
   background:#fff;
-  overflow:auto;
+
+  /* This area is the "content pane" under the bar. */
+  flex:1 1 auto;
+  min-height:0;
+
+  /* Let the embedded viewer handle scrolling; prevents double-scroll + clipping. */
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
-#noteImg{ display:block; background:#fff; border:0; }
-#notePdf, #noteFrame{
+
+/* Non-image viewers fill the pane */
+#noteFrame, #notePdf{
+  flex:1 1 auto;
+  min-height:0;
   width:100%;
-  height:min(78vh, 760px);
+  height:100%;
   border:0;
   display:block;
   background:#fff;
@@ -628,8 +644,7 @@ em{font-style:italic}
   .tqNavBtn{width:66px;height:52px}
   .tqCloseBtn{width:110px;height:52px}
   .tqQuote, .tqMeta{font-size:16px}
-  #noteFrame{ height:min(78vh, 680px); }
-}
+  }
 
 /* ASCII in About module */
 #aboutModule pre.ascii,
@@ -768,26 +783,26 @@ body.modalOpen{ overflow:hidden; }
   }
   #aboutDialog .tqQuoteBox{ padding:12px; }
 
-  #notePdf, #noteFrame{
-    height:min(62svh, 520px);
-  }
-
+  
   #noteDialog .noteFrameWrap.isImg{
     background:#000;
     display:grid;
     grid-template-rows: 1fr auto;
     gap:0;
-    min-height:0;
     overflow:hidden;
+    min-height:0;
   }
   #noteDialog .noteFrameWrap.isImg #noteImg{
-    width:100%;
-    height:100%;
+    justify-self:center;
+    align-self:center;
+    width:auto;
+    height:auto;
+    max-width:100%;
+    max-height:100%;
     object-fit:contain;
     background:#000;
     margin:0;
     display:block;
-    min-height:0;
   }
   #noteDialog .noteFrameWrap.isImg.isFill #noteImg{
     object-fit:cover;
@@ -1065,6 +1080,8 @@ body.modalOpen{ overflow:hidden; }
         allowfullscreen
         referrerpolicy="strict-origin-when-cross-origin"
       ></iframe>
+
+      <embed id="notePdf" type="application/pdf" hidden>
 
       <div id="notePdfMobile" class="notePdfMobile" hidden>
         <div class="pdfTitle" id="notePdfMobileTitle">PDF</div>
@@ -1534,77 +1551,32 @@ body.modalOpen{ overflow:hidden; }
       if (wrap){
         wrap.style.maxHeight = "none";
         wrap.style.overflow = "";
-        wrap.style.height = "";
       }
     }
 
     function sizeDialogToImage(img){
-      if (!noteDialog || !img || !img.naturalWidth || !img.naturalHeight) return;
+      if (!noteDialog || !img) return;
 
-      if (typeof isMobileDialog === "function" && isMobileDialog()){
-        img.style.width = "100%";
-        img.style.height = "100%";
-        img.style.maxHeight = "none";
-        img.style.objectFit = "contain";
-        noteDialog.style.width = "";
-        noteDialog.style.height = "";
-        return;
-      }
-
-      var maxW = Math.min(1200, Math.floor(window.innerWidth * 0.92));
-      var maxH = Math.floor(window.innerHeight * 0.92);
+      // Let CSS handle sizing for stability (prevents caption clipping).
+      // Clear any inline sizing that might have been set previously.
+      img.style.width = "";
+      img.style.height = "";
+      img.style.maxWidth = "";
+      img.style.maxHeight = "";
+      img.style.objectFit = "";
 
       var modal = noteDialog.querySelector(".tqModal");
-      var bar   = noteDialog.querySelector(".tqBar");
       var wrap  = noteDialog.querySelector(".noteFrameWrap");
-      if (!modal || !bar || !wrap) return;
-
-      var csModal = window.getComputedStyle(modal);
-      var csBar   = window.getComputedStyle(bar);
-      var csWrap  = window.getComputedStyle(wrap);
-
-      function px(v){ return Math.max(0, parseFloat(v || "0") || 0); }
-
-      var padX = px(csModal.paddingLeft) + px(csModal.paddingRight);
-      var padY = px(csModal.paddingTop) + px(csModal.paddingBottom);
-      var borderModalX = px(csModal.borderLeftWidth) + px(csModal.borderRightWidth);
-      var borderModalY = px(csModal.borderTopWidth) + px(csModal.borderBottomWidth);
-
-      var barH = bar.getBoundingClientRect().height;
-      var barMarginB = px(csBar.marginBottom);
-
-      var wrapBorderX = px(csWrap.borderLeftWidth) + px(csWrap.borderRightWidth);
-      var wrapBorderY = px(csWrap.borderTopWidth) + px(csWrap.borderBottomWidth);
-
-      var chromeW = padX + borderModalX + wrapBorderX;
-      var chromeH = padY + borderModalY + barH + barMarginB + wrapBorderY;
-
-      var availW = Math.max(240, maxW - chromeW);
-      var capH0 = (noteCaption && !noteCaption.hidden) ? noteCaption.getBoundingClientRect().height : 0;
-      var availH = Math.max(240, maxH - chromeH - capH0);
-
-      var iw = img.naturalWidth;
-      var ih = img.naturalHeight;
-
-      var scale = Math.min(1, availW / iw, availH / ih);
-
-      var drawW = Math.max(1, Math.floor(iw * scale));
-      var drawH = Math.max(1, Math.floor(ih * scale));
-
-img.style.width = drawW + "px";
-img.style.height = drawH + "px";
-img.style.objectFit = "contain";
-
-      // Size the inner window (dialog overlay stays full-screen for stable centering)
-      var capH = capH0;
-      var totalW = Math.min(maxW, drawW + chromeW);
-      var totalH = Math.min(maxH, drawH + capH + chromeH);
-
-      modal.style.width  = totalW + "px";
-      modal.style.height = totalH + "px";
-
-      // Lock the frame wrap so the image row gets an exact height and the caption row stays visible
-      wrap.style.height = Math.max(1, Math.floor(drawH + capH)) + "px";
+      if (modal){
+        modal.style.width = "";
+        modal.style.height = "";
+        modal.style.maxHeight = "";
+      }
+      if (wrap){
+        wrap.style.maxHeight = "none";
+        wrap.style.overflow = "";
+        wrap.style.height = "";
+      }
     }
 
     function slugify(s){
@@ -1794,17 +1766,18 @@ img.style.objectFit = "contain";
         return;
       }
 
-if (lower.endsWith(".pdf")){
-  // PDFs via iframe everywhere
-  if (noteFrame){
-    noteFrame.hidden = false;
+      if (lower.endsWith(".pdf")){
+        // PDFs via iframe everywhere (more consistent than <embed>, including mobile).
+        if (noteFrame){
+          noteFrame.hidden = false;
+          try{ noteFrame.loading = "eager"; }catch(_){}
 
-    // reset first to avoid some browsers "sticking" the previous doc
-    noteFrame.src = "about:blank";
-    noteFrame.src = (fUrl ? (fUrl + "#view=FitH") : "about:blank");
-  }
-  return;
-}
+          // reset first to avoid some browsers "sticking" the previous doc
+          noteFrame.src = "about:blank";
+          noteFrame.src = (fUrl ? (fUrl + "#view=FitH") : "about:blank");
+        }
+        return;
+      }
 
       if (noteFrame){
         noteFrame.hidden = false;
