@@ -549,17 +549,17 @@ em{font-style:italic}
 #noteDialog .noteFrameWrap.isImg{
   background:#000;
   display:grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap:0;
   overflow:hidden;
   min-height:0;
 }
 
 #noteDialog .noteFrameWrap.isImg #noteImg{
-  justify-self:center;
-  align-self:center;
-  width:auto;
-  height:auto;
+  justify-self:stretch;
+  align-self:stretch;
+  width:100%;
+  height:100%;
   max-width:100%;
   max-height:100%;
   object-fit:contain;
@@ -787,7 +787,7 @@ body.modalOpen{ overflow:hidden; }
   #noteDialog .noteFrameWrap.isImg{
     background:#000;
     display:grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: minmax(0, 1fr) auto;
     gap:0;
     overflow:hidden;
     min-height:0;
@@ -805,7 +805,7 @@ body.modalOpen{ overflow:hidden; }
     display:block;
   }
   #noteDialog .noteFrameWrap.isImg.isFill #noteImg{
-    object-fit:cover;
+    object-fit:contain;
   }
 
   .noteCaption{
@@ -1551,33 +1551,87 @@ body.modalOpen{ overflow:hidden; }
       if (wrap){
         wrap.style.maxHeight = "none";
         wrap.style.overflow = "";
+        wrap.style.height = "";
       }
     }
 
     function sizeDialogToImage(img){
-      if (!noteDialog || !img) return;
+      if (!noteDialog || !img || !img.naturalWidth || !img.naturalHeight) return;
 
-      // Let CSS handle sizing for stability (prevents caption clipping).
-      // Clear any inline sizing that might have been set previously.
-      img.style.width = "";
-      img.style.height = "";
-      img.style.maxWidth = "";
-      img.style.maxHeight = "";
-      img.style.objectFit = "";
+      // Mobile/fullscreen dialogs: let CSS drive layout.
+      if (typeof isMobileDialog === "function" && isMobileDialog()){
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "contain";
+
+        var m0 = noteDialog.querySelector(".tqModal");
+        if (m0){ m0.style.width = ""; m0.style.height = ""; }
+        return;
+      }
 
       var modal = noteDialog.querySelector(".tqModal");
+      var bar   = noteDialog.querySelector(".tqBar");
       var wrap  = noteDialog.querySelector(".noteFrameWrap");
-      if (modal){
-        modal.style.width = "";
-        modal.style.height = "";
-        modal.style.maxHeight = "";
+      if (!modal || !bar || !wrap) return;
+
+      // Hard caps (match existing desktop intent).
+      var maxW = Math.min(1200, Math.floor(window.innerWidth  * 0.92));
+      var maxH = Math.floor(window.innerHeight * 0.92);
+
+      // Measure "chrome" once, then snap the modal to the largest size
+      // that fits while preserving the image aspect ratio and keeping caption visible.
+      var csModal = window.getComputedStyle(modal);
+      var csBar   = window.getComputedStyle(bar);
+      var csWrap  = window.getComputedStyle(wrap);
+
+      function px(v){ return Math.max(0, parseFloat(v || "0") || 0); }
+
+      var padX = px(csModal.paddingLeft) + px(csModal.paddingRight);
+      var padY = px(csModal.paddingTop) + px(csModal.paddingBottom);
+      var borderModalX = px(csModal.borderLeftWidth) + px(csModal.borderRightWidth);
+      var borderModalY = px(csModal.borderTopWidth) + px(csModal.borderBottomWidth);
+
+      var barH = bar.getBoundingClientRect().height;
+      var barMarginB = px(csBar.marginBottom);
+
+      var wrapBorderX = px(csWrap.borderLeftWidth) + px(csWrap.borderRightWidth);
+      var wrapBorderY = px(csWrap.borderTopWidth) + px(csWrap.borderBottomWidth);
+
+      // Caption lives inside wrap (grid row 2). Reserve its current height + a small buffer.
+      var capH = 0;
+      if (noteCaption && !noteCaption.hidden){
+        capH = noteCaption.getBoundingClientRect().height;
+        capH += 10; // breathing room for font rounding / zoom
       }
-      if (wrap){
-        wrap.style.maxHeight = "none";
-        wrap.style.overflow = "";
-        wrap.style.height = "";
-      }
+
+      var chromeW = padX + borderModalX + wrapBorderX;
+      var chromeH = padY + borderModalY + barH + barMarginB + wrapBorderY;
+
+      var availW = Math.max(240, maxW - chromeW);
+      var availH = Math.max(240, maxH - chromeH - capH);
+
+      var iw = img.naturalWidth;
+      var ih = img.naturalHeight;
+
+      // Snap: choose the largest modal that fits within caps, preserving the image aspect ratio.
+      var scale = Math.min(1, availW / iw, availH / ih);
+
+      var drawW = Math.max(1, Math.floor(iw * scale));
+      var drawH = Math.max(1, Math.floor(ih * scale));
+
+      var totalW = Math.min(maxW, drawW + chromeW);
+      var totalH = Math.min(maxH, drawH + chromeH + capH);
+
+      // Apply size to the inner window (overlay stays full-screen for stable centering).
+      modal.style.width  = totalW + "px";
+      modal.style.height = totalH + "px";
+
+      // Let CSS grid manage image+caption; ensure the image uses the 1fr row.
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "contain";
     }
+
 
     function slugify(s){
       return String(s || "")
@@ -1847,6 +1901,14 @@ body.modalOpen{ overflow:hidden; }
       if (e.key === "ArrowRight"){ e.preventDefault(); gotoNoteDelta(1); return; }
     });
 
+
+    // Re-snap image modal on resize (desktop). Keeps vertical images fully viewable.
+    window.addEventListener("resize", function(){
+      if (!noteDialog || !noteDialog.hasAttribute("open")) return;
+      var wrap = noteDialog.querySelector(".noteFrameWrap");
+      if (!wrap || !wrap.classList.contains("isImg")) return;
+      if (noteImg && !noteImg.hidden) sizeDialogToImage(noteImg);
+    });
     function buildNotesKeyIndex(){
       notesKeyToIndex.clear();
       var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
