@@ -702,13 +702,29 @@ button, .notesMiniBtn, .blogOpenBtn, .btn, .nameBtn, .pbtn{ color:#000; }
 
 /* PDF.js viewer (PDF posts only) */
 #p-notes .blogMediaFrame.isPdfJsFrame{
-  display:block;
+  /* PDF.js scroll container: must be height-constrained inside the viewer */
+  display:block;            /* stack canvases vertically */
+  flex:1 1 auto;            /* occupy the whole viewer */
+  min-height:0;             /* allow internal scrolling in flex layouts (iOS Safari) */
+  width:100%;
+  height:100%;
   overflow:auto;
   background:#fff;
   padding:6px;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
 }
+.blogMediaFrame.isPdfJsFrame canvas{
+  display:block;
+  max-width:100%;
+  margin:0 auto 10px;
+}
+.pdfjsStatus{
+  font:12px var(--mono);
+  padding:8px;
+  opacity:.7;
+}
+
 #p-notes .blogMediaFrame.isPdfJsFrame canvas{
   width:100%;
   height:auto;
