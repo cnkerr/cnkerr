@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no" />
 <title>Christian N. Kerr</title>
 
 <style>
@@ -365,65 +366,71 @@ em{font-style:italic}
 #p-contact p{ white-space:normal; overflow-wrap:anywhere; }
 
 /* =========================================================
-   CSS: BLOG — IN-WINDOW (no popup)
-   - Single scroll surface (like other pages)
-   - Horizontal list scroll with sticky LED column
-   - Entry header (title/meta) reserves space so buttons never clip
+   CSS: BLOG — CANONICAL (single source of truth)
+   - No JS sizing needed
+   - Entry view is a true viewport: header + media + caption
 ========================================================= */
-#p-notes #scroll-notes{ overflow:auto; }
-#p-notes .blogPage{
-  height:100%;
+
+#p-notes #scroll-notes{
+  /* This panel is a flex column so inner scrollers can resolve height */
   display:flex;
   flex-direction:column;
   min-height:0;
+  height:100%;
+  overflow:hidden;
 }
 
-
-#p-notes .blogBody{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
-#p-notes #blogListWrap{ flex:1 1 auto; min-height:0; overflow:auto; }
-#p-notes #blogView{ flex:1 1 auto; min-height:0; overflow:auto; }
-#p-notes .blogContent{ flex:1 1 auto; min-height:0; }
-#p-notes .pageInner.blogPage{ padding-bottom:0; }
+#p-notes .pageScroll{ overflow:hidden; }
 
 
-/* Top row: BLOG + nav (no open button here) */
+#p-notes .pageInner{
+  width:100%;
+  min-width:0;
+  padding-right:0;
+}
+
+/* Make Blog page a true flex column so the list/view can compute height */
+#p-notes .blogPage{
+  /* must be height-resolving for list/view to scroll correctly */
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
+  min-height:0;
+  height:100%;
+}
+
+/* Header (sticky) */
 #p-notes .blogHdr{
   position:sticky;
   top:0;
-  z-index:120;
+  z-index:200;
   background:#fff;
-  padding:0;
   overflow:visible;
 }
-#p-notes .blogHdr .rule{ margin:0 0 14px; }
 
-@media (max-width:560px){
-  #p-notes .blogHdrTop{ flex-wrap:wrap; gap:6px; }
-  #p-notes .blogPath{ width:100%; white-space:normal; overflow:visible; text-overflow:clip; }
-  #p-notes .blogBtns{ margin-left:auto; }
-  #p-notes .notesMiniBtn{ min-width:44px; height:40px; }
-}
 #p-notes .blogHdrTop{
+  /* Match other pages: left title + right controls on one row */
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  flex-wrap:nowrap;
-  min-height:0;
-  margin: 0 0 6px
+  padding:0 0 6px;
+  min-height:46px;
 }
 
 #p-notes .blogPath{
   display:flex;
-  align-items:baseline;
+  align-items:center;
   gap:6px;
   min-width:0;
+  flex:1 1 auto;
   font-size:14px;
   letter-spacing:.08em;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
+
 #p-notes .blogCrumb{
   font:inherit;
   color:inherit;
@@ -432,26 +439,32 @@ em{font-style:italic}
   padding:0 2px;
   margin:0;
 }
+
 #p-notes .blogCrumbHome{
   cursor:pointer;
   font-weight:800;
   text-transform:uppercase;
   letter-spacing:.08em;
+  padding:0;
 }
+
+/* Keep the main header clean: we show meta (type/date/path) under the entry title instead */
+#p-notes #blogCrumbTail{ display:none; }
 #p-notes .blogCrumbHome:hover{
   background:#000;
   color:#fff;
   border-color:#000;
 }
 #p-notes .blogCrumbHome:active{ transform:translate(1px,1px); }
+
 #p-notes .blogCrumbTail{
   font-size:11px;
   letter-spacing:.02em;
   opacity:.75;
-  white-space:nowrap;
+  min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
-  min-width:0;
+  white-space:nowrap;
 }
 
 #p-notes .blogBtns{
@@ -463,11 +476,9 @@ em{font-style:italic}
   white-space:nowrap;
 }
 
-#p-notes .blogPath{ flex:1 1 auto; }
-#p-notes .blogBtns{ margin-left:auto; }
+#p-notes .blogSortIcons{ display:flex; align-items:center; gap:6px; }
 
-
-/* Blog nav buttons: match TimeQuotes keycaps */
+/* Blog nav buttons match keycap style */
 #p-notes .notesMiniBtn{
   width:54px;
   height:32px;
@@ -485,288 +496,59 @@ em{font-style:italic}
   place-items:center;
   -webkit-tap-highlight-color:transparent;
 }
-#blogList{font-weight:900;}
-
 #p-notes .notesMiniBtn:active{
   border-color:#000000 #ffffff #ffffff #000000;
   box-shadow:inset 1px 1px 0 #808080, inset -1px -1px 0 #dfdfdf;
   transform:translate(1px,1px);
 }
 #p-notes .notesMiniBtn.isDim,
-#p-notes .notesMiniBtn:disabled{
-  opacity:.35;
-  cursor:default;
-}
-#p-notes .notesMiniBtn.isDim:active,
+#p-notes .notesMiniBtn:disabled{ opacity:.35; cursor:default; }
 #p-notes .notesMiniBtn:disabled:active{ transform:none; }
 
-/* Blog sort buttons: active state */
+/* Force UI glyph color (prevents mobile Safari tinting) */
+button, .notesMiniBtn, .blogOpenBtn, .btn, .nameBtn, .pbtn{ color:#000; }
+
+#blogList{ font-weight:900; }
+
+/* Sort active */
 #p-notes .notesMiniBtn.isOn{
   background:var(--accent);
   border-color:var(--deep) var(--hi) var(--hi) var(--deep);
 }
-/* Viewport below the rule: fixed (no clipping); list or entry manages its own content */
+
+/* BLOG BODY: list OR entry fills remaining panel height */
 #p-notes .blogBody{
-  flex:1;
   min-height:0;
-  overflow:hidden;          /* prevents header/nav from being clipped by inner scroll */
-  touch-action: pan-x pan-y;
-  padding-right:2px;
   display:flex;
   flex-direction:column;
+  overflow:hidden;
+  flex:1 1 auto;
 }
 
-/* LIST scroll surface (both axes) */
+/* LIST */
 #p-notes #blogListWrap{
-  flex:1;
+  flex:1 1 auto;
   min-height:0;
   overflow:auto;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x pan-y;
+  position:relative;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
   min-width:100%;
 }
-#p-notes .blogListInner{
+#p-notes #blogListWrap .blogListInner{
   width:max-content;
   min-width:100%;
   padding-right:18px;
   padding-bottom:14px;
 }
 
-/* Each list row: sticky LED + single line (Title / Type / Date) */
-#p-notes .noteRow{
-  display:flex;
-  align-items:baseline;
-  gap:6px;
-  padding:5px 0;
-  border-top:1px solid rgba(0,0,0,.14);
-  font-variant-numeric: tabular-nums;
-  white-space:nowrap;
-}
-#p-notes .noteRow:first-child{ border-top:0; }
-
-#p-notes .noteLedCell{
-  position:sticky;
-  left:0;
-  z-index:4;
-  background:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-}
-#p-notes .noteLedCell::after{
-  content:"";
-  position:absolute;
-  left:100%;
-  top:0;
-  bottom:0;
-  width:10px;
-  background:linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0));
-  pointer-events:none;
-}
-
-#p-notes .noteMain{
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-#p-notes .noteMain .prompt{ opacity:.95; margin-right:0; }
-#p-notes .noteMain a{ text-decoration:none; }
-#p-notes .noteMain a:hover{ text-decoration:underline; }
-
-#p-notes .noteSlash{
-  opacity:.55;
-  padding:0;
-}
-#p-notes .noteMeta{
-  font-size:10px;
-  opacity:.75;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Entry view occupies the same fixed viewport */
-#p-notes #blogView{
-  flex:1;
-  min-height:0;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden; /* no vertical scrolling in entry view; media fits */
-}
-#p-notes .blogContent{
-  flex:1;
-  min-height:0;
-  display:flex;
-  overflow:hidden;
-}
-/* ENTRY view header under rule: title + open button */
-#p-notes .blogEntryHdr{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  gap:8px;
-  margin:0 0 10px;
-}
-#p-notes .blogTitle{
-  margin:0;
-  font-weight:800;
-  font-variant-numeric: tabular-nums;
-  min-width:0;
-  flex:1 1 auto;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-#p-notes .blogTitleRow{ display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0; }
-.blogTitleRow .blogTitle{ flex:1; min-width:0; white-space:normal; overflow-wrap:anywhere; }
-#p-notes .blogTitleRow .blogTitle{ min-width:0; }
-#p-notes .blogOpenBtn{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:32px;
-  width:44px;
-  padding:0;
-  background:#cfcfcf;
-  color:#000;
-  border:2px solid;
-  border-color:#ffffff #000000 #000000 #ffffff;
-  box-shadow:inset 1px 1px 0 rgba(255,255,255,.25), inset -1px -1px 0 rgba(0,0,0,.35);
-  cursor:pointer;
-  align-self:center;
-  font-family:inherit;
-  font-weight:900;
-  font-size:18px;
-  line-height:1;
-  display:grid;
-  place-items:center;
-  -webkit-tap-highlight-color: transparent;
-}
-#p-notes .blogOpenBtn:hover{ filter:brightness(1.08); }
-#p-notes .blogOpenBtn:active{
-  border-color:#000000 #ffffff #ffffff #000000;
-  box-shadow:inset 1px 1px 0 rgba(0,0,0,.35), inset -1px -1px 0 rgba(255,255,255,.25);
-  transform:translate(1px,1px);
-}
-#p-notes .blogOpenBtn:disabled{ opacity:.35; cursor:default; }
-#p-notes .blogOpenBtn:disabled:active{ transform:none; }
-#p-notes .blogOpenBtn:hover{ background:var(--accent); }
-#p-notes .blogOpenBtn:active{ border-color:#000000 #ffffff #ffffff #000000; }
-#p-notes .blogOpenBtn:active{ transform:translate(1px,1px); }
-#p-notes .blogOpenBtn:disabled{ opacity:.35; cursor:default; }
-#p-notes .blogOpenBtn:disabled:active{ transform:none; }
-
-#p-notes .blogEntryMeta{
-  font-size:10px;
-  opacity:.75;
-  margin:2px 0 10px;
-}
-
-/* Media containment (Blog viewer):
-   Goal: ALWAYS fit media inside the window without clipping,
-   while keeping a “floating on white” look (no heavy boxes).
-   Sizing is driven by JS via --blogImgMaxH / --blogPdfMaxH / --blogVidMaxH.
-*/
-#p-notes{
-  --blogImgMaxH: 520px;
-  --blogPdfMaxH: 680px;
-  --blogVidMaxH: 520px;
-}
-
-/* Blog page should not become width:max-content (that clips the right side on narrow view). */
-#p-notes .pageInner{
-  width:100%;
-  min-width:0;
-  padding-right:0;
-}
-
-/* Media wrap */
-#p-notes .blogMediaFrame{
-  width:100%;
-  display:flex;
-  align-items:flex-start;
-  justify-content:flex-start; /* left aligned */
-  background:transparent;
-  border:0;
-  box-shadow:none;
-}
-
-/* Make the media itself feel like it’s floating (shadow only). */
-#p-notes .blogMediaFrame > img,
-#p-notes .blogMediaFrame > video,
-#p-notes .blogMediaFrame > iframe,
-#p-notes .blogMediaFrame > embed{
-  display:block;
-  max-width:100%;
-  border:0;
-  box-shadow:var(--shadow);
-  background:#fff;
-}
-
-/* Images: never clip; constrain by BOTH width and available height */
-#p-notes .blogMediaFrame > img{
-  background:transparent;
-  width:auto;
-  height:auto;
-  max-height: var(--blogImgMaxH);
-  object-fit:contain;
-}
-
-/* Direct video files */
-#p-notes .blogMediaFrame > video{
-  width:100%;
-  height:auto;
-  max-height: var(--blogVidMaxH);
-  background:#000;
-}
-
-/* Iframes */
-#p-notes .blogMediaFrame > iframe{
-  width:100%;
-  border:0;
-  background:#fff;
-}
-
-/* YouTube / iframe video: keep 16:9, but never exceed height budget */
-#p-notes #blogView.isVideo .blogMediaFrame > iframe{
-  aspect-ratio:16 / 9;
-  height:auto;
-  max-height: var(--blogVidMaxH);
-}
-
-/* PDF: full-width reading viewport with a small paper margin */
-#p-notes #blogView.isPdf .blogMediaFrame{
-  flex:1;
-  min-height:0;
-  padding:8px;              /* small paper margin */
-  box-sizing:border-box;
-}
-
-#p-notes #blogView.isPdf .blogMediaFrame{
-  height: var(--blogPdfMaxH);
-  max-height: var(--blogPdfMaxH);
-}
-
-#p-notes #blogView.isPdf .blogMediaFrame > embed{
-  width:100%;
-  height:100%;              /* fill the viewport height */
-  min-height: var(--blogPdfMaxH);
-  max-width:none;
-  display:block;
-  box-shadow:none;          /* remove “boxed” look */
-  background:#fff;
-}
-
-/* HTML: iframe uses the PDF height (readable) */
-#p-notes #blogView.isHtml .blogMediaFrame > iframe{
-  height: var(--blogPdfMaxH);
-}
-
-/* ===== BLOG v5c: list matches Clips/Research ===== */
+/* List row spacing */
 #p-notes .noteItem{ padding:6px 0; }
 #p-notes .noteItem .pathRow{ gap:0; }
 #p-notes .noteItem .sep{ margin:0 6px; opacity:.9; }
 #p-notes .noteItem .metaLine{ opacity:.75; font-size:11px; }
 
-/* Sticky LED while horizontal scrolling the scrollbox */
+/* Sticky LED column while horizontal scrolling */
 #p-notes .noteLedCell{
   position:sticky;
   left:0;
@@ -788,262 +570,212 @@ em{font-style:italic}
   pointer-events:none;
 }
 
-/* ===== BLOG v5c: lock header controls above rule ===== */
-#p-notes .blogHdr{
-  position:sticky;
-  top:0;
-  z-index:120;
-  background:#fff;
+/* LED dots (blog list) */
+#p-notes .led{
+  width:10px; height:10px;
+  border:1px solid #000;
+  background:#bdbdbd;
+  display:inline-block;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.45), inset -1px -1px 0 rgba(0,0,0,.35);
 }
-#p-notes .blogHdrTop{
+#p-notes .led.led-zine{ background:#990066; }
+#p-notes .led.led-video{ background:#FF6600; }
+#p-notes .led.led-photo{ background:#fdfb8c; }
+#p-notes .led.led-pdf{ background:#ffffff; }
+#p-notes .led.led-article{ background:#669900; }
+#p-notes .led.led-other{ background:#777; }
+
+/* ENTRY VIEW: header + media viewport + caption */
+#p-notes #blogView{
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+#p-notes .blogEntryHdr{
+  flex:0 0 auto;
+  margin:0 0 8px;
+}
+
+#p-notes .blogTitleRow{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  flex-wrap:nowrap;
-  padding:0;
-}
-#p-notes .blogPath{
   min-width:0;
-  overflow:hidden;
+}
+#p-notes .blogTitle{
+  margin:0;
+  font-weight:800;
+  min-width:0;
+  flex:1 1 auto;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+
+#p-notes .blogEntryMeta{
+  margin-top:4px;
+  font-size:11px;
+  opacity:.75;
+  font-variant-numeric: tabular-nums;
   white-space:nowrap;
+  overflow:hidden;
   text-overflow:ellipsis;
 }
-#p-notes .blogBtns{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  flex-wrap:nowrap;
-}
-#p-notes .blogSortIcons{ display:flex; gap:6px; align-items:center; }
 
-/* ===== BLOG v5c: entry media always fits remaining viewport (no crop) ===== */
-#p-notes #blogView{ overflow:hidden; }
+/* Open button */
+#p-notes .blogOpenBtn{
+  flex:0 0 auto;
+  height:32px;
+  width:44px;
+  padding:0;
+  background:#cfcfcf;
+  color:#000;
+  border:2px solid;
+  border-color:#ffffff #000000 #000000 #ffffff;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.25), inset -1px -1px 0 rgba(0,0,0,.35);
+  cursor:pointer;
+  font-family:inherit;
+  font-weight:900;
+  font-size:18px;
+  line-height:1;
+  display:grid;
+  place-items:center;
+  -webkit-tap-highlight-color:transparent;
+}
+#p-notes .blogOpenBtn:hover{ background:var(--accent); }
+#p-notes .blogOpenBtn:active{
+  border-color:#000000 #ffffff #ffffff #000000;
+  transform:translate(1px,1px);
+}
+#p-notes .blogOpenBtn:disabled{ opacity:.35; cursor:default; }
+#p-notes .blogOpenBtn:disabled:active{ transform:none; }
+
+/* Media viewport (the “window”) */
 #p-notes .blogContent{
-  flex:1;
+  flex:1 1 auto;
   min-height:0;
   display:flex;
-  overflow:hidden; /* no scroll; content shrinks */
+  overflow:hidden;
 }
+
 #p-notes .blogMediaFrame{
-  flex:1;
+  flex:1 1 auto;
   min-height:0;
   width:100%;
   display:flex;
   align-items:stretch;
-  justify-content:flex-start; /* left aligned */
-  overflow:hidden; /* prevent accidental crop via scroll area */
-  padding:0;
+  justify-content:flex-start;
+  overflow:hidden;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
 }
-/* images/videos: use max constraints (NOT width/height 100%) */
-#p-notes .blogMediaFrame img,
-#p-notes .blogMediaFrame video{
-  display:block;
+
+/* Images + direct videos: fill viewport, never crop */
+#p-notes .blogMediaFrame > img,
+#p-notes .blogMediaFrame > video{
   width:100%;
   height:100%;
   max-width:100%;
   max-height:100%;
+  display:block;
   object-fit:contain;
   object-position:left center;
-}
-/* iframes/embeds should fill the frame */
-#p-notes .blogMediaFrame iframe,
-#p-notes .blogMediaFrame embed{
-  width:100%;
-  height:100%;
+  background:transparent;
 }
 
-/* Caption: blends with the window */
+/* PDFs + HTML + video embeds: iframe */
+#p-notes .blogMediaFrame > iframe{
+  width:100%;
+  height:100%;
+  display:block;
+  border:0;
+  background:#fff;
+}
+
+/* PDF.js viewer (PDF posts only) */
+#p-notes .blogMediaFrame.isPdfJsFrame{
+  overflow:auto;
+  background:#fff;
+  padding:6px;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+#p-notes .blogMediaFrame.isPdfJsFrame canvas{
+  width:100%;
+  height:auto;
+  display:block;
+  margin:0 0 10px;
+  background:#fff;
+}
+#p-notes .blogMediaFrame.isPdfJsFrame .pdfjsStatus{
+  font-size:10px;
+  opacity:.7;
+  padding:6px 2px;
+}
+
+/* Media mode helpers */
+#p-notes .blogMediaFrame.isPdfFrame,
+#p-notes .blogMediaFrame.isHtmlFrame{
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+#p-notes .blogMediaFrame.isPdfFrame > iframe,
+#p-notes .blogMediaFrame.isHtmlFrame > iframe{
+  min-height:100%;
+}
+
+/* Media mode tuning */
+#p-notes #blogView.isVideo .blogMediaFrame{ align-items:flex-start; justify-content:flex-start; }
+#p-notes #blogView.isVideo .blogMediaFrame > iframe{
+  width:100%;
+  height:auto;
+  aspect-ratio:16/9;
+  max-height:100%;
+}
+#p-notes #blogView.isPdf .blogMediaFrame,
+#p-notes #blogView.isHtml .blogMediaFrame{
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+#p-notes #blogView.isPdf .blogMediaFrame > iframe,
+#p-notes #blogView.isHtml .blogMediaFrame > iframe{
+  height:100%;
+  min-height:100%;
+}
+
+
+/* Caption: tight + wraps */
 #p-notes #blogCaption{
-  margin-top:10px;
+  flex:0 0 auto;
+  margin-top:6px;
   background:var(--paper2);
   color:rgba(0,0,0,.75);
   border:2px solid;
   border-color:var(--hi) var(--deep) var(--deep) var(--hi);
   box-shadow:var(--shadow);
-  padding:7px 9px;
+  padding:6px 8px;
   font-size:10px;
   line-height:1.25;
   white-space:normal;
   overflow-wrap:anywhere;
-  max-height:140px;
-  overflow:auto;
 }
 
-
-
-/* === BLOG v5e FIXES ===
-   1) ensure header buttons never clip
-   2) media never crops in narrow view
-   3) captions wrap naturally (no forced scroll)
-*/
-#p-notes .blogHdrTop{ min-height:48px; }
-#p-notes .blogBtns{ align-items:center; }
-#p-notes .notesMiniBtn{ height:26px; line-height:1; }
-
-#p-notes .blogContent{ overflow:hidden; }
-#p-notes .blogMediaFrame{ overflow:hidden; }
-#p-notes .blogMediaFrame img,
-#p-notes .blogMediaFrame video{
-  width:100%;
-  height:100%;
-  max-width:100%;
-  max-height:100%;
-  object-fit:contain;
-  object-position:left center;
+/* Mobile tweaks: allow BLOG tail to wrap and give buttons finger-room */
+@media (max-width:560px){
+  /* Keep title + controls on one line like other pages */
+  #p-notes .blogHdrTop{ flex-wrap:nowrap; }
+  #p-notes .blogPath{ white-space:nowrap; }
+  #p-notes .notesMiniBtn{ width:54px; height:40px; }
 }
 
-/* keep photos floating */
-#p-notes .blogMediaFrame.isImgFrame{
-  border:0;
-  box-shadow:none;
-  background:transparent;
-}
-
-/* caption: wrap, no scrolling box unless truly necessary */
-#p-notes #blogCaption{
-  max-height:none;
-  overflow:visible;
-  white-space:normal;
-}
-
-
-/* =========================================================
-   CSS: BLOG LED (colors)
-========================================================= */
-.led-zine{ background:#990066; }
-.led-video{ background:#FF6600; }
-.led-photo{ background:#fdfb8c; }
-.led-pdf{ background:#ffffff; }
-.led-article{ background:#669900; }
-.led-other{ background:#777; }
-
-/* =========================================================
-   BLOG v5J: STABLE MEDIA FIT + STICKY CONTROLS
-   - No cropping for horizontal OR vertical photos
-   - Header controls never disappear (independent of media)
-   - PDFs/iframes/videos float (no heavy frames)
-   - Captions wrap
-========================================================= */
-
-/* Keep the blog header controls pinned and unclippable */
-#p-notes .blogHdr{
-  position:sticky;
-  top:0;
-  z-index:200;
-  background:#fff;
-  overflow:visible;
-}
-#p-notes .blogHdrTop{
-  min-height:46px;
-  padding:2px 0 6px;
-  flex-wrap:nowrap;
-  align-items:center;
-}
-#p-notes .blogBtns{
-  display:flex;
-  gap:10px;
-  flex-wrap:nowrap;
-  align-items:center;
-}
-#p-notes .blogBtns button{ line-height:1; }
-
-/* Entry view becomes a true viewport: header + media + caption */
-#p-notes #blogBody{
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-}
-#p-notes #blogView{
-  display:flex;
-  flex-direction:column;
-  flex:1 1 auto;
-  min-height:0;
-}
-#p-notes .blogEntryRow{
-  flex:0 0 auto;
-}
-#p-notes .blogContent{
-  flex:1 1 auto;
-  min-height:0;
-  overflow:hidden; /* media must fit; no cropping */
-  display:flex;
-  flex-direction:column;
-}
-
-/* Media frame fills available space; left-aligned */
-#p-notes .blogMediaFrame{
-  flex:1 1 auto;
-  min-height:0;
-  height:100%;
-  width:100%;
-  display:flex;
-  align-items:flex-start;
-  justify-content:flex-start;
-  background:transparent;
-  border:0;
-  box-shadow:none;
-  overflow:hidden;
-}
-
-/* All media types: fill frame, contain without cropping */
-#p-notes .blogMediaFrame > img,
-#p-notes .blogMediaFrame > video,
-#p-notes .blogMediaFrame > iframe,
-#p-notes .blogMediaFrame > embed{
-  width:100%;
-  height:100%;
-  max-width:100%;
-  max-height:100%;
-  display:block;
-  border:0;
-  box-shadow:none; /* floating look */
-  background:transparent;
-}
-
-/* Images: contain + left align */
-#p-notes .blogMediaFrame > img{
-  object-fit:contain;
-  object-position:left top;
-}
-
-/* Video files: contain within frame */
-#p-notes .blogMediaFrame > video{
-  object-fit:contain;
-  background:transparent;
-}
-
-/* Iframes/PDFs: fill frame */
-#p-notes .blogMediaFrame > iframe,
-#p-notes .blogMediaFrame > embed{
-  background:#fff;
-}
-
-/* Captions: wrap, no forced scrolling */
-#p-notes #blogCaption{
-  white-space:normal;
-  overflow:visible;
-  max-height:none;
-}
-
-
-
-/* =========================================================
-   BLOG v5K: PDF fit + caption nestle
-   - PDFs/HTML fill the remaining viewport (no cut-off)
-   - Caption sits tight under media
-========================================================= */
-#p-notes #blogView.isPdf .blogMediaFrame{ overflow:auto !important; }
-#p-notes #blogView.isPdf .blogMediaFrame > embed{ height:100% !important; }
-#p-notes #blogView.isHtml .blogMediaFrame{ overflow:auto !important; }
-#p-notes #blogView.isHtml .blogMediaFrame > iframe{ height:100% !important; }
-
-/* Nestle caption close to media */
-#p-notes .blogMediaFrame > img{ object-position:left bottom; }
-#p-notes #blogCaption{ margin-top:6px !important; padding:6px 8px !important; }
-/* Tighten vertical whitespace in entry view */
-#p-notes .blogEntryRow{ margin:8px 0 8px; }
-#p-notes .blogContent{ margin:0; }
 
 /* =========================================================
    CSS: DIALOGS (TimeQuotes + Notes + About)
@@ -1640,7 +1372,7 @@ body.modalOpen{ overflow:hidden; }
 <div class="blogHdr" role="navigation" aria-label="Blog navigation">
               <div class="blogHdrTop">
                 <div class="blogPath">
-                <button id="blogHome" class="blogCrumb blogCrumbHome" type="button">blog</button>
+                <button id="blogHome" class="blogCrumb blogCrumbHome" type="button">BLOG</button>
                 <span id="blogCrumbTail" class="blogCrumbTail" aria-hidden="true"></span>
               </div>
 
@@ -1660,7 +1392,7 @@ body.modalOpen{ overflow:hidden; }
             </div>
 
             <div class="blogBody" id="blogBody">
-              <div id="blogListWrap"><div class="blogListInner"><div class="items" id="items-notes" aria-live="polite"></div></div></div>
+              <div id="blogListWrap" class="scrollbox"><div class="blogListInner"><div class="items" id="items-notes" aria-live="polite"></div></div></div>
 
               <div id="blogView" hidden>
                 <div class="blogEntryHdr">
@@ -1668,6 +1400,7 @@ body.modalOpen{ overflow:hidden; }
                     <div class="blogTitle" id="blogTitle"></div>
                     <button id="blogOpen2" class="blogOpenBtn" type="button" aria-label="Open media in new tab" title="Open in new tab">⧉</button>
                   </div>
+                  <div class="blogEntryMeta" id="blogEntryMeta"></div>
                 </div>
 <div class="blogContent" id="blogContent"></div>
                 <div id="blogCaption" hidden></div>
@@ -2395,39 +2128,120 @@ function typeLabel(n){
       return parts.join(" / ") || "—";
     }
 
-    /* Thorough sizing: set per-type max heights based on real available space */
-    function fitBlogMedia(){
-      if (!blogBody || !blogView || blogView.hidden) return;
-
-      var bodyH = blogBody.clientHeight || 0;
-      if (!bodyH) return;
-
-      var hdrH = 0;
-      if (blogTitle && blogTitle.parentElement) hdrH = blogTitle.parentElement.getBoundingClientRect().height;
-      var metaH = blogEntryMeta ? blogEntryMeta.getBoundingClientRect().height : 0;
-      var capH  = (blogCaption2 && !blogCaption2.hidden) ? blogCaption2.getBoundingClientRect().height : 0;
-
-      // breathing room between blocks (tight, because you want taller reading area)
-      var padImg = 22;
-      var padPdf = 16;
-      var padVid = 20;
-
-      var imgMax = Math.max(220, Math.floor(bodyH - hdrH - metaH - capH - padImg));
-      var pdfMax = Math.max(260, Math.floor(bodyH - hdrH - metaH - capH - padPdf)); // slightly taller
-      var vidMax = Math.max(220, Math.floor(bodyH - hdrH - metaH - capH - padVid));
-
-      var panel = document.getElementById("p-notes");
-      if (!panel) return;
-
-      panel.style.setProperty("--blogImgMaxH", imgMax + "px");
-      panel.style.setProperty("--blogPdfMaxH", pdfMax + "px");
-      panel.style.setProperty("--blogVidMaxH", vidMax + "px");
-    }
-
+    
     function clearBlogViewClasses(){
       if (!blogView) return;
       blogView.classList.remove("isImg","isPdf","isVideo","isHtml","isOther");
     }
+
+    
+    // =========================================================
+    // PDF.js (lazy) — used only for PDF blog posts to avoid iOS toolbar
+    // =========================================================
+    var _pdfjsLoading = null;
+    var _pdfjsReady = false;
+    var _pdfjsRenderToken = 0;
+
+    function ensurePdfJsLoaded(){
+      if (_pdfjsReady && window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+      if (_pdfjsLoading) return _pdfjsLoading;
+
+      _pdfjsLoading = new Promise(function(resolve, reject){
+        // Load PDF.js core
+        var s = document.createElement("script");
+        s.src = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.min.js";
+        s.async = true;
+        s.onload = function(){
+          try{
+            if (!window.pdfjsLib) throw new Error("pdfjsLib missing after load");
+            // Load worker (same version)
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+              "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.worker.min.js";
+            _pdfjsReady = true;
+            resolve(window.pdfjsLib);
+          }catch(e){ reject(e); }
+        };
+        s.onerror = function(){ reject(new Error("Failed to load pdf.min.js")); };
+        document.head.appendChild(s);
+      });
+
+      return _pdfjsLoading;
+    }
+
+    function clearNode(el){
+      while (el && el.firstChild) el.removeChild(el.firstChild);
+    }
+
+    function renderPdfJsInto(url, frameEl){
+      if (!frameEl) return;
+
+      var myToken = ++_pdfjsRenderToken;
+
+      // status line while loading
+      clearNode(frameEl);
+      var status = document.createElement("div");
+      status.className = "pdfjsStatus";
+      status.textContent = "Loading PDF…";
+      frameEl.appendChild(status);
+
+      // IMPORTANT: encode spaces safely
+      var safeUrl = String(url || "").replace(/\\s/g, "%20");
+
+      return ensurePdfJsLoaded().then(function(pdfjs){
+        if (myToken !== _pdfjsRenderToken) return;
+
+        // Some servers require CORS; pdf.js uses fetch/XHR — if it fails, caller can fallback.
+        return pdfjs.getDocument({ url: safeUrl, withCredentials: false }).promise.then(function(pdf){
+          if (myToken !== _pdfjsRenderToken) return;
+          clearNode(frameEl);
+
+          var dpr = Math.max(1, window.devicePixelRatio || 1);
+          var targetWidth = Math.max(200, frameEl.clientWidth - 12);
+
+          // Render pages sequentially to keep memory sane on mobile.
+          var p = Promise.resolve();
+          for (var i = 1; i <= pdf.numPages; i++){
+            (function(pageNum){
+              p = p.then(function(){
+                if (myToken !== _pdfjsRenderToken) return;
+
+                return pdf.getPage(pageNum).then(function(page){
+                  if (myToken !== _pdfjsRenderToken) return;
+
+                  var viewport1 = page.getViewport({ scale: 1 });
+                  var scale = targetWidth / viewport1.width;
+                  // clamp: prevents huge renders on tiny devices
+                  scale = Math.min(Math.max(scale, 0.5), 2.5);
+
+                  var viewport = page.getViewport({ scale: scale });
+
+                  var canvas = document.createElement("canvas");
+                  var ctx = canvas.getContext("2d", { alpha: false });
+
+                  canvas.width = Math.floor(viewport.width * dpr);
+                  canvas.height = Math.floor(viewport.height * dpr);
+                  canvas.style.width = Math.floor(viewport.width) + "px";
+                  canvas.style.height = Math.floor(viewport.height) + "px";
+
+                  frameEl.appendChild(canvas);
+
+                  var renderTask = page.render({
+                    canvasContext: ctx,
+                    viewport: viewport,
+                    transform: (dpr !== 1) ? [dpr,0,0,dpr,0,0] : null
+                  });
+
+                  return renderTask.promise;
+                });
+              });
+            })(i);
+          }
+
+          return p;
+        });
+      });
+    }
+
 
     function renderBlogEntryAt(pos){
       blogCurrentURL = "";
@@ -2442,9 +2256,7 @@ function typeLabel(n){
       // header path: blog / type / date (no slug)
       var t = typeLower(n);
       var d = String((n && n.date) ? n.date : "").trim();
-      if (blogCrumbTail){
-        blogCrumbTail.textContent = " / " + t + (d ? (" / " + d) : "");
-      }
+      if (blogCrumbTail) blogCrumbTail.textContent = "";
       if (blogEntryMeta){
         blogEntryMeta.textContent = (t ? t : "—") + (d ? (" / " + d) : "");
       }
@@ -2478,8 +2290,7 @@ function typeLabel(n){
         if (!file){
           if (blogView) blogView.classList.add("isOther");
           blogContent.innerHTML = "<p>(No file attached.)</p>";
-          setTimeout(fitBlogMedia, 0);
-        } else {
+                  } else {
           var fUrl = file;
           try{ fUrl = new URL(file, location.href).toString(); }
           catch(_){ fUrl = encodeURI(file); }
@@ -2493,29 +2304,32 @@ function typeLabel(n){
           if (yt){
             if (blogView) blogView.classList.add("isVideo");
             blogContent.innerHTML =
-              '<div class="blogMediaFrame"><iframe src="' + esc(fUrl) + '" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
-            setTimeout(fitBlogMedia, 0);
-          } else if (ext === "pdf"){
-            // PDFs: hint the browser viewer to fit page width (reduces side whitespace)
+              '<div class="blogMediaFrame isVideoFrame"><iframe src="' + esc(fUrl) + '" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
+                      } else if (ext === "pdf"){
             if (blogView) blogView.classList.add("isPdf");
 
-            var pdfUrl = fUrl;
-            if (pdfUrl.indexOf("#") === -1){
-              pdfUrl = pdfUrl + "#view=FitH";
-            } else if (pdfUrl.indexOf("view=") === -1){
-              pdfUrl = pdfUrl + (pdfUrl.endsWith("#") || pdfUrl.endsWith("&") ? "" : "&") + "view=FitH";
-            }
+            blogCurrentURL = fUrl;
 
+            // PDF.js viewer (lazy) — avoids native iOS PDF toolbar and keeps PDFs in-window.
             blogContent.innerHTML =
-              '<div class="blogMediaFrame"><embed src="' + esc(pdfUrl) + '" type="application/pdf" /></div>';
-            setTimeout(fitBlogMedia, 0);
+              '<div class="blogMediaFrame isPdfJsFrame" id="blogPdfJsFrame"></div>';
+
+            var frame = document.getElementById("blogPdfJsFrame");
+            renderPdfJsInto(fUrl, frame).catch(function(){
+              // Fallback: native iframe if PDF.js cannot load or PDF fetch is blocked.
+              var pdfUrl = fUrl;
+              if (pdfUrl.indexOf("#") === -1) pdfUrl = pdfUrl + "#view=FitH";
+              if (blogContent){
+                blogContent.innerHTML =
+                  '<div class="blogMediaFrame isPdfFrame"><iframe src="' + esc(pdfUrl) + '" loading="lazy" scrolling="yes" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
+              }
+            });
           } else if (ext === "html" || ext === "htm"){
             if (blogView) blogView.classList.add("isHtml");
             // Render HTML in an iframe so it can scroll naturally and fill the viewer.
             blogContent.innerHTML =
               '<div class="blogMediaFrame isHtmlFrame"><iframe src="' + esc(fUrl) + '" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
-            setTimeout(fitBlogMedia, 0);
-          } else if (/(png|jpe?g|gif|webp|bmp|svg)/i.test(ext)){
+                      } else if (/(png|jpe?g|gif|webp|bmp|svg)/i.test(ext)){
             if (blogView) blogView.classList.add("isImg");
             blogContent.innerHTML = '<div class="blogMediaFrame isImgFrame"><img src="' + esc(fUrl) + '" alt="' + esc(ttl) + '" loading="lazy" decoding="async" /></div>';
             var img = blogContent.querySelector("img");
@@ -2527,40 +2341,30 @@ function typeLabel(n){
                 e.stopPropagation();
                 var u = blogCurrentURL || fUrl;
                 if (u) window.open(u, "_blank", "noopener");
-              });
-              img.addEventListener("load", fitBlogMedia, { once:true });
-              img.addEventListener("error", fitBlogMedia, { once:true });
-            } else {
-              setTimeout(fitBlogMedia, 0);
-            }
+              });            } else {
+                          }
           } else if (/(mp4|webm|ogg)/i.test(ext)){
             if (blogView) blogView.classList.add("isOther");
             blogContent.innerHTML = '<div class="blogMediaFrame"><video controls playsinline preload="metadata" src="' + esc(fUrl) + '"></video></div>';
             var vid = blogContent.querySelector("video");
-            if (vid){
-              vid.addEventListener("loadedmetadata", fitBlogMedia, { once:true });
-            } else {
-              setTimeout(fitBlogMedia, 0);
-            }
+            if (vid){            } else {
+                          }
           } else if (noteTypeKey(n) === "video"){
             // Non-YouTube, non-file-extension video embeds (Vimeo, Archive, player pages, etc.)
             // If it's not a direct video file, render as an iframe player.
             if (blogView) blogView.classList.add("isVideo");
             blogContent.innerHTML =
               '<div class="blogMediaFrame"><iframe src="' + esc(fUrl) + '" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
-            setTimeout(fitBlogMedia, 0);
-          } else {
+                      } else {
             if (blogView) blogView.classList.add("isOther");
             blogContent.innerHTML = '<p><a href="' + esc(fUrl) + '" target="_blank" rel="noopener">open file</a></p>';
-            setTimeout(fitBlogMedia, 0);
-          }
+                      }
         }
       }
 
       /* entry view: no list scroll */
       setBlogMode("entry");
-      setTimeout(fitBlogMedia, 0);
-    }
+          }
 
     function openBlogByIdx(idx){
       if (blogListWrap) blogListScrollTop = blogListWrap.scrollTop;
@@ -2775,17 +2579,6 @@ function typeLabel(n){
         if (blogNextBtn.disabled) return;
         gotoNoteDelta(1);
       });
-    }
-
-    window.addEventListener("resize", function(){
-      fitBlogMedia();
-    });
-
-    if (window.ResizeObserver && blogBody){
-      try{
-        var ro = new ResizeObserver(function(){ fitBlogMedia(); });
-        ro.observe(blogBody);
-      }catch(_){ }
     }
 
     // -------------------------------------------------------
@@ -3038,8 +2831,7 @@ function typeLabel(n){
       if (key === "home") requestAnimationFrame(panCenter);
       if (key === "notes") requestAnimationFrame(function(){
         refreshNotes();
-        setTimeout(fitBlogMedia, 0);
-      });
+              });
     }
 
     document.addEventListener("click", function(e){
@@ -3076,8 +2868,7 @@ function typeLabel(n){
       setActive(r);
       if (r === "notes"){
         refreshNotes();
-        setTimeout(fitBlogMedia, 0);
-      }
+              }
     });
 
     // -------------------------------------------------------
