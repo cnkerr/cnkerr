@@ -247,9 +247,12 @@ aside.win{position:sticky;top:18px}
   margin-top:10px;
   display:flex;
   align-items:center;
-  justify-content:space-between;
+  justify-content:flex-start;
   gap:10px;
 }
+#homeOverlay .pager{flex:0 0 auto}
+#homeOverlay .caption{flex:1 1 auto; min-width:0}
+
 .caption{
   max-width:420px;
   background:#fff;
@@ -260,7 +263,15 @@ aside.win{position:sticky;top:18px}
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+
+  /* button reset (caption is clickable) */
+  cursor:pointer;
+  font-family:inherit;
+  text-align:left;
+  appearance:none;
 }
+.caption:active{ transform:translate(1px,1px); }
+.caption:focus{ outline:2px solid #000; outline-offset:2px; }
 .pager{display:flex;gap:6px}
 .pbtn{
   width:34px;height:28px;display:grid;place-items:center;
@@ -323,12 +334,12 @@ aside.win{position:sticky;top:18px}
   font-variant-numeric: tabular-nums;
 }
 .item:first-child{border-top:0}
-.pathRow{display:flex;align-items:baseline;gap:0;white-space:nowrap}
+.pathRow{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
 .prompt{opacity:.95}
 .promptLine{display:flex;align-items:baseline;gap:0;white-space:nowrap}
 .titleCell{white-space:nowrap}
-.sep{opacity:.9; margin:0 4px;}
-.metaLine{white-space:nowrap}
+.sep{opacity:.55;margin:0;}
+.metaLine{white-space:nowrap;font-size:10px;opacity:.75;font-variant-numeric: tabular-nums}
 
 .list a, .caption a{
   color:#1f4f8a;
@@ -351,66 +362,658 @@ em{font-style:italic}
 #p-contact p{ white-space:normal; overflow-wrap:anywhere; }
 
 /* =========================================================
-   CSS: BLOG — HEADER TOOLS + LED
+   CSS: BLOG — IN-WINDOW (no popup)
+   - Single scroll surface (like other pages)
+   - Horizontal list scroll with sticky LED column
+   - Entry header (title/meta) reserves space so buttons never clip
 ========================================================= */
-.notesHdr{
+#p-notes #scroll-notes{ overflow:auto; }
+#p-notes .blogPage{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+
+/* Top row: BLOG + nav (no open button here) */
+#p-notes .blogHdr{
+  position:sticky;
+  top:0;
+  z-index:120;
+  background:#fff;
+  padding:0;
+  overflow:visible;
+}
+#p-notes .blogHdrTop{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:10px;
+  flex-wrap:nowrap;
+  min-height:0;
+  margin:0 0 8px;
 }
-.notesTools{ display:flex; gap:8px; }
-.notesMiniBtn{
-  width:26px;
-  height:20px;
-  background:#c4c4c4;
-  border:1px solid #000;
-  box-shadow:var(--shadow);
+
+#p-notes .blogPath{
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  min-width:0;
+  font-size:14px;
+  letter-spacing:.08em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#p-notes .blogCrumb{
+  font:inherit;
+  color:inherit;
+  background:transparent;
+  border:1px solid transparent;
+  padding:0 2px;
+  margin:0;
+}
+#p-notes .blogCrumbHome{
   cursor:pointer;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+#p-notes .blogCrumbHome:hover{
+  background:#000;
+  color:#fff;
+  border-color:#000;
+}
+#p-notes .blogCrumbHome:active{ transform:translate(1px,1px); }
+#p-notes .blogCrumbTail{
+  font-size:11px;
+  letter-spacing:.02em;
+  opacity:.75;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+}
+
+#p-notes .blogBtns{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
+  flex-wrap:nowrap;
+  white-space:nowrap;
+}
+
+#p-notes .blogPath{ flex:1 1 auto; }
+#p-notes .blogBtns{ margin-left:auto; }
+
+
+/* Blog nav buttons: match TimeQuotes keycaps */
+#p-notes .notesMiniBtn{
+  width:54px;
+  height:32px;
+  background:#c0c0c0;
+  border:2px solid;
+  border-color:#ffffff #000000 #000000 #ffffff;
+  box-shadow:inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080;
+  cursor:pointer;
+  font-family:inherit;
+  font-weight:900;
+  font-size:18px;
+  line-height:1;
   padding:0;
   display:grid;
   place-items:center;
-  font-size:14px;
-  line-height:1;
-  color:#000;
-  font-family:inherit;
+  -webkit-tap-highlight-color:transparent;
 }
-.notesMiniBtn:active{ transform:translate(1px,1px); }
-.notesMiniBtn.isOn{
-  background: var(--accent);
-  border-color: var(--deep) var(--hi) var(--hi) var(--deep);
+#blogList{font-weight:900;}
+
+#p-notes .notesMiniBtn:active{
+  border-color:#000000 #ffffff #ffffff #000000;
+  box-shadow:inset 1px 1px 0 #808080, inset -1px -1px 0 #dfdfdf;
+  transform:translate(1px,1px);
+}
+#p-notes .notesMiniBtn.isDim,
+#p-notes .notesMiniBtn:disabled{
+  opacity:.35;
+  cursor:default;
+}
+#p-notes .notesMiniBtn.isDim:active,
+#p-notes .notesMiniBtn:disabled:active{ transform:none; }
+
+/* Blog sort buttons: active state */
+#p-notes .notesMiniBtn.isOn{
+  background:var(--accent);
+  border-color:var(--deep) var(--hi) var(--hi) var(--deep);
+}
+/* Viewport below the rule: fixed (no clipping); list or entry manages its own content */
+#p-notes .blogBody{
+  flex:1;
+  min-height:0;
+  overflow:hidden;          /* prevents header/nav from being clipped by inner scroll */
+  touch-action: pan-x pan-y;
+  padding-right:2px;
+  display:flex;
+  flex-direction:column;
 }
 
-.led{
-  display:inline-block;
-  width:7px;
-  height:7px;
-  border:1px solid #000;
-  margin-right:8px;
-  vertical-align:middle;
-  box-shadow:var(--shadow);
+/* LIST scroll surface (both axes) */
+#p-notes #blogListWrap{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  min-width:100%;
+}
+#p-notes .blogListInner{
+  width:max-content;
+  min-width:100%;
+  padding-right:18px;
+  padding-bottom:14px;
 }
 
-/* BLOG: keep ">" aligned AND keep LED fully visible */
-#p-notes .pathRow .promptLine{
-  position:relative;
-  padding-left:18px;
+/* Each list row: sticky LED + single line (Title / Type / Date) */
+#p-notes .noteRow{
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  padding:5px 0;
+  border-top:1px solid rgba(0,0,0,.14);
+  font-variant-numeric: tabular-nums;
+  white-space:nowrap;
 }
-#p-notes .pathRow .promptLine .led{
-  position:absolute;
+#p-notes .noteRow:first-child{ border-top:0; }
+
+#p-notes .noteLedCell{
+  position:sticky;
   left:0;
-  top:50%;
-  transform:translateY(-50%);
-  margin:0;
+  z-index:4;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+}
+#p-notes .noteLedCell::after{
+  content:"";
+  position:absolute;
+  left:100%;
+  top:0;
+  bottom:0;
+  width:10px;
+  background:linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0));
+  pointer-events:none;
 }
 
-/* LED colors */
+#p-notes .noteMain{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#p-notes .noteMain .prompt{ opacity:.95; margin-right:0; }
+#p-notes .noteMain a{ text-decoration:none; }
+#p-notes .noteMain a:hover{ text-decoration:underline; }
+
+#p-notes .noteSlash{
+  opacity:.55;
+  padding:0;
+}
+#p-notes .noteMeta{
+  font-size:10px;
+  opacity:.75;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Entry view occupies the same fixed viewport */
+#p-notes #blogView{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden; /* no vertical scrolling in entry view; media fits */
+}
+#p-notes .blogContent{
+  flex:1;
+  min-height:0;
+  display:flex;
+  overflow:hidden;
+}
+/* ENTRY view header under rule: title + open button */
+#p-notes .blogEntryHdr{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  margin:0 0 10px;
+}
+#p-notes .blogTitle{
+  margin:0;
+  font-weight:800;
+  font-variant-numeric: tabular-nums;
+  min-width:0;
+  flex:1 1 auto;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#p-notes .blogTitleRow{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; min-width:0; }
+#p-notes .blogTitleRow .blogTitle{ min-width:0; }
+#p-notes .blogOpenBtn{
+  height:32px;
+  width:44px;
+  padding:0;
+  background:#1f4f8a;
+  color:#fff;
+  border:2px solid;
+  border-color:#ffffff #000000 #000000 #ffffff;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.25), inset -1px -1px 0 rgba(0,0,0,.35);
+  cursor:pointer;
+  font-family:inherit;
+  font-weight:900;
+  font-size:18px;
+  line-height:1;
+  display:grid;
+  place-items:center;
+  -webkit-tap-highlight-color: transparent;
+}
+#p-notes .blogOpenBtn:hover{ filter:brightness(1.08); }
+#p-notes .blogOpenBtn:active{
+  border-color:#000000 #ffffff #ffffff #000000;
+  box-shadow:inset 1px 1px 0 rgba(0,0,0,.35), inset -1px -1px 0 rgba(255,255,255,.25);
+  transform:translate(1px,1px);
+}
+#p-notes .blogOpenBtn:disabled{ opacity:.35; cursor:default; }
+#p-notes .blogOpenBtn:disabled:active{ transform:none; }
+#p-notes .blogOpenBtn:hover{ background:var(--accent); }
+#p-notes .blogOpenBtn:active{ border-color:#000000 #ffffff #ffffff #000000; }
+#p-notes .blogOpenBtn:active{ transform:translate(1px,1px); }
+#p-notes .blogOpenBtn:disabled{ opacity:.35; cursor:default; }
+#p-notes .blogOpenBtn:disabled:active{ transform:none; }
+
+#p-notes .blogEntryMeta{
+  font-size:10px;
+  opacity:.75;
+  margin:2px 0 10px;
+}
+
+/* Media containment (Blog viewer):
+   Goal: ALWAYS fit media inside the window without clipping,
+   while keeping a “floating on white” look (no heavy boxes).
+   Sizing is driven by JS via --blogImgMaxH / --blogPdfMaxH / --blogVidMaxH.
+*/
+#p-notes{
+  --blogImgMaxH: 520px;
+  --blogPdfMaxH: 680px;
+  --blogVidMaxH: 520px;
+}
+
+/* Blog page should not become width:max-content (that clips the right side on narrow view). */
+#p-notes .pageInner{
+  width:100%;
+  min-width:0;
+  padding-right:0;
+}
+
+/* Media wrap */
+#p-notes .blogMediaFrame{
+  width:100%;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start; /* left aligned */
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+
+/* Make the media itself feel like it’s floating (shadow only). */
+#p-notes .blogMediaFrame > img,
+#p-notes .blogMediaFrame > video,
+#p-notes .blogMediaFrame > iframe,
+#p-notes .blogMediaFrame > embed{
+  display:block;
+  max-width:100%;
+  border:0;
+  box-shadow:var(--shadow);
+  background:#fff;
+}
+
+/* Images: never clip; constrain by BOTH width and available height */
+#p-notes .blogMediaFrame > img{
+  background:transparent;
+  width:auto;
+  height:auto;
+  max-height: var(--blogImgMaxH);
+  object-fit:contain;
+}
+
+/* Direct video files */
+#p-notes .blogMediaFrame > video{
+  width:100%;
+  height:auto;
+  max-height: var(--blogVidMaxH);
+  background:#000;
+}
+
+/* Iframes */
+#p-notes .blogMediaFrame > iframe{
+  width:100%;
+  border:0;
+  background:#fff;
+}
+
+/* YouTube / iframe video: keep 16:9, but never exceed height budget */
+#p-notes #blogView.isVideo .blogMediaFrame > iframe{
+  aspect-ratio:16 / 9;
+  height:auto;
+  max-height: var(--blogVidMaxH);
+}
+
+/* PDF: full-width reading viewport with a small paper margin */
+#p-notes #blogView.isPdf .blogMediaFrame{
+  flex:1;
+  min-height:0;
+  padding:8px;              /* small paper margin */
+  box-sizing:border-box;
+}
+
+#p-notes #blogView.isPdf .blogMediaFrame > embed{
+  width:100%;
+  height:100%;              /* fill the viewport height */
+  max-width:none;
+  display:block;
+  box-shadow:none;          /* remove “boxed” look */
+  background:#fff;
+}
+
+/* HTML: iframe uses the PDF height (readable) */
+#p-notes #blogView.isHtml .blogMediaFrame > iframe{
+  height: var(--blogPdfMaxH);
+}
+
+/* ===== BLOG v5c: list matches Clips/Research ===== */
+#p-notes .noteItem{ padding:6px 0; }
+#p-notes .noteItem .pathRow{ gap:0; }
+#p-notes .noteItem .sep{ margin:0 6px; opacity:.9; }
+#p-notes .noteItem .metaLine{ opacity:.75; font-size:11px; }
+
+/* Sticky LED while horizontal scrolling the scrollbox */
+#p-notes .noteLedCell{
+  position:sticky;
+  left:0;
+  z-index:5;
+  display:inline-flex;
+  align-items:center;
+  justify-content:flex-start;
+  background:#fff;
+  padding-right:6px;
+}
+#p-notes .noteLedCell::after{
+  content:"";
+  position:absolute;
+  left:100%;
+  top:0;
+  bottom:0;
+  width:10px;
+  background:linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0));
+  pointer-events:none;
+}
+
+/* ===== BLOG v5c: lock header controls above rule ===== */
+#p-notes .blogHdr{
+  position:sticky;
+  top:0;
+  z-index:120;
+  background:#fff;
+}
+#p-notes .blogHdrTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:nowrap;
+  padding:2px 0 4px;
+}
+#p-notes .blogPath{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+#p-notes .blogBtns{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:nowrap;
+}
+#p-notes .blogSortIcons{ display:flex; gap:6px; align-items:center; }
+
+/* ===== BLOG v5c: entry media always fits remaining viewport (no crop) ===== */
+#p-notes #blogView{ overflow:hidden; }
+#p-notes .blogContent{
+  flex:1;
+  min-height:0;
+  display:flex;
+  overflow:hidden; /* no scroll; content shrinks */
+}
+#p-notes .blogMediaFrame{
+  flex:1;
+  min-height:0;
+  width:100%;
+  display:flex;
+  align-items:stretch;
+  justify-content:flex-start; /* left aligned */
+  overflow:hidden; /* prevent accidental crop via scroll area */
+  padding:0;
+}
+/* images/videos: use max constraints (NOT width/height 100%) */
+#p-notes .blogMediaFrame img,
+#p-notes .blogMediaFrame video{
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  object-position:left center;
+}
+/* iframes/embeds should fill the frame */
+#p-notes .blogMediaFrame iframe,
+#p-notes .blogMediaFrame embed{
+  width:100%;
+  height:100%;
+}
+
+/* Caption: blends with the window */
+#p-notes #blogCaption{
+  margin-top:10px;
+  background:var(--paper2);
+  color:rgba(0,0,0,.75);
+  border:2px solid;
+  border-color:var(--hi) var(--deep) var(--deep) var(--hi);
+  box-shadow:var(--shadow);
+  padding:7px 9px;
+  font-size:10px;
+  line-height:1.25;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  max-height:140px;
+  overflow:auto;
+}
+
+
+
+/* === BLOG v5e FIXES ===
+   1) ensure header buttons never clip
+   2) media never crops in narrow view
+   3) captions wrap naturally (no forced scroll)
+*/
+#p-notes .blogHdrTop{ min-height:48px; }
+#p-notes .blogBtns{ align-items:center; }
+#p-notes .notesMiniBtn{ height:26px; line-height:1; }
+
+#p-notes .blogContent{ overflow:hidden; }
+#p-notes .blogMediaFrame{ overflow:hidden; }
+#p-notes .blogMediaFrame img,
+#p-notes .blogMediaFrame video{
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  object-position:left center;
+}
+
+/* keep photos floating */
+#p-notes .blogMediaFrame.isImgFrame{
+  border:0;
+  box-shadow:none;
+  background:transparent;
+}
+
+/* caption: wrap, no scrolling box unless truly necessary */
+#p-notes #blogCaption{
+  max-height:none;
+  overflow:visible;
+  white-space:normal;
+}
+
+
+/* =========================================================
+   CSS: BLOG LED (colors)
+========================================================= */
 .led-zine{ background:#990066; }
 .led-video{ background:#FF6600; }
 .led-photo{ background:#fdfb8c; }
 .led-pdf{ background:#ffffff; }
 .led-article{ background:#669900; }
 .led-other{ background:#777; }
+
+/* =========================================================
+   BLOG v5J: STABLE MEDIA FIT + STICKY CONTROLS
+   - No cropping for horizontal OR vertical photos
+   - Header controls never disappear (independent of media)
+   - PDFs/iframes/videos float (no heavy frames)
+   - Captions wrap
+========================================================= */
+
+/* Keep the blog header controls pinned and unclippable */
+#p-notes .blogHdr{
+  position:sticky;
+  top:0;
+  z-index:200;
+  background:#fff;
+  overflow:visible;
+}
+#p-notes .blogHdrTop{
+  min-height:46px;
+  padding:2px 0 6px;
+  flex-wrap:nowrap;
+  align-items:center;
+}
+#p-notes .blogBtns{
+  display:flex;
+  gap:10px;
+  flex-wrap:nowrap;
+  align-items:center;
+}
+#p-notes .blogBtns button{ line-height:1; }
+
+/* Entry view becomes a true viewport: header + media + caption */
+#p-notes #blogBody{
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+#p-notes #blogView{
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
+  min-height:0;
+}
+#p-notes .blogEntryRow{
+  flex:0 0 auto;
+}
+#p-notes .blogContent{
+  flex:1 1 auto;
+  min-height:0;
+  overflow:hidden; /* media must fit; no cropping */
+  display:flex;
+  flex-direction:column;
+}
+
+/* Media frame fills available space; left-aligned */
+#p-notes .blogMediaFrame{
+  flex:1 1 auto;
+  min-height:0;
+  height:100%;
+  width:100%;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  overflow:hidden;
+}
+
+/* All media types: fill frame, contain without cropping */
+#p-notes .blogMediaFrame > img,
+#p-notes .blogMediaFrame > video,
+#p-notes .blogMediaFrame > iframe,
+#p-notes .blogMediaFrame > embed{
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  display:block;
+  border:0;
+  box-shadow:none; /* floating look */
+  background:transparent;
+}
+
+/* Images: contain + left align */
+#p-notes .blogMediaFrame > img{
+  object-fit:contain;
+  object-position:left top;
+}
+
+/* Video files: contain within frame */
+#p-notes .blogMediaFrame > video{
+  object-fit:contain;
+  background:transparent;
+}
+
+/* Iframes/PDFs: fill frame */
+#p-notes .blogMediaFrame > iframe,
+#p-notes .blogMediaFrame > embed{
+  background:#fff;
+}
+
+/* Captions: wrap, no forced scrolling */
+#p-notes #blogCaption{
+  white-space:normal;
+  overflow:visible;
+  max-height:none;
+}
+
+
+
+/* =========================================================
+   BLOG v5K: PDF fit + caption nestle
+   - PDFs/HTML fill the remaining viewport (no cut-off)
+   - Caption sits tight under media
+========================================================= */
+#p-notes #blogView.isPdf .blogMediaFrame{ overflow:auto !important; }
+#p-notes #blogView.isPdf .blogMediaFrame > embed{ height:100% !important; }
+#p-notes #blogView.isHtml .blogMediaFrame{ overflow:auto !important; }
+#p-notes #blogView.isHtml .blogMediaFrame > iframe{ height:100% !important; }
+
+/* Nestle caption close to media */
+#p-notes .blogMediaFrame > img{ object-position:left bottom; }
+#p-notes #blogCaption{ margin-top:6px !important; padding:6px 8px !important; }
+/* Tighten vertical whitespace in entry view */
+#p-notes .blogEntryRow{ margin:8px 0 8px; }
+#p-notes .blogContent{ margin:0; }
 
 /* =========================================================
    CSS: DIALOGS (TimeQuotes + Notes + About)
@@ -423,48 +1026,47 @@ em{font-style:italic}
 #timeDialog::backdrop, #noteDialog::backdrop, #aboutDialog::backdrop{
   background:rgba(0,0,0,.35);
 }
-/* DIALOG OVERLAYS: always full-screen; center inner window reliably */
 #timeDialog[open], #noteDialog[open], #aboutDialog[open]{
   position:fixed;
   inset:0;
-  margin:0;
-  padding:0;
-  width:auto;
-  height:auto;
-  max-height:none;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-/* Size is on the inner window (prevents centering drift when content changes) */
-#timeDialog .tqModal, #noteDialog .tqModal, #aboutDialog .tqModal{
+  margin:auto;
   width:min(1200px, 92vw);
   max-height:92vh;
 }
 
 .tqModal{
-  background:#000;
-  border:2px solid #000;
+  background:#c0c0c0;
+  border:2px solid;
+  border-color:#ffffff #000000 #000000 #ffffff;
   box-shadow:var(--shadow);
-  padding:14px 14px 12px;
-  overflow:auto;
+  padding:0;
+  overflow:hidden;
   max-height:92vh;
+}
+.tqQuoteBox{
+  margin:12px;
+  padding:16px 18px;
+  background:#fff;
+  border:2px solid #000;
+  box-shadow:none;
 }
 .tqBar{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:14px;
-  margin-bottom:12px;
+  margin:0;
+  padding:4px 6px;
+  background:linear-gradient(90deg,#000080,#1084d0) !important;
+  border-bottom:2px solid #000;
 }
 
 .tqTitle{
-  font-weight:900;
-  font-size:14px;
+  font-weight:800;
+  font-size:13px;
   letter-spacing:.02em;
   color:#fff;
+  user-select:none;
 }
 .tqIdx{
   margin-left:18px;
@@ -475,30 +1077,35 @@ em{font-style:italic}
 }
 .tqNav{display:flex;align-items:center;gap:10px}
 .tqNavBtn{
-  width:40px;
-  height:25px;
-  background:#c4c4c4;
-  border:1px solid #000;
-  box-shadow:var(--shadow);
+  width:34px;
+  height:28px;
+  background:#c0c0c0;
+  border:2px solid;
+  border-color:#ffffff #000000 #000000 #ffffff;
+  box-shadow:none;
   cursor:pointer;
   font-family:inherit;
-  font-weight:900;
+  font-weight:800;
+  padding:0;
 }
 .tqCloseBtn{
-  width:40px;
-  height:25px;
-  background:#c4c4c4;
-  border:1px solid #000;
-  box-shadow:var(--shadow);
+  width:26px;
+  height:26px;
+  background:#c0c0c0;
+  border:2px solid;
+  border-color:#ffffff #000000 #000000 #ffffff;
   cursor:pointer;
-  font-size:22px;
+  font-size:16px;
   line-height:1;
   padding:0;
   display:grid;
   place-items:center;
 }
 
-.tqNavBtn:active, .tqCloseBtn:active{ transform:translate(1px,1px); }
+.tqNavBtn:active, .tqCloseBtn:active{
+  border-color:#000000 #ffffff #ffffff #000000;
+  transform:none;
+}
 
 .tqNavBtn[disabled]{ opacity:.45; cursor:default; }
 .tqNavBtn[disabled]:active{ transform:none; }
@@ -506,10 +1113,6 @@ em{font-style:italic}
 /* =========================================================
    ABOUT: mobile layout polish
 ========================================================= */
-#aboutDialog .tqQuoteBox{
-  padding:16px 18px;
-}
-
 @media (max-width: 600px){
   #aboutDialog[open]{
     width:96vw;
@@ -531,43 +1134,7 @@ em{font-style:italic}
 }
 
 /* NOTE MODAL HEADER: prev/led/next on the left */
-.noteBar{ justify-content:space-between; }
-
-/* =========================================================
-   NOTES (IMAGE VIEWER): STABLE LAYOUT (NO JS HEIGHT MATH)
-   - Modal becomes a column: header + content
-   - Image notes become a 2-row grid: image (1fr) + caption (auto)
-   Ensures image + caption always visible without clipping.
-========================================================= */
-#noteDialog .tqModal{
-  display:flex;
-  flex-direction:column;
-  overflow:hidden; /* scrolling is managed inside content as needed */
-}
-
-/* Image notes: reserve caption row; image uses remaining space */
-#noteDialog .noteFrameWrap.isImg{
-  background:#000;
-  display:grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap:0;
-  overflow:hidden;
-  min-height:0;
-}
-
-#noteDialog .noteFrameWrap.isImg #noteImg{
-  justify-self:stretch;
-  align-self:stretch;
-  width:100%;
-  height:100%;
-  max-width:100%;
-  max-height:100%;
-  object-fit:contain;
-  background:#000;
-  margin:0;
-  display:block;
-}
-
+.noteBar{ justify-content:flex-start; }
 .noteNavLeft{
   display:flex;
   align-items:center;
@@ -575,9 +1142,11 @@ em{font-style:italic}
   flex:0 0 auto;
 }
 #noteDialog .noteNavLeft .led{
-  width:10px;
-  height:10px;
+  width:12px;
+  height:12px;
+  display:inline-block;
   margin:0;
+  border:1px solid #000;
   box-shadow:var(--shadow);
 }
 
@@ -585,18 +1154,13 @@ em{font-style:italic}
   border-top:2px solid #000;
   background:#000;
   color:#9a9a9a;
-  padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+  padding:8px 10px;
   font-size:10px;
   line-height:1.25;
   white-space:normal;
   overflow-wrap:anywhere;
 }
 
-.tqQuoteBox{
-  border:2px solid #000;
-  padding:16px 18px;
-  background:#fff;
-}
 .tqQuote{
   font-size:12px;
   line-height:1.15;
@@ -607,30 +1171,19 @@ em{font-style:italic}
   margin-top:12px;
   font-size:12px;
   font-family:var(--mono);
-  color:#555;
+  color:#000;
 }
 
-/* notes frame container (PDFs + embeds + articles) */
+/* notes iframe container */
 .noteFrameWrap{
   border:2px solid #000;
   background:#fff;
-
-  /* This area is the "content pane" under the bar. */
-  flex:1 1 auto;
-  min-height:0;
-
-  /* Let the embedded viewer handle scrolling; prevents double-scroll + clipping. */
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
+  overflow:auto;
 }
-
-/* Non-image viewers fill the pane */
-#noteFrame, #notePdf{
-  flex:1 1 auto;
-  min-height:0;
+#noteImg{ display:block; background:#fff; border:0; }
+#notePdf, #noteFrame{
   width:100%;
-  height:100%;
+  height:min(78vh, 760px);
   border:0;
   display:block;
   background:#fff;
@@ -644,7 +1197,8 @@ em{font-style:italic}
   .tqNavBtn{width:66px;height:52px}
   .tqCloseBtn{width:110px;height:52px}
   .tqQuote, .tqMeta{font-size:16px}
-  }
+  #noteFrame{ height:min(78vh, 680px); }
+}
 
 /* ASCII in About module */
 #aboutModule pre.ascii,
@@ -703,7 +1257,7 @@ body.modalOpen{ overflow:hidden; }
     width:min(520px, 94vw);
     max-height:82svh;
 
-    padding:10px;
+    padding:0;
     overflow:hidden;
   }
 
@@ -718,49 +1272,30 @@ body.modalOpen{ overflow:hidden; }
   }
   #timeDialog .tqBar, #aboutDialog .tqBar, #noteDialog .tqBar{
     gap:10px;
-    margin-bottom:10px;
-  }
+    }
 
   .tqNavBtn, .tqCloseBtn{
-    width:44px;
-    height:44px;
+    width:40px;
+    height:34px;
     padding:0;
-    background:transparent;
-    border:0;
+    background:#c0c0c0;
+    border:2px solid;
+    border-color:#ffffff #000000 #000000 #ffffff;
     box-shadow:none;
-    position:relative;
     cursor:pointer;
     font-family:inherit;
     font-weight:900;
     display:grid;
     place-items:center;
     color:#000;
-    font-size:16px;
+    font-size:18px;
     line-height:1;
     -webkit-tap-highlight-color: transparent;
-
-    z-index:0;
-    isolation:isolate;
   }
-  .tqNavBtn::before, .tqCloseBtn::before{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:34px;
-    height:24px;
-    transform:translate(-50%,-50%);
-    background:#c4c4c4;
-    border:1px solid #000;
-    box-shadow:var(--shadow);
-    z-index:-1;
+  .tqNavBtn:active, .tqCloseBtn:active{
+    border-color:#000000 #ffffff #ffffff #000000;
   }
-  .tqCloseBtn{ font-size:18px; }
-  .tqNavBtn:active::before, .tqCloseBtn:active::before{
-    transform:translate(calc(-50% + 1px), calc(-50% + 1px));
-  }
-
-  #timeDialog .tqQuoteBox,
+#timeDialog .tqQuoteBox,
   #aboutDialog .tqQuoteBox,
   #noteDialog .noteFrameWrap{
     overflow:auto;
@@ -783,29 +1318,26 @@ body.modalOpen{ overflow:hidden; }
   }
   #aboutDialog .tqQuoteBox{ padding:12px; }
 
-  
+  #notePdf, #noteFrame{
+    height:min(62svh, 520px);
+  }
+
   #noteDialog .noteFrameWrap.isImg{
     background:#000;
     display:grid;
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows:auto auto;
     gap:0;
-    overflow:hidden;
-    min-height:0;
   }
   #noteDialog .noteFrameWrap.isImg #noteImg{
-    justify-self:center;
-    align-self:center;
-    width:auto;
-    height:auto;
-    max-width:100%;
-    max-height:100%;
+    width:100%;
+    height:100%;
     object-fit:contain;
     background:#000;
     margin:0;
     display:block;
   }
   #noteDialog .noteFrameWrap.isImg.isFill #noteImg{
-    object-fit:contain;
+    object-fit:cover;
   }
 
   .noteCaption{
@@ -896,6 +1428,104 @@ body.modalOpen{ overflow:hidden; }
   font-weight:900;
 }
 
+/* ===== v5c: About + TimeQuotes dialogs more Win95 grey ===== */
+#modalOverlay{ background:rgba(0,0,0,.25); }
+.modalWin, .modal, #modal{
+  background:var(--panel);
+}
+.modalWin .modalHead, .modal .modalHead, #modal .modalHead{
+  background:#c9c9c9;
+  border-bottom:1px solid #000;
+}
+.modalWin .modalBody, .modal .modalBody, #modal .modalBody{
+  background:var(--paper);
+}
+.modalWin, .modal, #modal{
+  border:2px solid #000;
+  box-shadow:var(--shadow);
+}
+
+
+/* ===== Win95 greying for About + TimeQuotes dialogs ===== */
+/* =========================================================
+   BLOG v5f HOTFIX: header never clips, media never crops
+   - simplify sizing: media frame fills the viewport
+   - PDFs default to page-width (see JS #view=FitH)
+========================================================= */
+#p-notes .blogHdr{ background:#fff; overflow:visible; }
+#p-notes .blogBtns .notesMiniBtn{ line-height:1; }
+
+#p-notes .blogBody{
+  height:100%;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+#p-notes #blogListWrap{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+#p-notes #blogListWrap .blogListInner{ min-width:max-content; }
+
+#p-notes #blogView{
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Entry viewport: stretch media to available space */
+#p-notes .blogContent{
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+  display:flex;
+  align-items:stretch;
+  justify-content:flex-start;
+  padding:0;
+  background:#fff;
+}
+#p-notes .blogContent .blogMediaFrame{
+  flex:1;
+  min-height:0;
+  width:100%;
+  padding:0;
+  overflow:hidden;
+}
+#p-notes .blogContent .blogMediaFrame > img,
+#p-notes .blogContent .blogMediaFrame > video{
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  object-position:left center;
+  display:block;
+}
+#p-notes .blogContent .blogMediaFrame > iframe,
+#p-notes .blogContent .blogMediaFrame > embed{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+/* PDF/HTML: allow inner scrolling when needed, but keep full-width */
+#p-notes #blogView.isPdf .blogMediaFrame,
+#p-notes #blogView.isHtml .blogMediaFrame{
+  overflow:auto !important;
+}
+
+#p-notes #blogCaption, #p-notes #blogCaption2{
+  white-space:normal !important;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
 </style>
 </head>
 
@@ -929,11 +1559,11 @@ body.modalOpen{ overflow:hidden; }
         </div>
 
         <div class="overlayRow" id="homeOverlay" aria-label="Image controls">
-          <div class="caption" id="caption">—</div>
-          <div class="pager">
-            <button class="pbtn" id="prev" type="button" aria-label="Previous image" title="Previous">◀</button>
-            <button class="pbtn" id="next" type="button" aria-label="Next image" title="Next">▶</button>
+          <div class="pager" aria-label="Slide navigation">
+            <button class="pbtn" id="prev" type="button" aria-label="Previous image" title="Previous">◄</button>
+            <button class="pbtn" id="next" type="button" aria-label="Next image" title="Next">►</button>
           </div>
+          <button class="caption" id="caption" type="button" aria-label="Open current slide in new tab" title="Open slide in new tab">—</button>
         </div>
       </div>
     </section>
@@ -973,42 +1603,72 @@ body.modalOpen{ overflow:hidden; }
     <!-- BLOG -->
     <section class="panel" id="p-notes">
       <div class="list">
+        <!-- outer box stays fixed; only inner below rule scrolls -->
         <div class="pageScroll scrollbox" id="scroll-notes">
-          <div class="pageInner">
-            <div class="notesHdr">
-              <h2>BLOG</h2>
-              <div class="notesTools" aria-label="Blog sorting controls">
-                <button id="notesSortDate" class="notesMiniBtn" type="button" aria-label="Sort by date">↕</button>
-                <button id="notesSortType" class="notesMiniBtn" type="button" aria-label="Sort by type">≡</button>
+          <div class="pageInner blogPage">
+            
+<div class="blogHdr" role="navigation" aria-label="Blog navigation">
+              <div class="blogHdrTop">
+                <div class="blogPath">
+                <button id="blogHome" class="blogCrumb blogCrumbHome" type="button">blog</button>
+                <span id="blogCrumbTail" class="blogCrumbTail" aria-hidden="true"></span>
+              </div>
+
+                <div class="blogBtns" aria-label="Blog controls">
+                <div id="blogSort" class="blogSortIcons" aria-label="Blog sorting">
+                  <button id="blogSortDate" class="notesMiniBtn blogSortIcon" type="button" aria-label="Sort by date" title="Sort by date">◷</button>
+                  <button id="blogSortType" class="notesMiniBtn blogSortIcon" type="button" aria-label="Sort by type" title="Sort by type">≣</button>
+                </div>
+
+                <button id="blogPrev" class="notesMiniBtn blogNavBtn" type="button" aria-label="Previous entry">◄</button>
+                <button id="blogNext" class="notesMiniBtn blogNavBtn" type="button" aria-label="Next entry">►</button>
+                <button id="blogList" class="notesMiniBtn blogNavBtn" type="button" aria-label="Back to list" title="Back to list">↩</button>
+              </div>
+
+              </div>
+              <div class="rule"></div>
+            </div>
+
+            <div class="blogBody" id="blogBody">
+              <div id="blogListWrap"><div class="blogListInner"><div class="items" id="items-notes" aria-live="polite"></div></div></div>
+
+              <div id="blogView" hidden>
+                <div class="blogEntryHdr">
+                  <div class="blogTitleRow">
+                    <div class="blogTitle" id="blogTitle"></div>
+                    <button id="blogOpen2" class="blogOpenBtn" type="button" aria-label="Open media in new tab" title="Open in new tab">⧉</button>
+                  </div>
+                </div>
+<div class="blogContent" id="blogContent"></div>
+                <div id="blogCaption" hidden></div>
               </div>
             </div>
-            <div class="rule"></div>
-            <div class="items" id="items-notes" aria-live="polite"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- CONTACT -->
-<section class="panel" id="p-contact">
-  <div class="list">
-    <div class="pageScroll scrollbox">
-      <div class="pageInner">
-        <h2>CONTACT</h2>
-        <div class="rule"></div>
-        <p>
-          Location: Brooklyn, New York, USA<br>
-          Email: <a href="mailto:christian.n.kerr@gmail.com">christian.n.kerr@gmail.com</a><br>
-          Socials:
-          <a href="https://www.youtube.com/@CNKERR..." target="_blank" rel="noopener">YouTube</a>,
-          <a href="https://x.com/cnkerr" target="_blank" rel="noopener">X</a>,
-          <a href="https://www.instagram.com/cnkerr" target="_blank" rel="noopener">Instagram</a><br>
-
-          Resumé: <a href="assets/kerr_christian_cv.pdf" target="_blank" rel="noopener">kerr_christian_cv</a>
-        </p>
-        <p class="quote" style="color:#838383; font-size:8px; line-height:1.25;">
-          "I celebrate myself, and sing myself,<br>And what I assume you shall assume,<br>For every atom belonging to me as good belongs to you." <br>—WW
-        </p>
+<!-- CONTACT -->
+    <section class="panel" id="p-contact">
+      <div class="list">
+        <div class="pageScroll scrollbox">
+          <div class="pageInner">
+            <h2>CONTACT</h2>
+            <div class="rule"></div>
+            <p>
+              Location: Brooklyn, New York, USA<br>
+              Email: <a href="mailto:christian.n.kerr@gmail.com">christian.n.kerr@gmail.com</a><br>
+              Socials:
+              <a href="https://www.youtube.com/@CNKERR..." target="_blank" rel="noopener">YouTube</a>,
+              <a href="https://x.com/cnkerr" target="_blank" rel="noopener">X</a>,
+              <a href="https://www.instagram.com/cnkerr" target="_blank" rel="noopener">Instagram</a><br>
+              Resumé: <a href="assets/kerr_christian_cv.pdf" target="_blank" rel="noopener">kerr_christian_cv</a>
+            </p>
+            <p class="quote" style="color:#838383; font-size:8px; line-height:1.25;">
+              "I celebrate myself, and sing myself,<br>And what I assume you shall assume,<br>For every atom belonging to me as good belongs to you." <br>—WW
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -1022,8 +1682,8 @@ body.modalOpen{ overflow:hidden; }
         Time? <span class="tqIdx" id="timeIdx">00/00</span>
       </div>
       <div class="tqNav">
-        <button class="tqNavBtn" id="timePrev" type="button" aria-label="Previous quote">&lt;</button>
-        <button class="tqNavBtn" id="timeNext" type="button" aria-label="Next quote">&gt;</button>
+        <button class="tqNavBtn" id="timePrev" type="button" aria-label="Previous quote">◄</button>
+        <button class="tqNavBtn" id="timeNext" type="button" aria-label="Next quote">►</button>
         <button class="tqCloseBtn" id="timeClose" type="button" aria-label="Close">x</button>
       </div>
     </div>
@@ -1042,8 +1702,8 @@ body.modalOpen{ overflow:hidden; }
       <div class="tqTitle" id="aboutTitle"></div>
 
       <div class="tqNav">
-        <button class="tqNavBtn" id="aboutPrev" type="button" aria-label="Previous slide">&lt;</button>
-        <button class="tqNavBtn" id="aboutNext" type="button" aria-label="Next slide">&gt;</button>
+        <button class="tqNavBtn" id="aboutPrev" type="button" aria-label="Previous slide">◄</button>
+        <button class="tqNavBtn" id="aboutNext" type="button" aria-label="Next slide">►</button>
         <button class="tqCloseBtn" id="aboutClose" type="button" aria-label="Close">x</button>
       </div>
     </div>
@@ -1054,7 +1714,7 @@ body.modalOpen{ overflow:hidden; }
   </div>
 </dialog>
 
-<!-- NOTES dialog -->
+<!-- NOTES dialog (kept for legacy + deep links; blog page is in-window now) -->
 <dialog id="noteDialog" aria-label="Note">
   <div class="tqModal">
     <div class="tqBar noteBar">
@@ -1108,6 +1768,11 @@ body.modalOpen{ overflow:hidden; }
       return String(s == null ? "" : s).replace(/[&<>"']/g, function(m){
         return ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[m];
       });
+    }
+
+    function normDashText(s){
+      // Normalize dash separators (en/em) to include surrounding spaces, without touching hyphenated words.
+      return String(s == null ? "" : s).replace(/\s*[–—]\s*/g, " – ");
     }
 
     // -------------------------------------------------------
@@ -1277,6 +1942,7 @@ body.modalOpen{ overflow:hidden; }
 
     var slideIndex = Number(localStorage.getItem("slideIndex") || 0) || 0;
     var slides = DATA.slides;
+    var slideCurrentURL = "";
 
     function setHomeEmptyState(msg){
       if (hero) hero.removeAttribute("src");
@@ -1304,6 +1970,10 @@ body.modalOpen{ overflow:hidden; }
         return;
       }
 
+      // absolute URL for "open in new tab"
+      try{ slideCurrentURL = new URL(src, location.href).toString(); }
+      catch(_){ slideCurrentURL = src; }
+
       if (hero){
         hero.onload = function(){
           setCanvasForSlide();
@@ -1318,6 +1988,19 @@ body.modalOpen{ overflow:hidden; }
 
     if (prevBtn) prevBtn.addEventListener("click", function(){ showSlide(slideIndex - 1); });
     if (nextBtn) nextBtn.addEventListener("click", function(){ showSlide(slideIndex + 1); });
+
+    if (cap){
+      cap.addEventListener("click", function(){
+        if (!slideCurrentURL) return;
+        window.open(slideCurrentURL, "_blank", "noopener");
+      });
+      cap.addEventListener("keydown", function(e){
+        if (e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          cap.click();
+        }
+      });
+    }
 
     window.addEventListener("resize", function(){
       setCanvasForSlide();
@@ -1409,7 +2092,7 @@ body.modalOpen{ overflow:hidden; }
         var htmlW = [];
         for (var i=0;i<items.length;i++){
           var it = items[i] || {};
-          var title = esc(it.title || "");
+          var title = esc(normDashText(it.title || ""));
           var href = it.url ? String(it.url) : "";
           var titleHtml = href
             ? ('<a href="' + esc(href) + '" target="_blank" rel="noopener">' + title + '</a>')
@@ -1428,7 +2111,7 @@ body.modalOpen{ overflow:hidden; }
         var htmlR = [];
         for (var j=0;j<items.length;j++){
           var it2 = items[j] || {};
-          var raw = esc(it2.title || "");
+          var raw = esc(normDashText(it2.title || ""));
           var inner = it2.italic ? ("<em>" + raw + "</em>") : raw;
           var href2 = it2.url ? String(it2.url) : "";
           var titleHtml2 = href2
@@ -1448,7 +2131,7 @@ body.modalOpen{ overflow:hidden; }
       var htmlF = [];
       for (var k=0;k<items.length;k++){
         var it3 = items[k] || {};
-        var titleQuoted = '<span class="q">' + esc(it3.title || "") + '</span>';
+        var titleQuoted = '<span class="q">' + esc(normDashText(it3.title || "")) + '</span>';
         var href3 = it3.url ? String(it3.url) : "";
         var titleHtml3 = href3
           ? ('<a href="' + esc(href3) + '" target="_blank" rel="noopener">' + titleQuoted + '</a>')
@@ -1465,173 +2148,164 @@ body.modalOpen{ overflow:hidden; }
     }
 
     // -------------------------------------------------------
-    // JS: BLOG (NOTES)
+    // JS: BLOG (IN-WINDOW)
     // -------------------------------------------------------
     var itemsNotes   = $("items-notes");
-    var noteDialog   = $("noteDialog");
-    var noteClose    = $("noteClose");
-    var noteFrame    = $("noteFrame");
-    var notePdf      = $("notePdf");
-    var noteImg      = $("noteImg");
-    var notePop      = $("notePop");
-    var noteCaption  = $("noteCaption");
 
-    var notePdfMobile = $("notePdfMobile");
-    var notePdfMobileTitle = $("notePdfMobileTitle");
-    var notePdfMobileBtn = $("notePdfMobileBtn");
+    var blogHomeBtn   = $("blogHome");
+    var blogCrumbTail = $("blogCrumbTail");
+    var blogPrevBtn   = $("blogPrev");
+    var blogNextBtn   = $("blogNext");
+    var blogListBtn   = $("blogList");
 
-    var notePrevBtn  = $("notePrev");
-    var noteNextBtn  = $("noteNext");
-    var noteTypeLed  = $("noteTypeLed");
+    var blogSortDateBtn = $("blogSortDate");
+    var blogSortTypeBtn = $("blogSortType");
+
+    var blogOpenBtn   = $("blogOpen2");
+
+    var blogBody      = $("blogBody");
+    var blogSortEl    = $("blogSort");
+    var blogListWrap  = $("blogListWrap");
+var blogView      = $("blogView");
+    var blogTitle     = $("blogTitle");
+    var blogEntryMeta = $("blogEntryMeta");
+    var blogContent   = $("blogContent");
+    var blogCaption2  = $("blogCaption");
 
     var notesKeyToIndex = new Map();
     var suppressHashReopen = false;
 
-    var notesSortDateBtn = $("notesSortDate");
-    var notesSortTypeBtn = $("notesSortType");
+    var blogOrder = [];
+    var blogPos = -1; // position within blogOrder
+    var blogListScrollTop = 0;
 
-    var notesSortMode = localStorage.getItem("notesSortMode") || "date";
-    var notesSortDateDir = Number(localStorage.getItem("notesSortDateDir") || -1);
-    var notesSortTypeDir = Number(localStorage.getItem("notesSortTypeDir") || 1);
+    var blogSortMode = (localStorage.getItem("blogSortMode") || "date"); // "date" | "type"
+    if (blogSortMode !== "type") blogSortMode = "date";
+    var blogSortDirDate = Number(localStorage.getItem("blogSortDirDate") || "1"); //  1=newest→oldest, -1=oldest→newest
+    var blogSortDirType = Number(localStorage.getItem("blogSortDirType") || "1"); //  1=A→Z, -1=Z→A
 
-    function updateNotesSortUI(){
-      if (notesSortDateBtn){
-        notesSortDateBtn.classList.toggle("isOn", notesSortMode === "date");
-        notesSortDateBtn.title = (notesSortDateDir < 0) ? "Date: newest → oldest" : "Date: oldest → newest";
+    var blogCurrentURL = "";
+
+    function normalizeDashSpacing(s){
+  s = String(s == null ? "" : s);
+  // En-dash is used as a separator in titles; normalize it with spaces.
+  s = s.replace(/\s*–\s*/g, " – ");
+  // Hyphen-minus: only normalize when it's already acting as a separator (has whitespace on either side).
+  s = s.replace(/\s-\s*/g, " - ");
+  return s;
+}
+
+function parseISODateStrict(s){
+      var str = String(s || "").trim();
+      var m = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return 0;
+      var y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+      if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return 0;
+      if (mo < 1 || mo > 12 || d < 1 || d > 31) return 0;
+      return Date.UTC(y, mo - 1, d);
+    }
+
+    function typeLower(n){
+      return String((n && n.type) ? n.type : "").trim().toLowerCase() || "entry";
+    }
+
+
+function typeLabel(n){
+  var raw = (n && n.type) ? String(n.type).trim() : "";
+  if (raw) return raw;
+  // fallback to normalized key
+  var k = noteTypeKey(n || {});
+  if (!k) return "";
+  return k.charAt(0).toUpperCase() + k.slice(1);
+}
+
+    function noteTS(n){
+      var t = parseISODateStrict((n && n.date) ? n.date : "");
+      if (t) return t;
+      var d = Date.parse(String((n && n.date) ? n.date : ""));
+      return Number.isFinite(d) ? d : 0;
+    }
+
+    function buildBlogOrder(){
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      var ids = [];
+      for (var k=0;k<notes.length;k++) ids.push(k);
+
+      var dirDate = (blogSortDirDate === -1 ? -1 : 1); // normalize
+      var dirType = (blogSortDirType === -1 ? -1 : 1);
+
+      if (blogSortMode === "type"){
+        // group by type (toggleable), then date within type (toggleable)
+        ids.sort(function(a,b){
+          var ka = noteTypeKey(notes[a] || {});
+          var kb = noteTypeKey(notes[b] || {});
+          if (ka < kb) return -1 * dirType;
+          if (ka > kb) return  1 * dirType;
+
+          var ta = noteTS(notes[a] || {});
+          var tb = noteTS(notes[b] || {});
+          if (tb !== ta) return (tb - ta) * dirDate;
+          return a - b;
+        });
+      } else {
+        // date (toggleable)
+        ids.sort(function(a,b){
+          var ta = noteTS(notes[a] || {});
+          var tb = noteTS(notes[b] || {});
+          if (tb !== ta) return (tb - ta) * dirDate;
+          return a - b;
+        });
       }
-      if (notesSortTypeBtn){
-        notesSortTypeBtn.classList.toggle("isOn", notesSortMode === "type");
-        notesSortTypeBtn.title = (notesSortTypeDir > 0) ? "Type: A → Z (within type: newest first)" : "Type: Z → A (within type: newest first)";
+
+      blogOrder = ids;
+      updateBlogSortUI();
+    }
+
+    function setNavEnabled(btn, on){
+      if (!btn) return;
+      btn.disabled = !on;
+      btn.classList.toggle("isDim", !on);
+    }
+
+    function setBlogMode(mode){
+      var isList = (mode === "list");
+      if (blogListWrap) blogListWrap.hidden = !isList;
+      if (blogView) blogView.hidden = isList;
+      if (blogSortEl) blogSortEl.hidden = !isList;
+
+      if (isList){
+        if (blogCrumbTail) blogCrumbTail.textContent = "";
+        blogPos = -1;
+        if (blogPrevBtn) blogPrevBtn.hidden = true;
+        if (blogNextBtn) blogNextBtn.hidden = true;
+        if (blogListBtn) blogListBtn.hidden = true;
+        setNavEnabled(blogOpenBtn, false);
+      } else {
+        if (blogPrevBtn) blogPrevBtn.hidden = false;
+        if (blogNextBtn) blogNextBtn.hidden = false;
+        if (blogListBtn) blogListBtn.hidden = false;
+        setNavEnabled(blogListBtn, true);
+        setNavEnabled(blogPrevBtn, blogPos > 0);
+        setNavEnabled(blogNextBtn, blogPos >= 0 && blogPos < blogOrder.length - 1);
+        setNavEnabled(blogOpenBtn, !!blogCurrentURL);
       }
     }
 
-    if (notesSortDateBtn){
-      notesSortDateBtn.addEventListener("click", function(){
-        if (notesSortMode !== "date") notesSortMode = "date";
-        else notesSortDateDir *= -1;
+    function updateBlogSortUI(){
+      var dateActive = (blogSortMode === "date");
+      var typeActive = (blogSortMode === "type");
 
-        localStorage.setItem("notesSortMode", notesSortMode);
-        localStorage.setItem("notesSortDateDir", String(notesSortDateDir));
-        updateNotesSortUI();
-        renderNotesList();
-      });
-    }
-
-    if (notesSortTypeBtn){
-      notesSortTypeBtn.addEventListener("click", function(){
-        if (notesSortMode !== "type") notesSortMode = "type";
-        else notesSortTypeDir *= -1;
-
-        localStorage.setItem("notesSortMode", notesSortMode);
-        localStorage.setItem("notesSortTypeDir", String(notesSortTypeDir));
-        updateNotesSortUI();
-        renderNotesList();
-      });
-    }
-
-    function resetNoteDialogSizing(){
-      if (!noteDialog) return;
-      noteDialog.style.width = "";
-      noteDialog.style.height = "";
-      noteDialog.style.maxWidth = "";
-      noteDialog.style.maxHeight = "";
-      if (noteImg){
-        noteImg.style.width = "";
-        noteImg.style.height = "";
-        noteImg.style.objectFit = "";
+      if (blogSortDateBtn){
+        blogSortDateBtn.classList.toggle("isOn", dateActive);
+        blogSortDateBtn.title = "Sort by date (" + (blogSortDirDate === 1 ? "newest first" : "oldest first") + ")";
+        blogSortDateBtn.setAttribute("aria-label", blogSortDateBtn.title);
       }
-
-      var modal = noteDialog.querySelector(".tqModal");
-      var wrap = noteDialog.querySelector(".noteFrameWrap");
-      if (modal){
-        modal.style.width = "";
-        modal.style.height = "";
-        modal.style.maxHeight = "";
-      }
-      if (wrap){
-        wrap.style.maxHeight = "none";
-        wrap.style.overflow = "";
-        wrap.style.height = "";
+      if (blogSortTypeBtn){
+        blogSortTypeBtn.classList.toggle("isOn", typeActive);
+        blogSortTypeBtn.title = "Sort by type (" + (blogSortDirType === 1 ? "A→Z" : "Z→A") + ")";
+        blogSortTypeBtn.setAttribute("aria-label", blogSortTypeBtn.title);
       }
     }
-
-    function sizeDialogToImage(img){
-      if (!noteDialog || !img || !img.naturalWidth || !img.naturalHeight) return;
-
-      // Mobile/fullscreen dialogs: let CSS drive layout.
-      if (typeof isMobileDialog === "function" && isMobileDialog()){
-        img.style.width = "100%";
-        img.style.height = "100%";
-        img.style.objectFit = "contain";
-
-        var m0 = noteDialog.querySelector(".tqModal");
-        if (m0){ m0.style.width = ""; m0.style.height = ""; }
-        return;
-      }
-
-      var modal = noteDialog.querySelector(".tqModal");
-      var bar   = noteDialog.querySelector(".tqBar");
-      var wrap  = noteDialog.querySelector(".noteFrameWrap");
-      if (!modal || !bar || !wrap) return;
-
-      // Hard caps (match existing desktop intent).
-      var maxW = Math.min(1200, Math.floor(window.innerWidth  * 0.92));
-      var maxH = Math.floor(window.innerHeight * 0.92);
-
-      // Measure "chrome" once, then snap the modal to the largest size
-      // that fits while preserving the image aspect ratio and keeping caption visible.
-      var csModal = window.getComputedStyle(modal);
-      var csBar   = window.getComputedStyle(bar);
-      var csWrap  = window.getComputedStyle(wrap);
-
-      function px(v){ return Math.max(0, parseFloat(v || "0") || 0); }
-
-      var padX = px(csModal.paddingLeft) + px(csModal.paddingRight);
-      var padY = px(csModal.paddingTop) + px(csModal.paddingBottom);
-      var borderModalX = px(csModal.borderLeftWidth) + px(csModal.borderRightWidth);
-      var borderModalY = px(csModal.borderTopWidth) + px(csModal.borderBottomWidth);
-
-      var barH = bar.getBoundingClientRect().height;
-      var barMarginB = px(csBar.marginBottom);
-
-      var wrapBorderX = px(csWrap.borderLeftWidth) + px(csWrap.borderRightWidth);
-      var wrapBorderY = px(csWrap.borderTopWidth) + px(csWrap.borderBottomWidth);
-
-      // Caption lives inside wrap (grid row 2). Reserve its current height + a small buffer.
-      var capH = 0;
-      if (noteCaption && !noteCaption.hidden){
-        capH = noteCaption.getBoundingClientRect().height;
-        capH += 10; // breathing room for font rounding / zoom
-      }
-
-      var chromeW = padX + borderModalX + wrapBorderX;
-      var chromeH = padY + borderModalY + barH + barMarginB + wrapBorderY;
-
-      var availW = Math.max(240, maxW - chromeW);
-      var availH = Math.max(240, maxH - chromeH - capH);
-
-      var iw = img.naturalWidth;
-      var ih = img.naturalHeight;
-
-      // Snap: choose the largest modal that fits within caps, preserving the image aspect ratio.
-      var scale = Math.min(1, availW / iw, availH / ih);
-
-      var drawW = Math.max(1, Math.floor(iw * scale));
-      var drawH = Math.max(1, Math.floor(ih * scale));
-
-      var totalW = Math.min(maxW, drawW + chromeW);
-      var totalH = Math.min(maxH, drawH + chromeH + capH);
-
-      // Apply size to the inner window (overlay stays full-screen for stable centering).
-      modal.style.width  = totalW + "px";
-      modal.style.height = totalH + "px";
-
-      // Let CSS grid manage image+caption; ensure the image uses the 1fr row.
-      img.style.width = "100%";
-      img.style.height = "100%";
-      img.style.objectFit = "contain";
-    }
-
 
     function slugify(s){
       return String(s || "")
@@ -1654,23 +2328,12 @@ body.modalOpen{ overflow:hidden; }
       return m ? decodeURIComponent(m[1]) : "";
     }
 
-    function parseISODateStrict(s){
-      var str = String(s || "").trim();
-      var m = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      if (!m) return 0;
-      var y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
-      if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return 0;
-      if (mo < 1 || mo > 12 || d < 1 || d > 31) return 0;
-      return Date.UTC(y, mo - 1, d);
-    }
-
-    function fmtNoteMeta(n){
-      var parts = [];
-      var type = String((n && n.type) ? n.type : "").trim();
-      var date = String((n && n.date) ? n.date : "").trim();
-      if (type) parts.push(type);
-      if (date) parts.push(date);
-      return parts.join(" / ") || "—";
+    function buildNotesKeyIndex(){
+      notesKeyToIndex.clear();
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      for (var i=0;i<notes.length;i++){
+        notesKeyToIndex.set(noteKey(notes[i] || {}, i), i);
+      }
     }
 
     function noteTypeKey(n){
@@ -1693,301 +2356,229 @@ body.modalOpen{ overflow:hidden; }
       return "led-other";
     }
 
-    function getNotesOrder(){
-      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
-      var ids = [];
-      for (var i=0;i<notes.length;i++) ids.push(i);
-
-      function ts(i){
-        return parseISODateStrict((notes[i] || {}).date);
-      }
-
-      if (notesSortMode === "type"){
-        ids.sort(function(a,b){
-          var ka = noteTypeKey(notes[a] || {});
-          var kb = noteTypeKey(notes[b] || {});
-          if (ka < kb) return -1 * notesSortTypeDir;
-          if (ka > kb) return  1 * notesSortTypeDir;
-
-          var d = ts(b) - ts(a);
-          if (d) return d;
-
-          return a - b;
-        });
-        return ids;
-      }
-
-      ids.sort(function(a,b){
-        var ta = ts(a), tb = ts(b);
-        var newestFirst = (notesSortDateDir < 0);
-        var d2 = newestFirst ? (tb - ta) : (ta - tb);
-        if (d2) return d2;
-        return a - b;
-      });
-      return ids;
+    function fmtNoteMeta(n){
+      var parts = [];
+      var type = String((n && n.type) ? n.type : "").trim();
+      var date = String((n && n.date) ? n.date : "").trim();
+      if (type) parts.push(type);
+      if (date) parts.push(date);
+      return parts.join(" / ") || "—";
     }
 
-    var currentNoteLedClass = "led-other";
+    /* Thorough sizing: set per-type max heights based on real available space */
+    function fitBlogMedia(){
+      if (!blogBody || !blogView || blogView.hidden) return;
 
-    function openNoteDialog(title, file, caption){
-      if (!noteDialog) return;
+      var bodyH = blogBody.clientHeight || 0;
+      if (!bodyH) return;
 
-      var f = String(file || "").trim();
-      var lower = f.toLowerCase();
+      var hdrH = 0;
+      if (blogTitle && blogTitle.parentElement) hdrH = blogTitle.parentElement.getBoundingClientRect().height;
+      var metaH = blogEntryMeta ? blogEntryMeta.getBoundingClientRect().height : 0;
+      var capH  = (blogCaption2 && !blogCaption2.hidden) ? blogCaption2.getBoundingClientRect().height : 0;
 
-      var fUrl = f;
-      try{ fUrl = new URL(f, location.href).toString(); }
-      catch(_){ fUrl = encodeURI(f); }
+      // breathing room between blocks (tight, because you want taller reading area)
+      var padImg = 22;
+      var padPdf = 16;
+      var padVid = 20;
 
-      if (noteCaption){
-        var c = String(caption || "").trim();
-        noteCaption.textContent = c;
-        noteCaption.hidden = !c;
+      var imgMax = Math.max(220, Math.floor(bodyH - hdrH - metaH - capH - padImg));
+      var pdfMax = Math.max(260, Math.floor(bodyH - hdrH - metaH - capH - padPdf)); // slightly taller
+      var vidMax = Math.max(220, Math.floor(bodyH - hdrH - metaH - capH - padVid));
+
+      var panel = document.getElementById("p-notes");
+      if (!panel) return;
+
+      panel.style.setProperty("--blogImgMaxH", imgMax + "px");
+      panel.style.setProperty("--blogPdfMaxH", pdfMax + "px");
+      panel.style.setProperty("--blogVidMaxH", vidMax + "px");
+    }
+
+    function clearBlogViewClasses(){
+      if (!blogView) return;
+      blogView.classList.remove("isImg","isPdf","isVideo","isHtml","isOther");
+    }
+
+    function renderBlogEntryAt(pos){
+      blogCurrentURL = "";
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      if (!blogOrder.length) buildBlogOrder();
+      if (pos < 0 || pos >= blogOrder.length) return;
+
+      blogPos = pos;
+      var idx = blogOrder[pos];
+      var n = notes[idx] || {};
+
+      // header path: blog / type / date (no slug)
+      var t = typeLower(n);
+      var d = String((n && n.date) ? n.date : "").trim();
+      if (blogCrumbTail){
+        blogCrumbTail.textContent = " / " + t + (d ? (" / " + d) : "");
+      }
+      if (blogEntryMeta){
+        blogEntryMeta.textContent = (t ? t : "—") + (d ? (" / " + d) : "");
       }
 
-      if (noteTypeLed){ noteTypeLed.className = "led " + (currentNoteLedClass || "led-other"); }
+      // title below rule
+      var ttl = String((n && n.title) ? n.title : "Untitled").trim() || "Untitled";
+      if (blogTitle) blogTitle.textContent = "> " + ttl;
 
-      resetNoteDialogSizing();
-
-      if (noteImg){
-        noteImg.hidden = true;
-        noteImg.onload = null;
-        noteImg.onerror = null;
-        noteImg.removeAttribute("src");
-        noteImg.alt = "";
-      }
-      if (noteFrame){
-        noteFrame.hidden = true;
-        noteFrame.removeAttribute("srcdoc");
-        noteFrame.src = "about:blank";
-      }
-      if (notePdf){
-        notePdf.hidden = true;
-        notePdf.removeAttribute("src");
-      }
-      if (notePdfMobile){
-        notePdfMobile.hidden = true;
-        if (notePdfMobileBtn) notePdfMobileBtn.onclick = null;
-        if (notePdfMobileTitle) notePdfMobileTitle.textContent = "PDF";
+      // caption (window-blended strip)
+      var cap = String((n && n.caption) ? n.caption : "").trim();
+      if (blogCaption2){
+        blogCaption2.textContent = cap;
+        blogCaption2.hidden = !cap;
       }
 
-      if (notePop){
-        notePop.hidden = !(f && f !== "about:blank");
-        notePop.onclick = function(){
-          if (!f || f === "about:blank") return;
-          window.open(fUrl, "_blank", "noopener");
-        };
-      }
+      // content
+      if (blogContent){
+        blogContent.innerHTML = "";
+        clearBlogViewClasses();
 
-      var noteFrameWrap = document.querySelector('#noteDialog .noteFrameWrap');
-      if (noteFrameWrap){
-        noteFrameWrap.scrollTop = 0;
-        noteFrameWrap.classList.remove("isVideo");
-        noteFrameWrap.classList.remove("isImg");
-        noteFrameWrap.classList.remove("isFill");
-      }
+        var yt = String((n && n.youtube) ? n.youtube : "").trim();
+        var file = "";
 
-      try{
-        if (!noteDialog.open){
-          if (typeof noteDialog.showModal === "function") noteDialog.showModal();
-          else noteDialog.setAttribute("open","open");
+        if (yt){
+          yt = yt.replace(/[^a-zA-Z0-9_-]/g, "");
+          file = "https://www.youtube-nocookie.com/embed/" + yt + "?rel=0";
+        } else {
+          file = String((n && n.file) ? n.file : "").trim();
         }
-      }catch(_){
-        noteDialog.setAttribute("open","open");
-      }
-      setBodyModalOpen(true);
 
-      setNoteNavEnabled();
+        if (!file){
+          if (blogView) blogView.classList.add("isOther");
+          blogContent.innerHTML = "<p>(No file attached.)</p>";
+          setTimeout(fitBlogMedia, 0);
+        } else {
+          var fUrl = file;
+          try{ fUrl = new URL(file, location.href).toString(); }
+          catch(_){ fUrl = encodeURI(file); }
 
-      var isImg = /\.(png|jpe?g|gif|webp|bmp|svg)(\?|#|$)/i.test(lower);
+          var lower = fUrl.toLowerCase();
 
-      if (isImg && noteImg){
-        if (noteFrameWrap) noteFrameWrap.classList.add("isImg");
-        noteImg.hidden = false;
-        noteImg.onload = function(){
-          sizeDialogToImage(noteImg);
-        };
-        noteImg.onerror = function(){
-          if (noteImg) noteImg.hidden = true;
-          if (noteFrame){
-            noteFrame.hidden = false;
-            noteFrame.src = fUrl || "about:blank";
+          blogCurrentURL = fUrl;
+          var extm = lower.match(/\.([a-z0-9]+)(?:\?|#|$)/i);
+          var ext = extm ? extm[1] : "";
+
+          if (yt){
+            if (blogView) blogView.classList.add("isVideo");
+            blogContent.innerHTML =
+              '<div class="blogMediaFrame"><iframe src="' + esc(fUrl) + '" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
+            setTimeout(fitBlogMedia, 0);
+          } else if (ext === "pdf"){
+            // PDFs: hint the browser viewer to fit page width (reduces side whitespace)
+            if (blogView) blogView.classList.add("isPdf");
+
+            var pdfUrl = fUrl;
+            if (pdfUrl.indexOf("#") === -1){
+              pdfUrl = pdfUrl + "#view=FitH";
+            } else if (pdfUrl.indexOf("view=") === -1){
+              pdfUrl = pdfUrl + (pdfUrl.endsWith("#") || pdfUrl.endsWith("&") ? "" : "&") + "view=FitH";
+            }
+
+            blogContent.innerHTML =
+              '<div class="blogMediaFrame"><embed src="' + esc(pdfUrl) + '" type="application/pdf" /></div>';
+            setTimeout(fitBlogMedia, 0);
+          } else if (ext === "html" || ext === "htm"){
+            if (blogView) blogView.classList.add("isHtml");
+            // Render HTML in an iframe so it can scroll naturally and fill the viewer.
+            blogContent.innerHTML =
+              '<div class="blogMediaFrame isHtmlFrame"><iframe src="' + esc(fUrl) + '" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
+            setTimeout(fitBlogMedia, 0);
+          } else if (/(png|jpe?g|gif|webp|bmp|svg)/i.test(ext)){
+            if (blogView) blogView.classList.add("isImg");
+            blogContent.innerHTML = '<div class="blogMediaFrame isImgFrame"><img src="' + esc(fUrl) + '" alt="' + esc(ttl) + '" loading="lazy" decoding="async" /></div>';
+            var img = blogContent.querySelector("img");
+            if (img){
+              img.addEventListener("load", fitBlogMedia, { once:true });
+              img.addEventListener("error", fitBlogMedia, { once:true });
+            } else {
+              setTimeout(fitBlogMedia, 0);
+            }
+          } else if (/(mp4|webm|ogg)/i.test(ext)){
+            if (blogView) blogView.classList.add("isOther");
+            blogContent.innerHTML = '<div class="blogMediaFrame"><video controls playsinline preload="metadata" src="' + esc(fUrl) + '"></video></div>';
+            var vid = blogContent.querySelector("video");
+            if (vid){
+              vid.addEventListener("loadedmetadata", fitBlogMedia, { once:true });
+            } else {
+              setTimeout(fitBlogMedia, 0);
+            }
+          } else if (noteTypeKey(n) === "video"){
+            // Non-YouTube, non-file-extension video embeds (Vimeo, Archive, player pages, etc.)
+            // If it's not a direct video file, render as an iframe player.
+            if (blogView) blogView.classList.add("isVideo");
+            blogContent.innerHTML =
+              '<div class="blogMediaFrame"><iframe src="' + esc(fUrl) + '" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
+            setTimeout(fitBlogMedia, 0);
+          } else {
+            if (blogView) blogView.classList.add("isOther");
+            blogContent.innerHTML = '<p><a href="' + esc(fUrl) + '" target="_blank" rel="noopener">open file</a></p>';
+            setTimeout(fitBlogMedia, 0);
           }
-        };
-        try{ noteImg.decoding = "async"; noteImg.fetchPriority = "high"; }catch(_){ }
-        noteImg.src = fUrl;
-        noteImg.alt = title || "";
-        return;
-      }
-
-      if (lower.endsWith(".pdf")){
-        // PDFs via iframe everywhere (more consistent than <embed>, including mobile).
-        if (noteFrame){
-          noteFrame.hidden = false;
-          try{ noteFrame.loading = "eager"; }catch(_){}
-
-          // reset first to avoid some browsers "sticking" the previous doc
-          noteFrame.src = "about:blank";
-          noteFrame.src = (fUrl ? (fUrl + "#view=FitH") : "about:blank");
         }
-        return;
       }
 
-      if (noteFrame){
-        noteFrame.hidden = false;
-        try{ noteFrame.loading = "eager"; }catch(_){ }
-        var isVideo = /youtube-nocookie\.com\/embed\//i.test(fUrl || "");
-        if (noteFrameWrap && isVideo) noteFrameWrap.classList.add("isVideo");
-        noteFrame.src = fUrl || "about:blank";
-      }
+      /* entry view: no list scroll */
+      setBlogMode("entry");
+      setTimeout(fitBlogMedia, 0);
     }
 
-    function closeNoteDialog(toList){
-      if (!noteDialog) return;
+    function openBlogByIdx(idx){
+      if (blogListWrap) blogListScrollTop = blogListWrap.scrollTop;
 
-      resetNoteDialogSizing();
-      currentNoteLedClass = "led-other";
-      if (noteTypeLed) noteTypeLed.className = "led led-other";
-
-      if (notePop) notePop.hidden = true;
-
-      if (noteCaption){
-        noteCaption.textContent = "";
-        noteCaption.hidden = true;
-      }
-
-      if (noteImg){
-        noteImg.hidden = true;
-        noteImg.onload = null;
-        noteImg.onerror = null;
-        noteImg.removeAttribute("src");
-        noteImg.alt = "";
-      }
-      if (noteFrame){
-        noteFrame.hidden = true;
-        noteFrame.removeAttribute("srcdoc");
-        noteFrame.src = "about:blank";
-      }
-      if (notePdf){
-        notePdf.hidden = true;
-        notePdf.removeAttribute("src");
-      }
-
-      if (typeof noteDialog.close === "function") noteDialog.close();
-      else noteDialog.removeAttribute("open");
-      setBodyModalOpen(false);
-
-      if (toList){
-        suppressHashReopen = true;
-        location.hash = "#/notes";
-        setTimeout(function(){ suppressHashReopen = false; }, 0);
-      }
-    }
-
-    if (noteClose) noteClose.addEventListener("click", function(){ closeNoteDialog(true); });
-
-    if (noteDialog){
-      noteDialog.addEventListener("click", function(e){
-        if (e.target === noteDialog) closeNoteDialog(true);
-      });
-    }
-
-    window.addEventListener("keydown", function(e){
-      if (!noteDialog || !noteDialog.hasAttribute("open")) return;
-      if (e.altKey || e.ctrlKey || e.metaKey) return;
-
-      if (e.key === "Escape"){ e.preventDefault(); closeNoteDialog(true); return; }
-      if (e.key === "ArrowLeft"){ e.preventDefault(); gotoNoteDelta(-1); return; }
-      if (e.key === "ArrowRight"){ e.preventDefault(); gotoNoteDelta(1); return; }
-    });
-
-
-    // Re-snap image modal on resize (desktop). Keeps vertical images fully viewable.
-    window.addEventListener("resize", function(){
-      if (!noteDialog || !noteDialog.hasAttribute("open")) return;
-      var wrap = noteDialog.querySelector(".noteFrameWrap");
-      if (!wrap || !wrap.classList.contains("isImg")) return;
-      if (noteImg && !noteImg.hidden) sizeDialogToImage(noteImg);
-    });
-    function buildNotesKeyIndex(){
-      notesKeyToIndex.clear();
-      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
-      for (var i=0;i<notes.length;i++){
-        notesKeyToIndex.set(noteKey(notes[i] || {}, i), i);
-      }
-    }
-
-    function setNoteNavEnabled(){
-      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
-      var ok = notes.length > 1;
-      if (notePrevBtn) notePrevBtn.disabled = !ok;
-      if (noteNextBtn) noteNextBtn.disabled = !ok;
-    }
-
-    function gotoNoteDelta(delta){
-      if (!noteDialog || !noteDialog.hasAttribute("open")) return;
-
-      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
-      if (notes.length < 2) return;
-
-      var key = noteKeyFromHash();
-      if (!key) return;
-
-      buildNotesKeyIndex();
-      var idx = notesKeyToIndex.has(key) ? notesKeyToIndex.get(key) : -1;
-      if (idx < 0) return;
-
-      var order = getNotesOrder();
+      if (!blogOrder.length) buildBlogOrder();
       var pos = -1;
-      for (var i=0;i<order.length;i++){
-        if (order[i] === idx){ pos = i; break; }
+      for (var k=0;k<blogOrder.length;k++){
+        if (blogOrder[k] === idx){ pos = k; break; }
       }
       if (pos < 0) return;
-
-      var newPos = (pos + delta + order.length) % order.length;
-      var newIdx = order[newPos];
-      var newKey = noteKey(notes[newIdx] || {}, newIdx);
-
-      suppressHashReopen = true;
-      location.hash = "#/notes/" + encodeURIComponent(newKey);
-      setTimeout(function(){
-        suppressHashReopen = false;
-        refreshNotes();
-      }, 0);
+      renderBlogEntryAt(pos);
     }
-
-    if (notePrevBtn) notePrevBtn.addEventListener("click", function(){ gotoNoteDelta(-1); });
-    if (noteNextBtn) noteNextBtn.addEventListener("click", function(){ gotoNoteDelta( 1); });
 
     function renderNotesList(){
       if (!itemsNotes) return;
       buildNotesKeyIndex();
-      updateNotesSortUI();
 
       var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
-      var order = getNotesOrder();
+      buildBlogOrder();
 
-      if (!order.length){
-        itemsNotes.innerHTML = row1("No notes yet.", "");
+      if (!blogOrder.length){
+        itemsNotes.innerHTML = '<div class="item"><div class="pathRow"><span class="noteLedCell"><span class="led led-other" aria-hidden="true"></span></span><span class="prompt">&gt;</span><span class="metaLine">No entries yet.</span></div></div>';
         return;
       }
 
-      var html = [];
-      for (var j=0;j<order.length;j++){
-        var idx = order[j];
+      var out = [];
+      for (var j=0;j<blogOrder.length;j++){
+        var idx = blogOrder[j];
         var n = notes[idx] || {};
         var key = noteKey(n, idx);
 
         var title = esc(String(n.title || "Untitled").trim() || "Untitled");
-        var meta = esc(fmtNoteMeta(n));
+        var typeTxt = esc(typeLabel(n) || "");
+        var dateTxt = esc(String((n && n.date) ? n.date : "").trim());
 
         var href = "#/notes/" + encodeURIComponent(key);
-        var led = '<span class="led ' + esc(ledClassForType(n)) + '" aria-hidden="true"></span>';
-        var titleHtml = '<a href="' + esc(href) + '">' + title + "</a>";
+        var ledCls = esc(ledClassForType(n));
 
-        html.push(row1(titleHtml, meta, led));
+        out.push(
+          '<div class="item noteItem">' +
+            '<div class="pathRow">' +
+              '<span class="noteLedCell"><span class="led ' + ledCls + '" aria-hidden="true"></span></span>' +
+              '<span class="prompt">&gt;</span>' +
+              '<a class="titleCell" href="' + esc(href) + '">' + title + '</a>' +
+              (typeTxt ? ('<span class="sep"> / </span><span class="metaLine">' + typeTxt + '</span>') : '') +
+              (dateTxt ? ('<span class="sep"> / </span><span class="metaLine">' + dateTxt + '</span>') : '') +
+            '</div>' +
+          '</div>'
+        );
       }
-      itemsNotes.innerHTML = html.join("");
+      itemsNotes.innerHTML = out.join("");
+    }
+    function showBlogList(){
+      renderNotesList();
+      if (blogListWrap) blogListWrap.scrollTop = blogListScrollTop;
+      setBlogMode("list");
     }
 
     function refreshNotes(){
@@ -1996,7 +2587,7 @@ body.modalOpen{ overflow:hidden; }
 
       var key = noteKeyFromHash();
       if (!key){
-        closeNoteDialog(false);
+        showBlogList();
         return;
       }
 
@@ -2004,38 +2595,159 @@ body.modalOpen{ overflow:hidden; }
       var idx = notesKeyToIndex.has(key) ? notesKeyToIndex.get(key) : -1;
 
       if (idx >= 0){
-        var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
-        var n = notes[idx] || {};
-        currentNoteLedClass = ledClassForType(n);
-
-        var title = String(n.title || "Untitled").trim() || "Untitled";
-
-        var yt = String(n.youtube || "").trim();
-        var file = "";
-        if (yt){
-          yt = yt.replace(/[^a-zA-Z0-9_-]/g, "");
-          file = "https://www.youtube-nocookie.com/embed/" + yt + "?rel=0";
-        } else {
-          file = String(n.file || "").trim();
-        }
-
-        if (!file){
-          openNoteDialog(title, "about:blank", n.caption);
-          try{
-            noteFrame.src = "about:blank";
-            noteFrame.srcdoc =
-              "<!doctype html><meta charset=utf-8><title>Missing file</title>" +
-              "<style>body{font-family:ui-monospace,Menlo,Monaco,Consolas,monospace;padding:18px}code{background:#eee;padding:2px 4px}</style>" +
-              "<h3>Missing note file</h3><p>This note has no <code>file</code> property.</p>";
-          }catch(_){}
-          return;
-        }
-
-        openNoteDialog(title, file, n.caption);
+        openBlogByIdx(idx);
         return;
       }
 
-      closeNoteDialog(false);
+      showBlogList();
+    }
+
+    function gotoNoteDelta(delta){
+      if (!blogOrder.length) buildBlogOrder();
+      if (blogPos < 0) return;
+
+      var newPos = blogPos + delta;
+      if (newPos < 0 || newPos >= blogOrder.length) return;
+
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      var idx = blogOrder[newPos];
+      var key = noteKey(notes[idx] || {}, idx);
+
+      suppressHashReopen = true;
+      location.hash = "#/notes/" + encodeURIComponent(key);
+      setTimeout(function(){
+        suppressHashReopen = false;
+        refreshNotes();
+      }, 0);
+    }
+
+    
+    // Keyboard shortcuts (Blog)
+    // - Entry mode only (prevents hijacking page navigation)
+    //   ← / → : prev / next
+    //   Esc   : back to list
+    //   O     : open in new tab
+    document.addEventListener("keydown", function(e){
+      if (e.defaultPrevented) return;
+
+      var t = e.target;
+      var tag = t && t.tagName ? String(t.tagName).toUpperCase() : "";
+      if (tag === "INPUT" || tag === "TEXTAREA" || (t && t.isContentEditable)) return;
+
+      var h = String(location.hash || "");
+      if (h.indexOf("#/notes") !== 0) return;
+
+      // Only when the Blog panel is actually visible
+      var p = document.getElementById("p-notes");
+      if (!p || p.hidden) return;
+
+      var inEntry = blogView && !blogView.hidden;
+
+      if (e.key === "Escape"){
+        if (inEntry){
+          if (blogListBtn && !blogListBtn.disabled) blogListBtn.click();
+          e.preventDefault();
+        }
+        return;
+      }
+
+      if (!inEntry) return;
+
+      if (e.key === "ArrowLeft"){
+        gotoNoteDelta(-1);
+        e.preventDefault();
+        return;
+      }
+      if (e.key === "ArrowRight"){
+        gotoNoteDelta(1);
+        e.preventDefault();
+        return;
+      }
+      if (e.key === "o" || e.key === "O"){
+        if (blogOpenBtn && !blogOpenBtn.disabled) blogOpenBtn.click();
+        e.preventDefault();
+        return;
+      }
+    });
+// Blog header controls
+    if (blogHomeBtn){
+      blogHomeBtn.addEventListener("click", function(){
+        suppressHashReopen = true;
+        location.hash = "#/notes";
+        setTimeout(function(){
+          suppressHashReopen = false;
+          refreshNotes();
+        }, 0);
+      });
+    }
+    if (blogListBtn){
+      blogListBtn.addEventListener("click", function(){
+        if (blogListBtn.disabled) return;
+        suppressHashReopen = true;
+        location.hash = "#/notes";
+        setTimeout(function(){
+          suppressHashReopen = false;
+          refreshNotes();
+        }, 0);
+      });
+    }
+
+    if (blogSortDateBtn){
+      blogSortDateBtn.addEventListener("click", function(){
+        if (blogSortMode !== "type"){
+          blogSortDirDate = (blogSortDirDate === -1 ? 1 : -1);
+          localStorage.setItem("blogSortDirDate", String(blogSortDirDate));
+        } else {
+          blogSortMode = "date";
+          localStorage.setItem("blogSortMode", blogSortMode);
+        }
+        blogListScrollTop = 0;
+        refreshNotes();
+      });
+    }
+    if (blogSortTypeBtn){
+      blogSortTypeBtn.addEventListener("click", function(){
+        if (blogSortMode === "type"){
+          blogSortDirType = (blogSortDirType === -1 ? 1 : -1);
+          localStorage.setItem("blogSortDirType", String(blogSortDirType));
+        } else {
+          blogSortMode = "type";
+          localStorage.setItem("blogSortMode", blogSortMode);
+        }
+        blogListScrollTop = 0;
+        refreshNotes();
+      });
+    }
+
+    if (blogOpenBtn){
+      blogOpenBtn.addEventListener("click", function(){
+        if (blogOpenBtn.disabled) return;
+        if (!blogCurrentURL) return;
+        window.open(blogCurrentURL, "_blank", "noopener");
+      });
+    }
+    if (blogPrevBtn){
+      blogPrevBtn.addEventListener("click", function(){
+        if (blogPrevBtn.disabled) return;
+        gotoNoteDelta(-1);
+      });
+    }
+    if (blogNextBtn){
+      blogNextBtn.addEventListener("click", function(){
+        if (blogNextBtn.disabled) return;
+        gotoNoteDelta(1);
+      });
+    }
+
+    window.addEventListener("resize", function(){
+      fitBlogMedia();
+    });
+
+    if (window.ResizeObserver && blogBody){
+      try{
+        var ro = new ResizeObserver(function(){ fitBlogMedia(); });
+        ro.observe(blogBody);
+      }catch(_){ }
     }
 
     // -------------------------------------------------------
@@ -2202,7 +2914,18 @@ body.modalOpen{ overflow:hidden; }
     function openAboutDialog(){
       if (!aboutDialog) return;
       aboutSlides = Array.isArray(DATA.aboutSlides) ? DATA.aboutSlides : [];
+
+      // Always start on "Who am I?" (fallback to first slide)
+      var target = -1;
+      for (var i=0;i<aboutSlides.length;i++){
+        var t = String((aboutSlides[i]||{}).title || "").trim().toLowerCase();
+        if (t === "who am i?" || t === "who am i"){ target = i; break; }
+      }
+      ai = (target >= 0) ? target : 0;
+      localStorage.setItem("aboutSlideIndex", String(ai));
+
       renderAboutSlide();
+
       try{
         if (!aboutDialog.open){
           if (typeof aboutDialog.showModal === "function") aboutDialog.showModal();
@@ -2274,10 +2997,11 @@ body.modalOpen{ overflow:hidden; }
         if (links[k]) links[k].classList.toggle("isActive", k === key);
       });
 
-      if (key !== "notes") closeNoteDialog(false);
-
       if (key === "home") requestAnimationFrame(panCenter);
-      if (key === "notes") requestAnimationFrame(refreshNotes);
+      if (key === "notes") requestAnimationFrame(function(){
+        refreshNotes();
+        setTimeout(fitBlogMedia, 0);
+      });
     }
 
     document.addEventListener("click", function(e){
@@ -2312,7 +3036,10 @@ body.modalOpen{ overflow:hidden; }
     window.addEventListener("hashchange", function(){
       var r = normalizeRoute(location.hash);
       setActive(r);
-      if (r === "notes") refreshNotes();
+      if (r === "notes"){
+        refreshNotes();
+        setTimeout(fitBlogMedia, 0);
+      }
     });
 
     // -------------------------------------------------------
