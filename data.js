@@ -1,3 +1,4 @@
+
 window.DATA_REMOTE = {
     slides: [
         {
@@ -5,8 +6,8 @@ window.DATA_REMOTE = {
             caption: 'Bruegel the Younger, "Basket of Flowers"'
         },
                 {
-            src: "assets/slides/twombly54.jpg",
-            caption: 'Twombly, "Untitled (1954)"'
+            src: "assets/slides/bullfightdivided.jpg",
+            caption: 'Goya, "Bullfight in a Divided Ring"'
         },
                 {
             src: "assets/slides/newfield.jpg",
@@ -17,8 +18,8 @@ window.DATA_REMOTE = {
             caption: 'Snyders, "Market Scene"'
         },
          {
-            src: "assets/slides/moonscape.jpg",
-            caption: 'Lichtenstein, "Moonscape"'
+            src: "assets/slides/poppy.jpg",
+            caption: 'Klimt, "Poppy Field (Mohnfeld)"'
         },
              {
             src: "assets/slides/virginforest.jpg",
@@ -40,10 +41,6 @@ window.DATA_REMOTE = {
             src: "assets/slides/marble.jpg",
             caption: 'Sargent, "Bringing Down Marble..."'
         },
-                        {
-            src: "assets/slides/dancers.jpg",
-            caption: 'Botero, "The Dancers"'
-        },
         {
             src: "assets/slides/icarus.jpg",
             caption: 'Bruegel the Elder, "Landscape w/ the Fall..."'
@@ -53,7 +50,7 @@ window.DATA_REMOTE = {
 aboutSlides: [
   {
     title: "Who am I?",
-    text: "A writer, researcher, fact-checker, editor, photographer, and skateboarder of Southern provenance living in Brooklyn. He has two cats and keeps a clean house, enjoys the music of Future and Faye Wong, the poems of H.D. and Yeats, the smells of lavender and lemongrass, and the prospect of a future in which all people can live in harmony with each other, the Earth, and its manifold creatures. He also likes to laugh."
+    text: "A writer, researcher, fact-checker, editor, photographer, and skateboarder of Southern provenance living in Brooklyn. Keeper of two cats and a clean house, currently enjoying the music of Faye Wong and Future, the poems of H.D. and Yeats, the smells of lavender and lemongrass, and the prospect of a future in which all people can live in harmony with each other, the Earth, and its manifold creatures. Despite it all, a lover of life and laughter."
   },
   {
     title: "Here I am in characters...",
@@ -139,11 +136,11 @@ aboutSlides: [
   },
     {
     title: "What is this?",
-    text: "A virtual repository of professional projects and more playful pursuits. To use it, click around! 博 takes you to the Blog; 刊 has links to an array of published articles and essays; 研 shows research and fact-checking contributions; and 联 gives you ways to reach out. Held together by HTML, Javascript, dozens of headaches, hundreds of “huh?”s, and a good deal of help and hope, this place is a perpetual work in progress."
+    text: "A perpetual work-in-progress. A virtual repository of professional projects and more playful pursuits. A Blog (博), an array of published articles and essays (刊), a list of links to research and fact-checking contributions (研) ; and information for those who wish to reach out (联). Designed in the style of early hypertext experiments of the 1980s and held together by HTML, Javascript, and a good deal of help and hope. A site to excavate that is still expanding."
   },
       {
     title: "What else?",
-    text: "Still here? Please, exit and explore. We have 'one wild and precious life', in the words of Mary Oliver, put it to positive ends. Pretend a better world is just around the bend and spend your time stretching toward that horizon."
+    text: "Still here? Please, exit and explore. We have 'one wild and precious life,' in the words of Mary Oliver, put it to positive ends. Pretend a better world is just around the bend and spend your time stretching toward that horizon."
   },
 ],
     
