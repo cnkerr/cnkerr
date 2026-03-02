@@ -136,7 +136,7 @@ aboutSlides: [
   },
     {
     title: "What is this?",
-    text: "A perpetual work-in-progress. A virtual repository of professional projects and more playful pursuits. A Blog (博), an array of published articles and essays (刊), a list of links to research and fact-checking contributions (研) ; and information for those who wish to reach out (联). Designed in the style of early hypertext experiments of the 1980s and held together by HTML, Javascript, and a good deal of help and hope. A site to excavate that is still expanding."
+    text: "A perpetual work-in-progress. A virtual repository of professional projects and more playful pursuits. A Blog (博), an array of published articles and essays (刊), a list of links to research and fact-checking contributions (研), and information for those who wish to reach out (联). Designed in the style of hypertext systems of the 1980s and held together by HTML, Javascript, and a good deal of help and hope. A site to excavate that is still expanding."
   },
       {
     title: "What else?",
