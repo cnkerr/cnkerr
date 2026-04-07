@@ -329,7 +329,7 @@ aboutSlides: [
             title: "7 Tricks to Make You Look Better at Skating Than You Really Are",
             outlet: "Jenkem Mag",
             year: 2020,
-            url: "https://www.jenkemmag.com/home/2020/09/10/7-tricks-make-look-better-at-skating-than-you-really-are/"
+            url: "https://www.jenkemmag.com/home/2020/09/10/7-tricks-make-look-better-skating-really/"
         },
         {
             title: "A Skater's Guide to Attending a Protest",
