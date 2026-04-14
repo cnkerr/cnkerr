@@ -145,7 +145,13 @@ aboutSlides: [
 ],
     
     writing: [
-    {
+        {
+            title: "Built for the Throne: Tyshawn Jones",
+            outlet: "HYPEBEAST",
+            year: 2026,
+            url: "https://hypebeast.com/2026/4/tyshawn-jones-hypebeast-magazine-37-cover-story"
+        },
+        {
             title: "The Two Hands of Mary Wigman",
             outlet: "PLANK",
             year: 2026,
