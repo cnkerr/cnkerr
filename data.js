@@ -443,7 +443,16 @@ aboutSlides: [
         },
     ],
 
-    notes: [{
+    notes: [        {
+            id: "sprig",
+            title: "SPRIG",
+            date: "2026-05-08",
+            type: "Video",
+            youtube: "a286ilR2iEM"
+        },
+        
+        
+        {
             id: "ck-peels",
             title: "Kicked out of Claes -Erick Cespedes",
             date: "2026-01-24",
