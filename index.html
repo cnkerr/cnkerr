@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no" />
+<base href="/" />
 <title>Christian N. Kerr</title>
 
 <style>
@@ -1339,14 +1340,14 @@ body.modalOpen{ overflow:hidden; }
 <body>
 <div class="frame" id="root">
   <aside class="win" aria-label="Sidebar">
-    <a class="nameBtn" id="linkHomeTop" href="#/home" data-route="home" title="Home" aria-label="Home">Christian N. Kerr</a>
+    <a class="nameBtn" id="linkHomeTop" href="/" data-route="home" title="Home" aria-label="Home">Christian N. Kerr</a>
 
     <div class="controls">
       <div class="btns" aria-label="Navigation">
-        <a class="btn" id="linkNotes" href="#/notes" data-route="notes" title="Blog" aria-label="Blog"><div class="glyph">博</div></a>
-        <a class="btn" id="linkWriting"  href="#/writing"  data-route="writing"  title="Clips"  aria-label="Clips"><div class="glyph">刊</div></a>
-        <a class="btn" id="linkResearch" href="#/research" data-route="research" title="Research" aria-label="Research"><div class="glyph">研</div></a>
-        <a class="btn" id="linkContact"  href="#/contact"  data-route="contact"  title="Contact" aria-label="Contact"><div class="glyph">联</div></a>
+        <a class="btn" id="linkNotes" href="/blog" data-route="notes" title="Blog" aria-label="Blog"><div class="glyph">博</div></a>
+        <a class="btn" id="linkWriting"  href="/clips"  data-route="writing"  title="Clips"  aria-label="Clips"><div class="glyph">刊</div></a>
+        <a class="btn" id="linkResearch" href="/bts" data-route="research" title="Research" aria-label="Research"><div class="glyph">研</div></a>
+        <a class="btn" id="linkContact"  href="/contact"  data-route="contact"  title="Contact" aria-label="Contact"><div class="glyph">联</div></a>
       </div>
 
       <button class="clockBtn" id="clockBtn" type="button" aria-label="Current date and time">
@@ -1581,6 +1582,18 @@ body.modalOpen{ overflow:hidden; }
    JS: BOOTSTRAP (loads data.js then starts)
 ========================================================= */
 (function loadDataThenBoot(){
+  // GitHub Pages serves 404.html for clean deep links. That file redirects to
+  // /?p=<original path>; restore the pretty path before loading data.js.
+  (function restorePathFrom404(){
+    try{
+      var params = new URLSearchParams(location.search);
+      var preserved = params.get("p");
+      if (!preserved) return;
+      var target = new URL(preserved, location.origin);
+      history.replaceState(null, "", target.pathname + target.search + target.hash);
+    }catch(_){}
+  })();
+
   function boot(){
     var $ = function(id){ return document.getElementById(id); };
 
@@ -1793,7 +1806,7 @@ body.modalOpen{ overflow:hidden; }
       }
 
       // absolute URL for "open in new tab"
-      try{ slideCurrentURL = new URL(src, location.href).toString(); }
+      try{ slideCurrentURL = new URL(src, document.baseURI).toString(); }
       catch(_){ slideCurrentURL = src; }
 
       if (hero){
@@ -2187,9 +2200,13 @@ function typeLabel(n){
       return s || String(idx);
     }
 
-    function noteKeyFromHash(){
-      var m = String(location.hash || "").match(/^#\/notes\/([^\/?#]+)\b/);
-      return m ? decodeURIComponent(m[1]) : "";
+    function noteKeyFromLocation(){
+      var pathMatch = String(location.pathname || "").match(/^\/blog\/([^\/?#]+)\/?$/);
+      if (pathMatch) return decodeURIComponent(pathMatch[1]);
+
+      // Backwards compatibility for old bookmarked hash URLs.
+      var hashMatch = String(location.hash || "").match(/^#\/notes\/([^\/?#]+)\b/);
+      return hashMatch ? decodeURIComponent(hashMatch[1]) : "";
     }
 
     function buildNotesKeyIndex(){
@@ -2393,7 +2410,7 @@ function typeLabel(n){
           blogContent.innerHTML = "<p>(No file attached.)</p>";
                   } else {
           var fUrl = file;
-          try{ fUrl = new URL(file, location.href).toString(); }
+          try{ fUrl = new URL(file, document.baseURI).toString(); }
           catch(_){ fUrl = encodeURI(file); }
 
           var lower = fUrl.toLowerCase();
@@ -2501,7 +2518,7 @@ function typeLabel(n){
         var typeTxt = esc(typeLabel(n) || "");
         var dateTxt = esc(String((n && n.date) ? n.date : "").trim());
 
-        var href = "#/notes/" + encodeURIComponent(key);
+        var href = "/blog/" + encodeURIComponent(key);
         var ledCls = esc(ledClassForType(n));
 
         out.push(
@@ -2509,7 +2526,7 @@ function typeLabel(n){
             '<div class="pathRow">' +
               '<span class="noteLedCell"><span class="led ' + ledCls + '" aria-hidden="true"></span></span>' +
               '<span class="prompt">&gt;</span>' +
-              '<a class="titleCell" href="' + esc(href) + '">' + title + '</a>' +
+              '<a class="titleCell" data-blog-key="' + esc(key) + '" href="' + esc(href) + '">' + title + '</a>' +
               (typeTxt ? ('<span class="sep"> / </span><span class="metaLine">' + typeTxt + '</span>') : '') +
               (dateTxt ? ('<span class="sep"> / </span><span class="metaLine">' + dateTxt + '</span>') : '') +
             '</div>' +
@@ -2528,7 +2545,7 @@ function typeLabel(n){
       renderNotesList();
       if (suppressHashReopen) return;
 
-      var key = noteKeyFromHash();
+      var key = noteKeyFromLocation();
       if (!key){
         showBlogList();
         return;
@@ -2556,12 +2573,7 @@ function typeLabel(n){
       var idx = blogOrder[newPos];
       var key = noteKey(notes[idx] || {}, idx);
 
-      suppressHashReopen = true;
-      location.hash = "#/notes/" + encodeURIComponent(key);
-      setTimeout(function(){
-        suppressHashReopen = false;
-        refreshNotes();
-      }, 0);
+      goToPath("/blog/" + encodeURIComponent(key));
     }
 
     
@@ -2577,8 +2589,7 @@ function typeLabel(n){
       var tag = t && t.tagName ? String(t.tagName).toUpperCase() : "";
       if (tag === "INPUT" || tag === "TEXTAREA" || (t && t.isContentEditable)) return;
 
-      var h = String(location.hash || "");
-      if (h.indexOf("#/notes") !== 0) return;
+      if (normalizeRouteFromLocation() !== "notes") return;
 
       // Only when the Blog panel is actually visible
       var p = document.getElementById("p-notes");
@@ -2615,23 +2626,13 @@ function typeLabel(n){
 // Blog header controls
     if (blogHomeBtn){
       blogHomeBtn.addEventListener("click", function(){
-        suppressHashReopen = true;
-        location.hash = "#/notes";
-        setTimeout(function(){
-          suppressHashReopen = false;
-          refreshNotes();
-        }, 0);
+        goToPath("/blog");
       });
     }
     if (blogListBtn){
       blogListBtn.addEventListener("click", function(){
         if (blogListBtn.disabled) return;
-        suppressHashReopen = true;
-        location.hash = "#/notes";
-        setTimeout(function(){
-          suppressHashReopen = false;
-          refreshNotes();
-        }, 0);
+        goToPath("/blog");
       });
     }
 
@@ -2915,10 +2916,52 @@ function typeLabel(n){
       contact: $("linkContact")
     };
 
-    function normalizeRoute(hash){
+    var routePaths = {
+      home: "/",
+      writing: "/clips",
+      research: "/bts",
+      notes: "/blog",
+      contact: "/contact"
+    };
+
+    function pathForRoute(key){
+      return routePaths[key] || "/";
+    }
+
+    function normalizeRouteFromLocation(){
+      var path = String(location.pathname || "/").replace(/\/+$/, "") || "/";
+      if (path === "/clips") return "writing";
+      if (path === "/bts") return "research";
+      if (path === "/contact") return "contact";
+      if (path === "/blog" || path.indexOf("/blog/") === 0) return "notes";
+      return "home";
+    }
+
+    function legacyPathFromHash(hash){
       var raw = String(hash || "");
+      var entry = raw.match(/^#\/notes\/([^\/?#]+)\b/);
+      if (entry) return "/blog/" + entry[1];
+
       var m = raw.match(/^#\/(home|writing|research|notes|contact)\b/);
-      return m ? m[1] : "home";
+      if (!m) return "";
+      return pathForRoute(m[1]);
+    }
+
+    function migrateLegacyLocation(){
+      var legacy = legacyPathFromHash(location.hash);
+      if (legacy){
+        history.replaceState(null, "", legacy);
+        return;
+      }
+
+      var path = String(location.pathname || "/").replace(/\/+$/, "") || "/";
+      var aliases = {
+        "/home": "/",
+        "/writing": "/clips",
+        "/research": "/bts",
+        "/notes": "/blog"
+      };
+      if (aliases[path]) history.replaceState(null, "", aliases[path]);
     }
 
     function setActive(key){
@@ -2935,12 +2978,27 @@ function typeLabel(n){
               });
     }
 
+    function goToPath(path, replace){
+      var target = String(path || "/");
+      var current = location.pathname + location.search;
+      if (replace) history.replaceState(null, "", target);
+      else if (current !== target) history.pushState(null, "", target);
+      setActive(normalizeRouteFromLocation());
+    }
+
     document.addEventListener("click", function(e){
+      var blogLink = e.target.closest("a[data-blog-key]");
+      if (blogLink){
+        e.preventDefault();
+        goToPath(blogLink.getAttribute("href") || "/blog");
+        return;
+      }
+
       var a = e.target.closest("a[data-route]");
       if (!a) return;
       e.preventDefault();
       var key = a.dataset.route || "home";
-      location.hash = "#/" + key;
+      goToPath(pathForRoute(key));
     });
 
     // Home nameplate opens About modal on DOUBLE-CLICK
@@ -2949,14 +3007,14 @@ function typeLabel(n){
       homeNameplate.addEventListener("dblclick", function(e){
         e.preventDefault();
         e.stopPropagation();
-        location.hash = "#/home";
+        goToPath("/", true);
         setTimeout(openAboutDialog, 0);
       });
 
       // Mobile: single tap opens About when already on Home
       homeNameplate.addEventListener("click", function(e){
         if (!isCoarsePointer()) return;
-        var r = normalizeRoute(location.hash);
+        var r = normalizeRouteFromLocation();
         if (r !== "home") return;
         e.preventDefault();
         e.stopPropagation();
@@ -2964,19 +3022,23 @@ function typeLabel(n){
       });
     }
 
+    window.addEventListener("popstate", function(){
+      setActive(normalizeRouteFromLocation());
+    });
+
+    // Old #/ links remain valid and are immediately canonicalized.
     window.addEventListener("hashchange", function(){
-      var r = normalizeRoute(location.hash);
-      setActive(r);
-      if (r === "notes"){
-        refreshNotes();
-              }
+      var legacy = legacyPathFromHash(location.hash);
+      if (!legacy) return;
+      history.replaceState(null, "", legacy);
+      setActive(normalizeRouteFromLocation());
     });
 
     // -------------------------------------------------------
     // JS: INIT
     // -------------------------------------------------------
-    if (!location.hash) location.hash = "#/home";
-    setActive(normalizeRoute(location.hash));
+    migrateLegacyLocation();
+    setActive(normalizeRouteFromLocation());
 
     render("writing");
     render("research");
