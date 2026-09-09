@@ -1399,6 +1399,18 @@ body.modalOpen{ overflow:hidden; }
 
             <div class="spacer"></div>
 
+            <h2>EDITING</h2>
+            <div class="rule"></div>
+            <div class="items" id="items-editing" aria-live="polite"></div>
+
+            <div class="spacer"></div>
+
+            <h2>DEVELOPMENT &amp; PRODUCTION</h2>
+            <div class="rule"></div>
+            <div class="items" id="items-development" aria-live="polite"></div>
+
+            <div class="spacer"></div>
+
             <h2>FACT-CHECKING</h2>
             <div class="rule"></div>
             <div class="items" id="items-factChecking" aria-live="polite"></div>
@@ -1588,7 +1600,7 @@ body.modalOpen{ overflow:hidden; }
     // -------------------------------------------------------
     var DATA = (window.DATA_REMOTE && typeof window.DATA_REMOTE === "object")
       ? window.DATA_REMOTE
-      : { slides:[], writing:[], research:[], factChecking:[], timeQuotes:[], notes:[], aboutSlides: [] };
+      : { slides:[], writing:[], research:[], editing:[], development:[], factChecking:[], timeQuotes:[], notes:[], aboutSlides: [] };
 
     function ensureArrayKey(obj, key){
       if (!obj || !Array.isArray(obj[key])) obj[key] = [];
@@ -1596,6 +1608,8 @@ body.modalOpen{ overflow:hidden; }
     ensureArrayKey(DATA, "slides");
     ensureArrayKey(DATA, "writing");
     ensureArrayKey(DATA, "research");
+    ensureArrayKey(DATA, "editing");
+    ensureArrayKey(DATA, "development");
     ensureArrayKey(DATA, "factChecking");
     ensureArrayKey(DATA, "timeQuotes");
     ensureArrayKey(DATA, "notes");
@@ -1932,6 +1946,48 @@ body.modalOpen{ overflow:hidden; }
           htmlR.push(row1(titleHtml2, metaHtml2));
         }
         out.innerHTML = htmlR.join("");
+        return;
+      }
+
+      if (section === "editing"){
+        var htmlE = [];
+        for (var e=0;e<items.length;e++){
+          var itE = items[e] || {};
+          var titleE = esc(normDashText(itE.title || ""));
+          var hrefE = itE.url ? String(itE.url) : "";
+          var titleHtmlE = hrefE
+            ? ('<a href="' + esc(hrefE) + '" target="_blank" rel="noopener">' + titleE + '</a>')
+            : titleE;
+
+          var authorE = esc(itE.author || "");
+          var pubE = itE.publication ? ("<em>" + esc(itE.publication) + "</em>") : "";
+          var apE = (authorE && pubE) ? (authorE + " (" + pubE + ")") : (authorE || (pubE ? ("(" + pubE + ")") : ""));
+          var dateE = esc(itE.date || "");
+          var metaHtmlE = [apE, dateE].filter(Boolean).join(" / ");
+          htmlE.push(row1(titleHtmlE, metaHtmlE));
+        }
+        out.innerHTML = htmlE.join("");
+        return;
+      }
+
+      if (section === "development"){
+        var htmlD = [];
+        for (var d=0;d<items.length;d++){
+          var itD = items[d] || {};
+          var titleD = esc(normDashText(itD.title || ""));
+          var hrefD = itD.url ? String(itD.url) : "";
+          var titleHtmlD = hrefD
+            ? ('<a href="' + esc(hrefD) + '" target="_blank" rel="noopener">' + titleD + '</a>')
+            : titleD;
+
+          var roleD = esc(itD.role || "");
+          var pubD = itD.publication ? ("<em>" + esc(itD.publication) + "</em>") : "";
+          var rpD = (roleD && pubD) ? (roleD + " (" + pubD + ")") : (roleD || (pubD ? ("(" + pubD + ")") : ""));
+          var dateD = esc(itD.date || "");
+          var metaHtmlD = [rpD, dateD].filter(Boolean).join(" / ");
+          htmlD.push(row1(titleHtmlD, metaHtmlD));
+        }
+        out.innerHTML = htmlD.join("");
         return;
       }
 
@@ -2924,6 +2980,8 @@ function typeLabel(n){
 
     render("writing");
     render("research");
+    render("editing");
+    render("development");
     render("factChecking");
 
     refreshNotes();

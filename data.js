@@ -392,6 +392,148 @@ aboutSlides: [
         }
     ],
 
+    editing: [
+        {
+            title: "Skaters Recommend Their Favorite Skate Pants",
+            author: "Jenkem Staff",
+            publication: "Jenkem Magazine",
+            date: "August 2020",
+            year: 2020,
+            url: "https://www.jenkemmag.com/home/2020/08/25/skate-pants-recommendations-pros-friends/"
+        },
+        {
+            title: "How a Group of Women Fought for Equal Pay in Contest Skating",
+            author: "Ian Browning",
+            publication: "Jenkem Magazine",
+            date: "January 2020",
+            year: 2020,
+            url: "https://www.jenkemmag.com/home/2020/01/08/group-women-fought-equal-pay-contest-skating/"
+        },
+        {
+            title: "Can Skateboarding Be a Religion? A Sociological Perspective",
+            author: "Paul O’Connor",
+            publication: "Jenkem Magazine",
+            date: "December 2019",
+            year: 2019,
+            url: "https://www.jenkemmag.com/home/2019/12/18/can-skateboarding-religion-sociological-perspective/"
+        },
+        {
+            title: "How a Sexual Predator Infiltrated Atlanta’s Skate Scene",
+            author: "Andrew Murrell",
+            publication: "Jenkem Magazine",
+            date: "November 2019",
+            year: 2019,
+            url: "https://www.jenkemmag.com/home/2019/11/05/sexual-predator-infiltrated-atlantas-skate-scene/"
+        },
+        {
+            title: "A Day in the Life of a Skate Shop",
+            author: "Ian Browning",
+            publication: "Jenkem Magazine",
+            date: "June 2019",
+            year: 2019,
+            url: "https://www.jenkemmag.com/home/2019/06/11/day-life-skate-shop/"
+        },
+        {
+            title: "Remembering the Mall Rat Shoe: The Etnies Callicut",
+            author: "Nic Dobija-Nootens",
+            publication: "Jenkem Magazine",
+            date: "November 2018",
+            year: 2018,
+            url: "https://www.jenkemmag.com/home/2018/11/20/remembering-mall-rat-shoe-etnies-callicut/"
+        },
+        {
+            title: "How Worried Should Skaters Be About CTE?",
+            author: "Andrew Murrell",
+            publication: "Jenkem Magazine",
+            date: "August 2018",
+            year: 2018,
+            url: "https://www.jenkemmag.com/home/2018/08/28/skateboarders-worried-cte/"
+        },
+        {
+            title: "What Happened to Gershon Mosley?",
+            author: "Tobias Coughlin-Bogue",
+            publication: "Jenkem Magazine",
+            date: "August 2018",
+            year: 2018,
+            url: "https://www.jenkemmag.com/home/2018/08/14/happened-gershon-mosley/"
+        },
+        {
+            title: "How Do Professional Skaters Deal With Health Insurance?",
+            author: "Ian Browning",
+            publication: "Jenkem Magazine",
+            date: "June 2017",
+            year: 2017,
+            url: "https://www.jenkemmag.com/home/2017/06/23/affordable-care-acts-effect-skateboard-industry/"
+        },
+        {
+            title: "A Day With Chaz Ortiz",
+            author: "Kyle Beachy",
+            publication: "Jenkem Magazine",
+            date: "April 2017",
+            year: 2017,
+            url: "https://www.jenkemmag.com/home/2017/04/11/day-chaz-ortiz/"
+        },
+        {
+            title: "The Skateboarder’s Guide to Getting Arrested",
+            author: "Anthony Pappalardo & Colin Commito",
+            publication: "Jenkem Magazine",
+            date: "December 2016",
+            year: 2016,
+            url: "https://www.jenkemmag.com/home/2016/12/19/the-skateboarders-guide-to-getting-arrested/"
+        },
+        {
+            title: "A Brief Look at Skateboarding’s Gay Past",
+            author: "Max Dubler",
+            publication: "Jenkem Magazine",
+            date: "September 2016",
+            year: 2016,
+            url: "https://www.jenkemmag.com/home/2016/09/29/a-brief-look-at-skateboardings-gay-past/"
+        },
+        {
+            title: "The Politics of Skate Photography",
+            author: "Nic Dobija-Nootens",
+            publication: "Jenkem Magazine",
+            date: "July 2016",
+            year: 2016,
+            url: "https://www.jenkemmag.com/home/2016/07/11/the-politics-of-skate-photography/"
+        }
+    ],
+
+    development: [
+        {
+            title: "Lurking With Lou",
+            role: "Producer",
+            publication: "Village Psychic",
+            date: "November 2022–April 2025",
+            year: 2025,
+            url: "https://www.villagepsychic.net/blog/lurking-with-lou-aaron-herrington-part-1"
+        },
+        {
+            title: "Date a Skater",
+            role: "Producer & Series Development",
+            publication: "Jenkem Magazine",
+            date: "November 2017–March 2022",
+            year: 2022,
+            url: "https://www.jenkemmag.com/home/2017/11/13/introducing-date-sk8r/"
+        },
+        {
+            title: "Jenkem Vol. 2",
+            role: "Editor & Book Production",
+            publication: "Jenkem Magazine",
+            date: "May 2018",
+            year: 2018,
+            url: "https://www.jenkemmag.com/home/2018/04/03/introducing-jenkem-vol-2/"
+        },
+        {
+            title: "Jenkem Vol. 1",
+            role: "Editor & Book Production",
+            publication: "Jenkem Magazine",
+            date: "August 2016",
+            year: 2016,
+            url: "https://www.jenkemmag.com/home/2016/07/18/introducing-jenkem-vol-1/"
+        }
+    ],
+
     factChecking: [{
             title: "The Magic Mountain Saved My Life",
             author: "George Packer",
