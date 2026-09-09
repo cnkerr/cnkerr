@@ -16,25 +16,12 @@ replace_once(
     "base href"
 )
 
-replace_once(
-'''    <a class="nameBtn" id="linkHomeTop" href="#/home" data-route="home" title="Home" aria-label="Home">Christian N. Kerr</a>
-
-    <div class="controls">
-      <div class="btns" aria-label="Navigation">
-        <a class="btn" id="linkNotes" href="#/notes" data-route="notes" title="Blog" aria-label="Blog"><div class="glyph">博</div></a>
-        <a class="btn" id="linkWriting"  href="#/writing"  data-route="writing"  title="Clips"  aria-label="Clips"><div class="glyph">刊</div></a>
-        <a class="btn" id="linkResearch" href="#/research" data-route="research" title="Research" aria-label="Research"><div class="glyph">研</div></a>
-        <a class="btn" id="linkContact"  href="#/contact"  data-route="contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></a>''',
-'''    <a class="nameBtn" id="linkHomeTop" href="/" data-route="home" title="Home" aria-label="Home">Christian N. Kerr</a>
-
-    <div class="controls">
-      <div class="btns" aria-label="Navigation">
-        <a class="btn" id="linkNotes" href="/blog" data-route="notes" title="Blog" aria-label="Blog"><div class="glyph">博</div></a>
-        <a class="btn" id="linkWriting"  href="/clips"  data-route="writing"  title="Clips"  aria-label="Clips"><div class="glyph">刊</div></a>
-        <a class="btn" id="linkResearch" href="/bts" data-route="research" title="Research" aria-label="Research"><div class="glyph">研</div></a>
-        <a class="btn" id="linkContact"  href="/contact"  data-route="contact"  title="Contact"  aria-label="Contact"><div class="glyph">联</div></a>''',
-    "navigation hrefs"
-)
+# Clean top-level routes. Replace only the href values so spacing/formatting elsewhere is untouched.
+replace_once('href="#/home"', 'href="/"', "home href")
+replace_once('href="#/notes"', 'href="/blog"', "blog href")
+replace_once('href="#/writing"', 'href="/clips"', "clips href")
+replace_once('href="#/research"', 'href="/bts"', "bts href")
+replace_once('href="#/contact"', 'href="/contact"', "contact href")
 
 replace_once(
 '''(function loadDataThenBoot(){
