@@ -585,7 +585,14 @@ aboutSlides: [
         },
     ],
 
-    notes: [        {
+    notes: [
+        {
+            id: "flatground-tricks",
+            title: "Flatground Tricks",
+            date: "2026-09-17",
+            type: "Project",
+            file: "notes/projects/flatground-tricks.html"
+        },        {
             id: "sprig",
             title: "SPRIG",
             date: "2026-05-08",
