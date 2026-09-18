@@ -589,7 +589,7 @@ aboutSlides: [
         {
             id: "flatground-tricks",
             title: "Flatground Tricks",
-            date: "2026-09-17",
+            date: "2026-09-18",
             type: "Project",
             file: "notes/projects/flatground-tricks.html"
         },        {
