@@ -2487,6 +2487,13 @@ function typeLabel(n){
     function openBlogByIdx(idx){
       if (blogListWrap) blogListScrollTop = blogListWrap.scrollTop;
 
+      var notes = Array.isArray(DATA.notes) ? DATA.notes : [];
+      var direct = String((notes[idx] && notes[idx].landing) ? notes[idx].landing : "").trim();
+      if (direct){
+        location.assign(direct);
+        return;
+      }
+
       if (!blogOrder.length) buildBlogOrder();
       var pos = -1;
       for (var k=0;k<blogOrder.length;k++){
@@ -2518,7 +2525,9 @@ function typeLabel(n){
         var typeTxt = esc(typeLabel(n) || "");
         var dateTxt = esc(String((n && n.date) ? n.date : "").trim());
 
-        var href = "/blog/" + encodeURIComponent(key);
+        var landing = String((n && n.landing) ? n.landing : "").trim();
+        var href = landing || ("/blog/" + encodeURIComponent(key));
+        var blogKeyAttr = landing ? "" : (' data-blog-key="' + esc(key) + '"');
         var ledCls = esc(ledClassForType(n));
 
         out.push(
@@ -2526,7 +2535,7 @@ function typeLabel(n){
             '<div class="pathRow">' +
               '<span class="noteLedCell"><span class="led ' + ledCls + '" aria-hidden="true"></span></span>' +
               '<span class="prompt">&gt;</span>' +
-              '<a class="titleCell" data-blog-key="' + esc(key) + '" href="' + esc(href) + '">' + title + '</a>' +
+              '<a class="titleCell"' + blogKeyAttr + ' href="' + esc(href) + '">' + title + '</a>' +
               (typeTxt ? ('<span class="sep"> / </span><span class="metaLine">' + typeTxt + '</span>') : '') +
               (dateTxt ? ('<span class="sep"> / </span><span class="metaLine">' + dateTxt + '</span>') : '') +
             '</div>' +
