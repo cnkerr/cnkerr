@@ -591,6 +591,7 @@ aboutSlides: [
             title: "Flatground Tricks",
             date: "2026-09-18",
             type: "Project",
+            landing: "/projects/flatground-tricks/",
             file: "notes/projects/flatground-tricks.html"
         },        {
             id: "sprig",
