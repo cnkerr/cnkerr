@@ -588,7 +588,7 @@ aboutSlides: [
     notes: [
         {
             id: "flatground-tricks",
-            title: "Flatground Tricks",
+            title: "A Compendium of Jamie Griffin’s Flatground Tricks",
             date: "2026-09-18",
             type: "Project",
             file: "notes/projects/flatground-tricks-intro.html"
