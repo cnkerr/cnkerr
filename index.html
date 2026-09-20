@@ -532,7 +532,7 @@ em{font-style:italic}
 #p-notes .notesMiniBtn:disabled:active{ transform:none; }
 
 /* Force UI glyph color (prevents mobile Safari tinting) */
-button, .notesMiniBtn, .blogOpenBtn, .btn, .nameBtn, .pbtn{ color:#000; }
+button, .notesMiniBtn, .btn, .nameBtn, .pbtn{ color:#000; }
 
 #blogList{ font-weight:900; }
 
@@ -655,33 +655,6 @@ button, .notesMiniBtn, .blogOpenBtn, .btn, .nameBtn, .pbtn{ color:#000; }
   text-overflow:ellipsis;
 }
 
-/* Open button */
-#p-notes .blogOpenBtn{
-  flex:0 0 auto;
-  height:32px;
-  width:44px;
-  padding:0;
-  background:#cfcfcf;
-  color:#000;
-  border:2px solid;
-  border-color:#ffffff #000000 #000000 #ffffff;
-  box-shadow:inset 1px 1px 0 rgba(255,255,255,.25), inset -1px -1px 0 rgba(0,0,0,.35);
-  cursor:pointer;
-  font-family:inherit;
-  font-weight:900;
-  font-size:18px;
-  line-height:1;
-  display:grid;
-  place-items:center;
-  -webkit-tap-highlight-color:transparent;
-}
-#p-notes .blogOpenBtn:hover{ background:var(--accent); }
-#p-notes .blogOpenBtn:active{
-  border-color:#000000 #ffffff #ffffff #000000;
-  transform:translate(1px,1px);
-}
-#p-notes .blogOpenBtn:disabled{ opacity:.35; cursor:default; }
-#p-notes .blogOpenBtn:disabled:active{ transform:none; }
 
 /* Media viewport (the “window”) */
 #p-notes .blogContent{
@@ -1456,7 +1429,6 @@ body.modalOpen{ overflow:hidden; }
                 <div class="blogEntryHdr">
                   <div class="blogTitleRow">
                     <div class="blogTitle" id="blogTitle"></div>
-                    <button id="blogOpen2" class="blogOpenBtn" type="button" aria-label="Open media in new tab" title="Open in new tab">⧉</button>
                   </div>
                   <div class="blogEntryMeta" id="blogEntryMeta"></div>
                 </div>
@@ -2038,8 +2010,6 @@ body.modalOpen{ overflow:hidden; }
     var blogSortDateBtn = $("blogSortDate");
     var blogSortTypeBtn = $("blogSortType");
 
-    var blogOpenBtn   = $("blogOpen2");
-
     var blogBody      = $("blogBody");
     var blogSortEl    = $("blogSort");
     var blogListWrap  = $("blogListWrap");
@@ -2156,7 +2126,6 @@ function typeLabel(n){
         if (blogPrevBtn) blogPrevBtn.hidden = true;
         if (blogNextBtn) blogNextBtn.hidden = true;
         if (blogListBtn) blogListBtn.hidden = true;
-        setNavEnabled(blogOpenBtn, false);
       } else {
         if (blogPrevBtn) blogPrevBtn.hidden = false;
         if (blogNextBtn) blogNextBtn.hidden = false;
@@ -2164,7 +2133,6 @@ function typeLabel(n){
         setNavEnabled(blogListBtn, true);
         setNavEnabled(blogPrevBtn, blogPos > 0);
         setNavEnabled(blogNextBtn, blogPos >= 0 && blogPos < blogOrder.length - 1);
-        setNavEnabled(blogOpenBtn, !!blogCurrentURL);
       }
     }
 
@@ -2581,7 +2549,6 @@ function typeLabel(n){
     // - Entry mode only (prevents hijacking page navigation)
     //   ← / → : prev / next
     //   Esc   : back to list
-    //   O     : open in new tab
     document.addEventListener("keydown", function(e){
       if (e.defaultPrevented) return;
 
@@ -2614,11 +2581,6 @@ function typeLabel(n){
       }
       if (e.key === "ArrowRight"){
         gotoNoteDelta(1);
-        e.preventDefault();
-        return;
-      }
-      if (e.key === "o" || e.key === "O"){
-        if (blogOpenBtn && !blogOpenBtn.disabled) blogOpenBtn.click();
         e.preventDefault();
         return;
       }
@@ -2660,14 +2622,6 @@ function typeLabel(n){
         }
         blogListScrollTop = 0;
         refreshNotes();
-      });
-    }
-
-    if (blogOpenBtn){
-      blogOpenBtn.addEventListener("click", function(){
-        if (blogOpenBtn.disabled) return;
-        if (!blogCurrentURL) return;
-        window.open(blogCurrentURL, "_blank", "noopener");
       });
     }
     if (blogPrevBtn){
