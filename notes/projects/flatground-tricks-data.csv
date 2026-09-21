@@ -1,0 +1,801 @@
+trick_number,trick_name,stance,part,caption_timestamp
+1,ollie,Regular,1,1:24.0
+2,fakie ollie,Fakie,1,1:26.0
+3,nollie,Nollie,1,1:29.0
+4,switch ollie,Switch,1,1:31.0
+5,frontside 180,Regular,1,1:33.0
+6,backside 180,Regular,1,1:36.0
+7,fakie backside 180,Fakie,1,1:38.0
+8,fakie frontside 180,Fakie,1,1:41.0
+9,nollie frontside 180,Nollie,1,1:43.0
+10,nollie backside 180,Nollie,1,1:46.0
+11,switch backside 180,Switch,1,1:48.0
+12,switch frontside 180,Switch,1,1:50.0
+13,kickflip,Regular,1,1:53.0
+14,fakie kickflip,Fakie,1,1:55.0
+15,switch kickflip,Switch,1,1:57.0
+16,nollie kickflip,Nollie,1,1:59.0
+17,heelflip,Regular,1,2:01.0
+18,fakie heelflip,Fakie,1,2:04.0
+19,switch heelflip,Switch,1,2:06.0
+20,nollie heelflip,Nollie,1,2:09.0
+21,frontside flip,Regular,1,2:11.0
+22,backside flip,Regular,1,2:14.0
+23,fakie backside flip,Fakie,1,2:16.0
+24,fakie backside heelflip,Fakie,1,2:19.0
+25,fakie frontside flip,Fakie,1,2:22.0
+26,backside heelflip,Regular,1,2:25.0
+27,frontside heelflip,Regular,1,2:28.0
+28,fakie frontside heelflip,Fakie,1,2:30.0
+29,nollie backside flip,Nollie,1,2:33.0
+30,switch frontside flip,Switch,1,2:36.0
+31,nollie frontside heelflip,Nollie,1,2:38.0
+32,nollie frontside flip,Nollie,1,2:40.0
+33,switch backside heelflip,Switch,1,2:43.0
+34,switch backside flip,Switch,1,2:45.0
+35,nollie backside heelflip,Nollie,1,2:48.0
+36,switch frontside heelflip,Switch,1,2:51.0
+37,360 flip,Regular,1,2:53.0
+38,switch 360 flip,Switch,1,2:55.0
+39,fakie 360 flip,Fakie,1,2:58.0
+40,nollie 360 flip,Nollie,1,3:00.0
+41,varial flip,Regular,1,3:02.0
+42,fakie varial flip,Fakie,1,3:05.0
+43,switch varial flip,Switch,1,3:07.0
+44,nollie varial flip,Nollie,1,3:10.0
+45,backside shuv,Regular,1,3:12.0
+46,fakie backside shuv,Fakie,1,3:14.0
+47,nollie frontside shuv,Nollie,1,3:16.0
+48,switch backside shuv,Switch,1,3:19.0
+49,frontside shuv,Regular,1,3:21.0
+50,fakie frontside shuv,Fakie,1,3:23.0
+51,nollie backside shuv,Nollie,1,3:25.0
+52,switch frontside shuv,Switch,1,3:27.0
+53,backside bigspin flip,Regular,1,3:29.0
+54,fakie backside bigspin flip,Fakie,1,3:32.0
+55,nollie frontside bigspin flip,Nollie,1,3:34.0
+56,switch backside bigspin flip,Switch,1,3:37.0
+57,backside bigspin,Regular,1,3:41.0
+58,fakie backside bigspin,Fakie,1,3:43.0
+59,nollie frontside bigspin,Nollie,1,3:45.0
+60,switch backside bigspin,Switch,1,3:47.0
+61,frontside bigspin,Regular,1,3:50.0
+62,fakie frontside bigspin,Fakie,1,3:52.0
+63,nollie backside bigspin,Nollie,1,3:55.0
+64,switch frontside bigspin,Switch,1,3:58.0
+65,varial heelflip,Regular,1,4:00.0
+66,fakie varial heelflip,Fakie,1,4:02.0
+67,nollie varial heelflip,Nollie,1,4:04.0
+68,switch varial heelflip,Switch,1,4:07.0
+69,inward heelflip,Regular,1,4:09.0
+70,fakie inward heelflip,Fakie,1,4:12.0
+71,nollie inward heelflip,Nollie,1,4:14.0
+72,switch inward heelflip,Switch,1,4:17.0
+73,hardflip,Regular,1,4:19.0
+74,nollie hardflip,Nollie,1,4:21.0
+75,fakie hardflip,Fakie,1,4:24.0
+76,switch hardflip,Switch,1,4:26.0
+77,360 backside shuv,Regular,1,4:29.0
+78,fakie 360 backside shuv,Fakie,1,4:32.0
+79,nollie 360 frontside shuv,Nollie,1,4:34.0
+80,switch 360 backside shuv,Switch,1,4:36.0
+81,360 frontside shuv,Regular,1,4:39.0
+82,fakie 360 frontside shuv,Fakie,1,4:41.0
+83,nollie 360 backside shuv,Nollie,1,4:44.0
+84,switch 360 frontside shuv,Switch,1,4:46.0
+85,frontside 360,Regular,1,4:48.0
+86,backside 360,Regular,1,4:51.0
+87,fakie frontside 360,Fakie,1,4:53.0
+88,fakie backside 360,Fakie,1,4:56.0
+89,switch frontside 360,Switch,1,5:00.0
+90,nollie backside 360,Nollie,1,5:02.0
+91,nollie frontside 360,Nollie,1,5:05.0
+92,switch backside 360,Switch,1,5:07.0
+93,frontside bigspin heelflip,Regular,1,5:10.0
+94,fakie frontside bigspin heelflip,Fakie,1,5:13.0
+95,nollie backside bigspin heelflip,Nollie,1,5:15.0
+96,switch frontside bigspin heelflip,Switch,1,5:17.0
+97,lazer flip,Regular,1,5:20.0
+98,fakie lazer flip,Fakie,1,5:22.0
+99,nollie lazer flip,Nollie,1,5:24.0
+100,switch lazer flip,Switch,1,5:27.0
+101,backside biggerspin,Regular,2,0:18.0
+102,fakie backside biggerspin,Fakie,2,0:20.0
+103,540 backside shuv,Regular,2,0:22.0
+104,fakie 540 backside shuv,Fakie,2,0:24.0
+105,fakie 540 backside shuv 180,Fakie,2,0:25.0
+106,540 flip,Regular,2,0:29.0
+107,fakie 540 flip,Fakie,2,0:31.0
+108,fakie backside biggerspin flip,Fakie,2,0:35.0
+109,backside biggerspin flip,Regular,2,0:41.0
+110,fakie backside gazelle spin,Fakie,2,0:43.0
+111,backside gazelle flip,Regular,2,0:45.0
+112,fakie backside gazelle flip,Fakie,2,0:47.0
+113,fakie backside 360 shuv frontside body varial,Fakie,2,0:49.0
+114,360 inward heelflip,Regular,2,0:51.0
+115,backside 360 shuv frontside body varial,Regular,2,0:53.0
+116,pressure flip,Regular,2,0:55.0
+117,fakie pressure flip,Fakie,2,0:57.0
+118,switch pressure flip,Switch,2,0:59.0
+119,nollie pressure flip,Nollie,2,1:00.0
+120,forward flip,Regular,2,1:02.0
+121,fakie frontside impossible bigspin,Fakie,2,1:03.0
+122,double kickflip,Regular,2,1:05.0
+123,fakie double kickflip,Fakie,2,1:07.0
+124,switch double kickflip,Switch,2,1:08.0
+125,nollie double kickflip,Nollie,2,1:10.0
+126,double heelflip,Regular,2,1:12.0
+127,fakie double heelflip,Fakie,2,1:14.0
+128,switch double heelflip,Switch,2,1:16.0
+129,nollie double heelflip,Nollie,2,1:17.0
+130,switch frontside 360 half front foot impossible,Switch,2,1:20.0
+131,kickflip frontside body varial,Regular,2,1:25.0
+132,kickflip backside body varial,Regular,2,1:26.0
+133,fakie kickflip backside body varial,Fakie,2,1:28.0
+134,fakie kickflip frontside body varial,Fakie,2,1:29.0
+135,switch kickflip frontside body varial,Switch,2,1:31.0
+136,switch kickflip backside body varial,Switch,2,1:33.0
+137,nollie kickflip backside body varial,Nollie,2,1:35.0
+138,nollie kickflip frontside body varial,Nollie,2,1:37.0
+139,pressure heelflip,Regular,2,1:39.0
+140,pressure heelflip frontside body varial,Regular,2,1:40.0
+141,backside pressure heelflip,Regular,2,1:42.0
+142,pressure kickflip,Regular,2,1:44.0
+143,pressure double flip,Regular,2,1:46.0
+144,frontside impossible,Regular,2,1:47.0
+145,fakie forward flip,Fakie,2,1:52.0
+146,forward double flip,Regular,2,1:54.0
+147,fakie forward double flip,Fakie,2,1:55.0
+148,varial double flip,Regular,2,1:57.0
+149,varial triple flip,Regular,2,1:58.0
+150,fakie varial double flip,Fakie,2,2:01.0
+151,fakie varial triple flip,Fakie,2,2:03.0
+152,varial double heelflip,Regular,2,2:08.0
+153,fakie varial double heelflip,Fakie,2,2:10.0
+154,360 pressure flip,Regular,2,2:12.0
+155,backside bigspin pressure flip,Regular,2,2:14.0
+156,inward double heelflip,Regular,2,2:16.0
+157,hard double flip,Regular,2,2:18.0
+158,fakie hard double flip,Fakie,2,2:21.0
+159,impossible,Regular,2,2:23.0
+160,fakie impossible,Fakie,2,2:25.0
+161,switch impossible,Switch,2,2:27.0
+162,nollie impossible,Nollie,2,2:29.0
+163,backside half impossible bigspin,Regular,2,2:31.0
+164,feather flip,Regular,2,2:33.0
+165,fakie feather flip,Fakie,2,2:35.0
+166,switch feather flip,Switch,2,2:37.0
+167,nollie feather flip,Nollie,2,2:39.0
+168,feather flip frontside 180,Regular,2,2:43.0
+169,backside double kickflip,Regular,2,2:47.0
+170,fakie backside double kickflip,Fakie,2,2:49.0
+171,backside double heelflip,Regular,2,2:51.0
+172,fakie backside double heelflip,Fakie,2,2:54.0
+173,frontside double kickflip,Regular,2,2:59.0
+174,fakie frontside biggerspin,Fakie,2,3:01.0
+175,fakie frontside double kickflip,Fakie,2,3:04.0
+176,fakie frontside double heelflip,Fakie,2,3:06.0
+177,fakie frontside 360 heelflip,Fakie,2,3:08.0
+178,frontside double heelflip,Regular,2,3:14.0
+179,frontside 360 heelflip,Regular,2,3:18.0
+180,ollie crossfoot,Regular,2,3:21.0
+181,frontside impossible bigspin,Regular,2,3:24.0
+182,forward heelflip,Regular,2,3:27.0
+183,fakie forward heelflip,Fakie,2,3:32.0
+184,pressure hardflip,Regular,2,3:35.0
+185,360 pressure hardflip,Regular,2,3:37.0
+186,frontside bigspin pressure hardflip,Regular,2,3:41.0
+187,fakie pressure hardflip,Fakie,2,3:44.0
+188,backside gazelle spin,Regular,2,3:46.0
+189,switch inward double heelflip,Switch,2,3:51.0
+190,feather flip frontside shuv,Regular,2,3:53.0
+191,heelflip backside body varial,Regular,2,3:55.0
+192,heelflip frontside body varial,Regular,2,3:57.0
+193,fakie heelflip backside body varial,Fakie,2,3:59.0
+194,fakie heelflip frontside body varial,Fakie,2,4:01.0
+195,fakie 360 inward heelflip,Fakie,2,4:07.0
+196,nollie heelflip backside body varial,Nollie,2,4:12.0
+197,nollie heelflip frontside body varial,Nollie,2,4:15.0
+198,switch heelflip frontside body varial,Switch,2,4:16.0
+199,switch heelflip backside body varial,Switch,2,4:19.0
+200,varial half flip anti casper flip,Regular,2,4:21.0
+201,frontside gazelle spin,Regular,3,0:01.8
+202,fakie frontside gazelle spin,Fakie,3,0:04.5
+203,nollie frontside biggerspin,Nollie,3,0:07.0
+204,nollie frontside 540 shuv,Nollie,3,0:08.9
+205,nollie backside 360 shuv underflip,Nollie,3,0:11.4
+206,nollie backside biggerspin underflip,Nollie,3,0:16.6
+207,nollie backside 180 hospital heel,Nollie,3,0:21.3
+208,switch backside biggerspin,Switch,3,0:24.2
+209,switch pressure hardflip,Switch,3,0:26.7
+210,switch pressure frontside flip,Switch,3,0:28.5
+211,switch frontside shuv late front foot heelflip,Switch,3,0:30.6
+212,fakie ollie crossfoot,Fakie,3,0:36.4
+213,impossible crossfoot,Regular,3,0:39.1
+214,pressure flip anti casper flip,Regular,3,0:41.1
+215,frontside shuv late front foot heelflip,Regular,3,0:47.4
+216,switch hard double flip,Switch,3,1:02.6
+217,triple heelflip,Regular,3,1:09.3
+218,ollie frontside body varial,Regular,3,1:14.3
+219,ollie backside body varial,Regular,3,1:15.8
+220,fakie ollie backside body varial,Fakie,3,1:17.8
+221,fakie ollie frontside body varial,Fakie,3,1:19.5
+222,switch frontside bigspin flip,Switch,3,1:21.7
+223,hardflip backside 180,Regular,3,1:26.6
+224,fakie hardflip backside 180,Fakie,3,1:28.6
+225,hardflip late shuv,Regular,3,1:31.0
+226,fakie triple heelflip,Fakie,3,1:35.8
+227,switch late flip,Switch,3,1:38.3
+228,nollie late flip,Nollie,3,1:40.9
+229,varial half flip cancel flip,Regular,3,1:42.8
+230,fakie 360 pressure flip,Fakie,3,1:44.5
+231,fakie bigspin pressure flip,Fakie,3,1:46.8
+232,fakie pressure flip rewind,Fakie,3,1:49.1
+233,late hardflip,Regular,3,1:51.3
+234,fakie hardflip late shuv,Fakie,3,1:56.8
+235,frontside late flip,Regular,3,1:59.7
+236,front foot impossible,Regular,3,2:04.4
+237,fakie front foot impossible,Fakie,3,2:08.7
+238,fakie frontside 180 front foot impossible,Fakie,3,2:11.4
+239,switch front foot impossible,Switch,3,2:13.9
+240,nollie front foot impossible,Nollie,3,2:16.9
+241,nollie backside 180 front foot impossible,Nollie,3,2:21.0
+242,nollie backside 360 front foot impossible,Nollie,3,2:25.6
+243,pressure flip rewind,Regular,3,2:32.2
+244,pressure flip frontside body varial,Regular,3,2:34.0
+245,varial heelflip backside body varial,Regular,3,2:35.9
+246,backside shuv late flip,Regular,3,2:37.9
+247,frontside shuv late flip,Regular,3,2:40.1
+248,frontside bigspin late flip,Regular,3,2:42.6
+249,frontside bigspin late double flip,Regular,3,2:46.7
+250,casper flip,Regular,3,2:53.1
+251,fakie casper flip,Fakie,3,2:56.7
+252,switch casper flip,Switch,3,2:59.1
+253,nollie casper flip,Nollie,3,3:02.7
+254,360 casper flip,Regular,3,3:04.9
+255,casper flip bigspin,Regular,3,3:10.8
+256,late inward heelflip,Regular,3,3:13.3
+257,360 shuv underflip,Regular,3,3:17.2
+258,backside bigspin underflip,Regular,3,3:19.4
+259,360 shuv under double flip,Regular,3,3:21.4
+260,late flip,Regular,3,3:23.8
+261,fakie late flip,Fakie,3,3:25.8
+262,fakie frontside late flip,Fakie,3,3:28.1
+263,late heelflip,Regular,3,3:29.9
+264,nollie backside body varial,Nollie,3,3:32.2
+265,nollie frontside body varial,Nollie,3,3:34.3
+266,switch ollie frontside body varial,Switch,3,3:36.3
+267,switch ollie backside body varial,Switch,3,3:38.3
+268,backside shuv underflip,Regular,3,3:40.5
+269,fakie casper flip bigspin,Fakie,3,3:42.2
+270,switch bigspin double flip,Switch,3,3:47.5
+271,frontside shuv rewind,Regular,3,3:50.5
+272,switch backside shuv rewind,Switch,3,3:52.6
+273,backside shuv rewind,Regular,3,3:54.3
+274,switch frontside shuv rewind,Switch,3,3:55.9
+275,fakie backside late flip,Fakie,3,3:57.9
+276,backside late flip,Regular,3,4:00.0
+277,fakie backside late double flip,Fakie,3,4:03.6
+278,fakie double heelflip backside body varial,Fakie,3,4:09.4
+279,anti bigspin heelflip,Regular,3,4:11.4
+280,fakie anti bigspin heelflip,Fakie,3,4:13.9
+281,late 360 inward heelflip,Regular,3,4:18.1
+282,switch 360 double flip,Switch,3,4:23.6
+283,impossible body varial,Regular,3,4:26.0
+284,impossible rewind,Regular,3,4:29.7
+285,double kickflip backside body varial,Regular,3,4:34.0
+286,double heelflip backside body varial,Regular,3,4:37.9
+287,fakie double kickflip backside body varial,Fakie,3,4:39.8
+288,fakie backside 360 kickflip,Fakie,3,4:42.1
+289,backside 360 kickflip,Regular,3,4:44.3
+290,360 flip body varial,Regular,3,4:49.4
+291,360 flip rewind,Regular,3,4:51.1
+292,switch 360 flip rewind,Switch,3,4:53.3
+293,360 double flip,Regular,3,4:55.3
+294,360 double flip body varial,Regular,3,4:57.2
+295,fakie 360 double flip,Fakie,3,4:59.3
+296,bigspin double flip,Regular,3,5:01.2
+297,fakie bigspin double flip,Fakie,3,5:05.0
+298,fakie bigspin triple flip,Fakie,3,5:07.4
+299,triple kickflip,Regular,3,5:13.0
+300,switch frontside 180 front foot impossible,Switch,3,5:15.1
+301,switch backside 360 kickflip,Switch,4,0:01.6
+302,nollie 360 inward heelflip,Nollie,4,0:05.1
+303,nollie frontside 360 kickflip,Nollie,4,0:07.7
+304,switch backside shuv late shuv,Switch,4,0:13.1
+305,switch backside shuv late under varial heel,Switch,4,0:15.8
+306,switch backside double heelflip,Switch,4,0:21.8
+307,nollie inward double heelflip,Nollie,4,0:24.3
+308,switch front foot feather flip,Switch,4,0:29.7
+309,switch varial double heelflip,Switch,4,0:36.0
+310,switch backside shuv late flip,Switch,4,0:39.0
+311,switch backside bigspin late flip,Switch,4,0:41.7
+312,nollie backside shuv late flip,Nollie,4,0:44.8
+313,switch frontside shuv late flip,Switch,4,0:47.2
+314,switch frontside shuv late double flip,Switch,4,0:49.7
+315,fakie backside shuv late flip,Fakie,4,0:55.9
+316,pressure frontside flip,Regular,4,0:58.0
+317,half impossible,Regular,4,1:00.2
+318,half impossible late flip,Regular,4,1:02.4
+319,bigspin half impossible late flip,Regular,4,1:04.4
+320,fakie frontside bigspin late flip,Fakie,4,1:12.3
+321,impossible late flip,Regular,4,1:14.5
+322,impossible late double flip,Regular,4,1:21.0
+323,fakie frontside shuv late flip,Fakie,4,1:30.6
+324,switch hardflip rewind,Switch,4,1:34.9
+325,nollie hardflip rewind,Nollie,4,1:37.6
+326,fakie lazer double flip,Fakie,4,1:42.1
+327,lazer double flip,Regular,4,1:44.5
+328,cancel flip,Regular,4,1:49.3
+329,cancel heel,Regular,4,1:55.5
+330,backside cancel heel,Regular,4,1:59.4
+331,inward heelflip rewind,Regular,4,2:06.6
+332,fakie inward heelflip rewind,Fakie,4,2:13.4
+333,varial heelflip rewind,Regular,4,2:20.3
+334,fakie bigspin inward heel,Fakie,4,2:23.2
+335,bigspin inward heel,Regular,4,2:27.6
+336,fakie pressure flip body varial,Fakie,4,2:29.8
+337,360 pressure flip body varial,Regular,4,2:31.9
+338,540 pressure flip,Regular,4,2:34.1
+339,pressure biggerspin flip,Regular,4,2:38.8
+340,switch backside 540 shuv,Switch,4,2:43.3
+341,frontside bigspin double heel,Regular,4,2:45.6
+342,frontside bigspin flip,Regular,4,2:48.2
+343,360 hardflip,Regular,4,2:55.6
+344,nollie frontside shuv late flip,Nollie,4,3:00.8
+345,late backside shuv,Regular,4,3:03.6
+346,fakie late backside shuv,Fakie,4,3:07.4
+347,late backside heel,Regular,4,3:09.5
+348,fakie pressure backside heel,Fakie,4,3:12.2
+349,half heel anti casper flip,Regular,4,3:14.4
+350,fakie backside cancel heel,Fakie,4,3:18.7
+351,fakie half heel anti casper flip,Fakie,4,3:23.0
+352,fakie frontside bigspin double heel,Fakie,4,3:25.7
+353,fakie frontside gazelle heel,Fakie,4,3:30.5
+354,fakie frontside biggerspin heel,Fakie,4,3:37.7
+355,backside feather flip,Regular,4,3:40.5
+356,nollie pressure hardflip,Nollie,4,3:45.2
+357,switch inward heel rewind,Switch,4,3:47.4
+358,switch 360 inward heel,Switch,4,3:52.3
+359,switch bigspin inward heel,Switch,4,3:57.0
+360,fakie backside 360 heelflip,Fakie,4,3:59.9
+361,fakie backside 360 double kickflip,Fakie,4,4:02.4
+362,kickflip late backside shuv,Regular,4,4:08.4
+363,frontside anti bigspin,Regular,4,4:13.4
+364,fakie frontside anti bigspin,Fakie,4,4:15.8
+365,fakie cancel heel,Fakie,4,4:18.1
+366,switch cancel heel,Switch,4,4:20.3
+367,late double flip,Regular,4,4:22.5
+368,nollie inward heel rewind,Nollie,4,4:27.4
+369,late frontside shuv,Regular,4,4:31.9
+370,switch late frontside shuv,Switch,4,4:35.9
+371,nollie 360 double flip,Nollie,4,4:40.3
+372,fakie frontside shuv rewind,Fakie,4,4:43.5
+373,frontside shuv body varial,Regular,4,4:45.6
+374,fakie frontside shuv body varial,Fakie,4,4:47.6
+375,frontside shuv crossfoot,Regular,4,4:49.8
+376,backside shuv crossfoot,Regular,4,4:51.9
+377,heelflip crossfoot,Regular,4,4:53.7
+378,kickflip crossfoot,Regular,4,4:56.6
+379,crossfoot heelflip,Regular,4,4:58.8
+380,backside shuv body varial,Regular,4,5:01.5
+381,fakie backside shuv body varial,Fakie,4,5:05.2
+382,fakie varial flip body varial,Fakie,4,5:07.4
+383,fakie varial heelflip body varial,Fakie,4,5:09.6
+384,impossible late flip body varial,Regular,4,5:11.7
+385,varial flip body varial,Regular,4,5:14.0
+386,360 forward flip,Regular,4,5:16.2
+387,fakie impossible late flip,Fakie,4,5:27.9
+388,fakie biggerspin double flip,Fakie,4,5:30.4
+389,360 triple flip,Regular,4,5:34.9
+390,switch 540 front foot impossible,Switch,4,5:42.0
+391,late varial flip,Regular,4,5:46.6
+392,late backside bigspin flip,Regular,4,5:50.5
+393,fakie late varial flip,Fakie,4,5:53.1
+394,fakie backside cancel flip,Fakie,4,5:55.0
+395,fakie cancel flip,Fakie,4,5:59.2
+396,fakie late frontside shuv,Fakie,4,6:01.7
+397,fakie late inward heelflip,Fakie,4,6:03.9
+398,late heelflip frontside body varial,Regular,4,6:08.5
+399,late impossible,Regular,4,6:13.0
+400,switch frontside 360 heelflip,Switch,4,6:21.1
+401,switch triple kickflip,Switch,5,0:01.6
+402,switch hospital heel,Switch,5,0:04.4
+403,switch bigspin hospital heel,Switch,5,0:06.9
+404,nollie forward flip,Nollie,5,0:11.2
+405,switch forward flip,Switch,5,0:13.7
+406,switch pressure 360 hardflip,Switch,5,0:20.1
+407,frontside anti bigspin flip,Regular,5,0:22.2
+408,fakie frontside anti bigspin flip,Fakie,5,0:27.9
+409,fakie varial half flip cancel flip,Fakie,5,0:30.5
+410,nollie frontside gazelle spin,Nollie,5,0:37.9
+411,nollie biggerspin flip,Nollie,5,0:40.5
+412,nollie 540 flip,Nollie,5,0:46.7
+413,switch frontside 360 kickflip,Switch,5,0:49.0
+414,pressure hardflip body varial,Regular,5,0:54.2
+415,frontside half impossible,Regular,5,0:56.8
+416,frontside feather flip,Regular,5,1:01.7
+417,switch backside flip underflip,Switch,5,1:05.2
+418,pressure flip underflip,Regular,5,1:08.2
+419,switch biggerspin flip,Switch,5,1:17.3
+420,semi flip,Regular,5,1:23.5
+421,switch pressure flip rewind,Switch,5,1:28.1
+422,switch pressure flip body varial,Switch,5,1:30.9
+423,switch pressure flip late flip,Switch,5,1:33.2
+424,pop shuv late varial flip,Regular,5,1:39.0
+425,impossible late varial flip,Regular,5,1:46.2
+426,backside anti bigspin,Regular,5,1:56.7
+427,backside anti bigspin flip,Regular,5,1:59.1
+428,late flip backside body varial,Regular,5,2:06.3
+429,nollie late flip frontside body varial,Nollie,5,2:11.0
+430,pressure flip crossfoot,Regular,5,2:13.3
+431,backside 180 impossible late flip,Regular,5,2:16.2
+432,kickflip late heelflip,Regular,5,2:25.3
+433,fakie backside anti bigspin,Fakie,5,2:38.3
+434,fakie backside 180 impossible,Fakie,5,2:43.4
+435,switch varial double flip,Switch,5,2:46.6
+436,fakie varial half flip anti casper flip,Fakie,5,2:49.2
+437,backside shuv under double flip,Regular,5,2:51.5
+438,backside shuv underflip body varial,Regular,5,2:53.7
+439,backside shuv under double flip body varial,Regular,5,2:56.3
+440,360 shuv underflip body varial,Regular,5,2:58.9
+441,casper flip body varial,Regular,5,3:01.0
+442,360 shuv under triple flip,Regular,5,3:04.1
+443,nollie hospital heel,Nollie,5,3:12.0
+444,nollie triple kickflip,Nollie,5,3:16.2
+445,switch pressure backside heel,Switch,5,3:19.6
+446,switch pressure heel body varial,Switch,5,3:27.1
+447,switch pressure heel,Switch,5,3:29.3
+448,double cancel flip,Regular,5,3:32.0
+449,fakie triple kickflip,Fakie,5,3:40.1
+450,switch frontside shuv body varial,Switch,5,3:48.1
+451,nollie backside shuv body varial,Nollie,5,3:50.2
+452,pressure half flip cancel flip,Regular,5,3:51.8
+453,late hard double flip,Regular,5,3:54.7
+454,frontside 360 double kickflip,Regular,5,4:02.0
+455,quadruple kickflip,Regular,5,4:05.3
+456,frontside triple kickflip,Regular,5,4:17.0
+457,monster flip,Regular,5,4:22.1
+458,fakie monster flip,Fakie,5,4:29.3
+459,fakie frontside bigspin flip,Fakie,5,4:36.9
+460,fakie hardflip late flip,Fakie,5,4:42.0
+461,switch late hardflip,Switch,5,4:47.7
+462,nollie late backside shuv,Nollie,5,4:55.2
+463,nollie late hardflip,Nollie,5,4:57.3
+464,frontside flip late flip,Regular,5,4:59.7
+465,bigspin dolphin flip,Regular,5,5:07.4
+466,fakie 360 forward flip,Fakie,5,5:12.1
+467,nollie pressure hardflip body varial,Nollie,5,5:20.0
+468,switch front foot impossible late hardflip,Switch,5,5:22.7
+469,fakie 360 flip body varial,Fakie,5,5:31.7
+470,varial half heel cancel flip,Regular,5,5:34.9
+471,frontside 360 pressure kickflip,Regular,5,5:39.9
+472,pressure hard double flip,Regular,5,5:47.5
+473,nollie backside shuv rewind,Nollie,5,5:49.9
+474,nollie backside bigspin late flip,Nollie,5,5:54.1
+475,nollie backside gazelle spin,Nollie,5,5:58.5
+476,nollie backside 360 heelflip,Nollie,5,6:01.2
+477,nollie late heelflip,Nollie,5,6:03.6
+478,backside 540 shuv body varial,Regular,5,6:06.4
+479,nollie frontside flip underflip,Nollie,5,6:08.7
+480,frontside shuv late hardflip,Regular,5,6:14.7
+481,backside shuv late double flip,Regular,5,6:17.2
+482,fakie late heelflip,Fakie,5,6:20.1
+483,fakie frontside late heelflip,Fakie,5,6:22.3
+484,fakie late double heelflip,Fakie,5,6:25.0
+485,fakie backside late heelflip,Fakie,5,6:32.8
+486,double kickflip frontside body varial,Regular,5,6:35.2
+487,triple kickflip frontside body varial,Regular,5,6:37.2
+488,fakie double kickflip frontside body varial,Fakie,5,6:39.9
+489,backside triple kickflip,Regular,5,6:42.2
+490,backside bigspin triple flip,Regular,5,6:44.7
+491,switch backside shuv body varial,Switch,5,6:51.8
+492,nollie frontside shuv body varial,Nollie,5,6:54.2
+493,nollie frontside shuv rewind,Nollie,5,6:56.1
+494,fakie backside shuv rewind,Fakie,5,6:58.3
+495,fakie pressure heelflip body varial,Fakie,5,7:02.9
+496,pressure heelflip 360 body varial,Regular,5,7:05.2
+497,fakie 360 shuv underflip,Fakie,5,7:08.0
+498,fakie 360 shuv under double flip,Fakie,5,7:10.1
+499,fakie bigspin underflip,Fakie,5,7:12.2
+500,switch 540 front foot impossible frontside 180,Switch,5,7:14.7
+501,360 semi flip,Regular,6,0:01.6
+502,switch late frontside flip,Switch,6,0:08.8
+503,bigspin semi flip,Regular,6,0:11.5
+504,bigspin semi double flip,Regular,6,0:16.4
+505,frontside biggerspin heel,Regular,6,0:22.3
+506,backside shuv late flip body varial,Regular,6,0:27.7
+507,switch frontside double flip,Switch,6,0:31.7
+508,pressure flip late flip,Regular,6,0:34.4
+509,pressure kickflip frontside body varial,Regular,6,0:36.4
+510,pressure frontside anti bigspin flip,Regular,6,0:40.6
+511,pressure hardflip rewind,Regular,6,0:45.6
+512,frontside 360 shuv body varial,Regular,6,0:48.2
+513,switch frontside bigspin late flip,Switch,6,0:50.8
+514,fakie backside 360 biggerspin,Fakie,6,0:56.2
+515,backside 360 biggerspin,Regular,6,1:01.7
+516,backside 720 shuv,Regular,6,1:06.9
+517,nollie frontside double flip,Nollie,6,1:11.5
+518,nollie varial double flip,Nollie,6,1:13.9
+519,nollie varial flip body varial,Nollie,6,1:18.3
+520,switch varial flip body varial,Switch,6,1:20.7
+521,switch 360 flip body varial,Switch,6,1:24.4
+522,fakie backside triple flip,Fakie,6,1:29.0
+523,old school inward heel,Regular,6,1:32.6
+524,switch double heel body varial,Switch,6,1:39.2
+525,switch late heelflip,Switch,6,1:41.9
+526,switch shuv late varial flip,Switch,6,1:46.8
+527,kickback,Regular,6,1:52.5
+528,frontside kickback,Regular,6,1:57.2
+529,fakie kickback shuv,Fakie,6,1:59.6
+530,underflip,Regular,6,2:01.6
+531,under varial heel,Regular,6,2:10.7
+532,360 triple flip body varial,Regular,6,2:18.3
+533,cancel heel body varial,Regular,6,2:24.2
+534,pressure double kickflip,Regular,6,2:28.7
+535,switch pressure kickflip body varial,Switch,6,2:33.3
+536,nollie pressure backside flip,Nollie,6,2:37.6
+537,late frontside 360 shuv,Regular,6,2:43.6
+538,late frontside heel,Regular,6,2:52.7
+539,late double heel,Regular,6,2:59.1
+540,fakie flip late heel,Fakie,6,3:08.5
+541,fakie pressure frontside flip,Fakie,6,3:12.2
+542,frontside gazelle heel,Regular,6,3:15.2
+543,fakie biggerspin underflip,Fakie,6,3:21.3
+544,fakie 360 shuv underflip body varial,Fakie,6,3:25.6
+545,360 shuv underflip 360 body varial,Regular,6,3:30.4
+546,fakie late varial heel,Fakie,6,3:33.1
+547,fakie kickback,Fakie,6,3:38.0
+548,pressure varial heel,Regular,6,3:40.7
+549,backside cancel flip,Regular,6,3:43.1
+550,nollie cancel heel,Nollie,6,3:48.0
+551,varial flip rewind,Regular,6,3:50.3
+552,varial flip crossfoot,Regular,6,3:53.0
+553,varial flip late flip,Regular,6,3:57.9
+554,nollie flip underflip,Nollie,6,4:03.3
+555,switch pressure kickflip,Switch,6,4:09.2
+556,fakie cancel heel body varial,Fakie,6,4:12.0
+557,fakie frontside cancel heel,Fakie,6,4:14.6
+558,backside 180 impossible,Regular,6,4:22.2
+559,fakie varial flip rewind,Fakie,6,4:28.6
+560,nollie frontside anti bigspin,Nollie,6,4:31.5
+561,pressure flip under varial heel,Regular,6,4:33.8
+562,hospital heel,Regular,6,4:39.4
+563,switch frontside anti bigspin,Switch,6,4:43.7
+564,switch frontside anti bigspin flip,Switch,6,4:50.6
+565,nollie backside anti bigspin,Nollie,6,4:56.2
+566,nollie backside anti bigspin flip,Nollie,6,5:00.7
+567,nollie double heel body varial,Nollie,6,5:05.0
+568,nollie late backside flip,Nollie,6,5:07.6
+569,nollie crossfoot,Nollie,6,5:11.8
+570,nollie frontside shuv crossfoot,Nollie,6,5:14.1
+571,nollie backside shuv crossfoot,Nollie,6,5:16.1
+572,switch ollie crossfoot,Switch,6,5:18.8
+573,switch front foot impossible crossfoot,Switch,6,5:21.3
+574,switch front foot impossible late flip,Switch,6,5:24.3
+575,switch varial flip rewind,Switch,6,5:30.5
+576,switch double flip frontside body varial,Switch,6,5:37.1
+577,fakie backside biggerspin heel,Fakie,6,5:39.2
+578,inward heel body varial,Regular,6,5:45.6
+579,nollie pressure frontside heel,Nollie,6,5:47.8
+580,varial double flip body varial,Regular,6,5:50.7
+581,fakie varial double flip body varial,Fakie,6,5:53.2
+582,fakie bigspin forward flip,Fakie,6,5:56.1
+583,heelflip late flip,Regular,6,6:02.2
+584,hard half flip cancel flip,Regular,6,6:07.6
+585,varial double heel body varial,Regular,6,6:10.3
+586,nollie heelflip late shuv,Nollie,6,6:15.3
+587,pressure frontside double flip,Regular,6,6:20.4
+588,backside 360 shuv rewind,Regular,6,6:25.6
+589,fakie varial heel rewind,Fakie,6,6:29.9
+590,360 inward double heel,Regular,6,6:32.5
+591,casper flip rewind,Regular,6,6:43.3
+592,fakie late flip backside body varial,Fakie,6,6:46.5
+593,switch pressure hardflip body varial,Switch,6,6:54.1
+594,switch pressure hard half flip cancel flip,Switch,6,6:56.6
+595,switch pressure frontside bigflip,Switch,6,6:59.1
+596,switch backside double flip,Switch,6,7:03.5
+597,double heelflip frontside body varial,Regular,6,7:08.7
+598,fakie double heelflip frontside body varial,Fakie,6,7:11.5
+599,360 flip late flip,Regular,6,7:13.8
+600,fakie heelflip anti casper flip,Fakie,6,7:21.3
+601,kickflip casper flip,Regular,7,0:01.6
+602,fakie backside bigspin late flip,Fakie,7,0:11.0
+603,pressure kickflip backside body varial,Regular,7,0:13.6
+604,pressure backside kickflip,Regular,7,0:16.0
+605,pressure varial kickflip,Regular,7,0:19.8
+606,pressure varial kickflip rewind,Regular,7,0:23.4
+607,fakie pressure varial kickflip,Fakie,7,0:26.9
+608,triple kickflip backside body varial,Regular,7,0:29.3
+609,nollie backside double heelflip,Nollie,7,0:31.9
+610,fakie late hardflip,Fakie,7,0:37.0
+611,backside shuv late shuv,Regular,7,0:39.8
+612,fakie backside shuv late shuv,Fakie,7,0:42.7
+613,fakie backside shuv under varial heel,Fakie,7,0:45.2
+614,fakie backside shuv under bigspin heel,Fakie,7,0:52.0
+615,switch double heel frontside body varial,Switch,7,0:54.3
+616,backside shuv under varial heel,Regular,7,0:59.5
+617,nollie double heel backside body varial,Nollie,7,1:04.4
+618,late backside shuv body varial,Regular,7,1:12.1
+619,backside bigspin under double flip,Regular,7,1:16.7
+620,fakie 540 shuv underflip,Fakie,7,1:19.0
+621,fakie 360 shuv under double flip body varial,Fakie,7,1:21.3
+622,360 shuv under double flip body varial,Regular,7,1:23.8
+623,360 shuv underflip rewind,Regular,7,1:27.7
+624,fakie frontside flip late flip,Fakie,7,1:29.7
+625,switch backside gazelle spin,Switch,7,1:34.8
+626,cancel flip body varial,Regular,7,1:37.4
+627,fakie cancel flip body varial,Fakie,7,1:39.7
+628,frontside cancel flip,Regular,7,1:42.1
+629,fakie frontside cancel flip,Fakie,7,1:46.4
+630,switch front foot impossible late flip frontside 180,Switch,7,1:49.3
+631,fakie 360 flip rewind,Fakie,7,1:52.2
+632,cancel heel frontside body varial,Regular,7,1:55.4
+633,switch cancel flip,Switch,7,1:57.9
+634,360 shuv underflip crossfoot,Regular,7,2:02.7
+635,switch pressure half flip cancel flip,Switch,7,2:07.1
+636,switch 360 pressure flip,Switch,7,2:09.4
+637,nollie frontside bigspin double flip,Nollie,7,2:16.2
+638,switch forward heel,Switch,7,2:19.0
+639,pressure backside 360 heel,Regular,7,2:21.5
+640,pressure backside cancel heel,Regular,7,2:26.1
+641,frontside anti bigspin heel,Regular,7,2:28.7
+642,fakie frontside anti bigspin heel,Fakie,7,2:36.5
+643,fakie impossible late flip body varial,Fakie,7,2:41.5
+644,hardflip late heel,Regular,7,2:44.5
+645,forward flip body varial,Regular,7,2:52.2
+646,forward double flip body varial,Regular,7,2:58.9
+647,forward half flip cancel flip,Regular,7,3:09.1
+648,forward flip crossfoot,Regular,7,3:19.1
+649,forward double flip crossfoot,Regular,7,3:25.7
+650,fakie pressure hardflip body varial,Fakie,7,3:28.3
+651,fakie 360 casper flip,Fakie,7,3:30.8
+652,late frontside bigspin,Regular,7,3:36.2
+653,kickflip late frontside shuv,Regular,7,3:43.7
+654,nollie frontside anti bigspin heel,Nollie,7,3:52.0
+655,nollie 540 front foot impossible,Nollie,7,3:59.4
+656,nollie pressure frontside bigspin flip,Nollie,7,4:02.2
+657,nollie pressure flip body varial,Nollie,7,4:04.8
+658,nollie pressure half flip cancel flip,Nollie,7,4:09.7
+659,late flip frontside body varial,Regular,7,4:16.6
+660,nollie backside bigspin late heel,Nollie,7,4:22.8
+661,fakie 360 pressure flip body varial,Fakie,7,4:30.3
+662,fakie pressure flip late flip,Fakie,7,4:33.2
+663,varial heelflip crossfoot,Regular,7,4:38.5
+664,fakie pressure hardflip rewind,Fakie,7,4:40.8
+665,fakie pressure frontside bigflip,Fakie,7,4:46.2
+666,nollie cancel flip,Nollie,7,4:54.1
+667,fakie pressure biggerspin flip,Fakie,7,5:00.8
+668,fakie 540 pressure flip,Fakie,7,5:03.6
+669,frontside shuv late shuv,Regular,7,5:06.2
+670,fakie cancel heel frontside body varial,Fakie,7,5:10.5
+671,nollie front foot impossible late flip backside 180,Nollie,7,5:16.0
+672,frontside biggerspin,Regular,7,5:23.7
+673,backside 360 double kickflip,Regular,7,5:28.4
+674,360 double flip rewind,Regular,7,5:36.9
+675,double cancel heel,Regular,7,5:41.5
+676,nollie pressure backside bigflip,Nollie,7,5:46.8
+677,nollie varial heel body varial,Nollie,7,5:53.4
+678,switch varial heel body varial,Switch,7,5:55.8
+679,fakie 360 flip late flip,Fakie,7,5:58.0
+680,switch varial heelflip rewind,Switch,7,6:00.6
+681,nollie double kickflip frontside body varial,Nollie,7,6:05.6
+682,nollie frontside anti bigspin flip,Nollie,7,6:08.8
+683,frontside shuv late varial heel,Regular,7,6:14.4
+684,fakie frontside shuv late varial heel,Fakie,7,6:18.7
+685,fakie frontside bigspin late heel,Fakie,7,6:28.2
+686,nollie 360 flip body varial,Nollie,7,6:34.1
+687,switch late flip backside body varial,Switch,7,6:36.4
+688,fakie varial double heel body varial,Fakie,7,6:41.4
+689,switch double flip backside body varial,Switch,7,6:46.1
+690,fakie late heel frontside body varial,Fakie,7,6:50.9
+691,late backside inward heel,Regular,7,6:53.2
+692,backside 540 shuv rewind,Regular,7,6:59.3
+693,fakie backside shuv underflip,Fakie,7,7:07.6
+694,fakie backside shuv underflip body varial,Fakie,7,7:11.8
+695,switch pressure hardflip rewind,Switch,7,7:14.5
+696,nollie pressure hardflip rewind,Nollie,7,7:19.7
+697,backfoot front impossible,Regular,7,7:22.0
+698,switch frontside 360 shuv body varial,Switch,7,7:29.2
+699,pressure flip late shuv,Regular,7,7:41.5
+700,switch front foot impossible frontside 360,Switch,7,7:46.7
+701,hard triple flip,Regular,8,0:01.6
+702,switch impossible late flip,Switch,8,0:08.8
+703,fakie inward double heel,Fakie,8,0:11.2
+704,late heel backside body varial,Regular,8,0:13.7
+705,feather flip hardflip,Regular,8,0:16.4
+706,nollie hospital flip bigspin,Nollie,8,0:19.2
+707,fakie backside shuv late varial flip,Fakie,8,0:23.4
+708,nollie frontside shuv late varial flip,Nollie,8,0:25.7
+709,nollie front foot impossible late flip,Nollie,8,0:27.8
+710,fakie late flip frontside body varial,Fakie,8,0:30.6
+711,360 quadruple flip,Regular,8,0:33.2
+712,nollie late frontside shuv,Nollie,8,0:40.8
+713,nollie late inward heel,Nollie,8,0:49.0
+714,switch late inward heel,Switch,8,0:54.1
+715,fakie late frontside 360 shuv,Fakie,8,0:56.9
+716,fakie frontside shuv late shuv,Fakie,8,1:01.5
+717,360 pressure flip rewind,Regular,8,1:05.8
+718,360 pressure half flip anti casper flip,Regular,8,1:08.4
+719,late frontside 540 shuv,Regular,8,1:18.0
+720,fakie backside anti bigspin flip,Fakie,8,1:27.6
+721,impossible late flip rewind,Regular,8,1:34.3
+722,nollie front foot impossible body varial,Nollie,8,1:37.2
+723,nollie backside biggerspin,Nollie,8,1:42.3
+724,fakie pressure double flip,Fakie,8,1:47.2
+725,nollie lazer flip body varial,Nollie,8,1:50.0
+726,fakie late backside bigspin heel,Fakie,8,1:55.2
+727,nollie pressure flip rewind,Nollie,8,1:59.9
+728,nollie backside double flip,Nollie,8,2:02.9
+729,switch inward heel body varial,Switch,8,2:09.4
+730,nollie frontside bigspin heel,Nollie,8,2:12.1
+731,late backside 360 shuv,Regular,8,2:17.0
+732,late backside bigspin,Regular,8,2:22.8
+733,fakie bigspin under double flip,Fakie,8,2:29.1
+734,half impossible body varial,Regular,8,2:31.6
+735,half impossible late flip body varial,Regular,8,2:35.8
+736,switch hospital flip bigspin,Switch,8,2:39.5
+737,hardflip body varial,Regular,8,2:43.8
+738,switch varial double flip body varial,Switch,8,2:46.4
+739,360 flip late double flip,Regular,8,2:48.4
+740,540 double flip,Regular,8,2:53.5
+741,double kickback,Regular,8,3:02.1
+742,frontside double kickback,Regular,8,3:06.3
+743,triple heelflip backside body varial,Regular,8,3:08.8
+744,fakie kickflip casper flip,Fakie,8,3:11.3
+745,pressure double flip rewind,Regular,8,3:16.0
+746,pressure double flip body varial,Regular,8,3:21.3
+747,nollie backside flip late flip,Nollie,8,3:27.0
+748,pressure flip late heel,Regular,8,3:33.5
+749,front foot impossible frontside 180,Regular,8,3:37.8
+750,hardflip late flip,Regular,8,3:42.5
+751,nollie kickflip late frontside shuv,Nollie,8,3:46.7
+752,nollie frontside double heelflip,Nollie,8,3:51.5
+753,nollie triple heelflip,Nollie,8,3:57.1
+754,fakie 360 triple flip,Fakie,8,3:59.8
+755,switch late backside flip,Switch,8,4:02.4
+756,switch late backside shuv,Switch,8,4:06.2
+757,fakie pressure hard double flip,Fakie,8,4:09.7
+758,nollie pressure flip late flip,Nollie,8,4:14.2
+759,frontside cancel heel,Regular,8,4:18.1
+760,fakie pressure half flip cancel flip,Fakie,8,4:20.2
+761,switch backside anti bigspin,Switch,8,4:22.0
+762,nollie double kickflip backside body varial,Nollie,8,4:24.6
+763,pressure double kickflip backside body varial,Regular,8,4:26.7
+764,heelflip anti casper flip,Regular,8,4:28.7
+765,backside bigspin late flip,Regular,8,4:31.0
+766,switch backside 360 shuv body varial,Switch,8,4:34.5
+767,varial flip anti casper flip,Regular,8,4:36.8
+768,varial triple flip body varial,Regular,8,4:42.4
+769,switch backside anti bigspin heel,Switch,8,4:45.9
+770,switch backside cancel heel,Switch,8,4:49.8
+771,fakie pressure 360 hardflip,Fakie,8,4:54.0
+772,fakie pressure frontside biggerspin flip,Fakie,8,4:57.8
+773,nollie frontside 360 heel,Nollie,8,5:00.4
+774,pressure hard half flip cancel flip,Regular,8,5:05.0
+775,fakie pressure hard half flip cancel flip,Fakie,8,5:07.1
+776,half impossible rewind,Regular,8,5:11.0
+777,fakie pressure flip late shuv,Fakie,8,5:12.6
+778,switch pressure backside bigspin flip,Switch,8,5:14.9
+779,fakie late backside bigspin,Fakie,8,5:17.0
+780,fakie hospital heel,Fakie,8,5:22.6
+781,fakie half impossible,Fakie,8,5:24.5
+782,fakie 360 double flip body varial,Fakie,8,5:26.7
+783,fakie 540 double flip,Fakie,8,5:28.8
+784,nollie varial double heel,Nollie,8,5:32.9
+785,late frontside shuv body varial,Regular,8,5:35.4
+786,backside 360 half impossible,Regular,8,5:39.0
+787,fakie late backside bigflip,Fakie,8,5:44.0
+788,frontside 360 kickflip,Regular,8,5:46.4
+789,nollie backside 360 kickflip,Nollie,8,5:48.1
+790,nollie hard double flip,Nollie,8,5:50.0
+791,fakie late frontside bigspin,Fakie,8,5:52.2
+792,nollie frontside shuv under varial heel,Nollie,8,5:54.4
+793,nollie frontside shuv late shuv,Nollie,8,6:00.8
+794,switch frontside bigspin late heel,Switch,8,6:03.0
+795,under lazer flip,Regular,8,6:08.1
+796,frontside 360 shuv rewind,Regular,8,6:11.9
+797,fakie backside heelflip late flip,Fakie,8,6:13.8
+798,backside heelflip late flip,Regular,8,6:18.5
+799,nollie pressure 360 hardflip,Nollie,8,6:24.1
+800,fakie impossible late varial flip,Fakie,8,6:28.0
