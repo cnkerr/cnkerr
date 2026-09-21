@@ -40,7 +40,7 @@ button:focus-visible,.trickname:focus-visible,.cell:focus-visible,summary:focus-
 <div class="shell"><div class="chrome">
   <div class="topline"><div class="site"><a href="/" target="_top">CNKERR</a> / <a href="/blog" target="_top">BLOG</a></div><button class="infoBtn" id="infoBtn" type="button" aria-label="About this compendium" title="About this compendium">i</button></div>
   <main class="paper">
-    <div class="heroRow"><div class="heroText"><div class="titleKicker">A COMPENDIUM OF</div><h1 class="title">FLATGROUND TRICKS</h1><div class="subtitle">(as performed by Jamie Griffin)</div></div><div class="heroViz"><div class="overviewMini" id="overview" aria-label="800-trick stance overview"></div></div></div>
+    <div class="heroRow"><div class="heroText"><div class="titleKicker">A COMPENDIUM OF</div><h1 class="title">FLATGROUND TRICKS</h1><div class="subtitle">(as performed by Jamie Griffin)</div></div><div class="heroViz"><div class="overviewMini" id="overview" role="grid" aria-label="800-trick stance overview"></div></div></div>
     <div class="rule"></div>
     <div class="stickyHead">
       <div class="controls">
@@ -218,7 +218,7 @@ function render(syncURL=true){
   for(let i=0;i<overviewCells.length;i++){const c=overviewCells[i],d=DATA[i];c.classList.toggle("filtered",!matched[d.num]);c.classList.toggle("selected",state.selected===d.num)}
   updateModalNav();if(syncURL)writeUrlState();
 }
-function renderOverview(){$("#overview").innerHTML=DATA.map(d=>`<button class="cell" data-num="${d.num}" title="#${pad(d.num)} ${esc(d.name)}" style="background:${stanceColors[d.stance]}" type="button" aria-label="#${pad(d.num)} ${esc(d.name)}"></button>`).join("");overviewCells=$$("#overview .cell")}
+let overviewFocusIndex=0;function renderOverview(){$("#overview").innerHTML=DATA.map((d,i)=>`<button class="cell" data-num="${d.num}" title="#${pad(d.num)} ${esc(d.name)}" style="background:${stanceColors[d.stance]}" type="button" role="gridcell" tabindex="${i===overviewFocusIndex?0:-1}" aria-label="#${pad(d.num)} ${esc(d.name)}, ${esc(d.stance)} stance"></button>`).join("");overviewCells=$("#overview .cell")}function setOverviewFocus(index,focus=false){index=Math.max(0,Math.min(DATA.length-1,index));if(overviewCells[overviewFocusIndex])overviewCells[overviewFocusIndex].tabIndex=-1;overviewFocusIndex=index;const cell=overviewCells[index];if(cell){cell.tabIndex=0;if(focus)cell.focus()}}
 function toggleStance(st){if(st==="All")state.stances.clear();else state.stances.has(st)?state.stances.delete(st):state.stances.add(st);syncStanceUI();render()}
 $(".controls").addEventListener("click",e=>{const b=e.target.closest(".stanceBtn");if(b)toggleStance(b.dataset.stance)});
 $("#filterGroups").addEventListener("change",e=>{
@@ -231,7 +231,22 @@ $("#activeReadout").addEventListener("click",e=>{const b=e.target.closest(".acti
 document.addEventListener("pointerdown",e=>{const m=$("#filterMenu");if(m.open&&!m.contains(e.target))m.removeAttribute("open")});
 let searchFrame=0;$("#search").addEventListener("input",e=>{state.query=e.target.value.trim().toLowerCase();state.terms=state.query.split(/\s+/).filter(Boolean);if(!searchFrame)searchFrame=requestAnimationFrame(()=>{searchFrame=0;render()})});$("#search").addEventListener("keydown",e=>{if(e.key==="Escape"){e.currentTarget.value="";state.query="";state.terms=[];if(searchFrame){cancelAnimationFrame(searchFrame);searchFrame=0}render();e.currentTarget.blur()}});$("#sortHead").addEventListener("click",()=>{state.order=state.order==="asc"?"desc":"asc";render()});
 function resetAll(){state.stances.clear();state.trickTypes.clear();state.modifiers.clear();state.query="";state.terms=[];state.order="asc";$("#search").value="";syncStanceUI();renderFilterMenu();$("#filterMenu").removeAttribute("open");render()}$("#clear").addEventListener("click",resetAll);
-$("#list").addEventListener("click",e=>{const b=e.target.closest(".trickname");if(b)openTrick(+b.dataset.num,"push")});$("#overview").addEventListener("click",e=>{const b=e.target.closest(".cell");if(b)openTrick(+b.dataset.num,"push")});
+$("#list").addEventListener("click",e=>{const b=e.target.closest(".trickname");if(b)openTrick(+b.dataset.num,"push")});
+$("#overview").addEventListener("click",e=>{const b=e.target.closest(".cell");if(!b)return;setOverviewFocus(+b.dataset.num-1);openTrick(+b.dataset.num,"push")});
+$("#overview").addEventListener("keydown",e=>{
+  const cell=e.target.closest(".cell");if(!cell)return;
+  const index=+cell.dataset.num-1;
+  const columns=window.matchMedia("(max-width:760px)").matches?50:100;
+  let next=index;
+  if(e.key==="ArrowLeft"&&index%columns!==0)next=index-1;
+  else if(e.key==="ArrowRight"&&index%columns!==columns-1&&index<DATA.length-1)next=index+1;
+  else if(e.key==="ArrowUp"&&index>=columns)next=index-columns;
+  else if(e.key==="ArrowDown"&&index+columns<DATA.length)next=index+columns;
+  else if(e.key==="Home")next=0;
+  else if(e.key==="End")next=DATA.length-1;
+  else return;
+  e.preventDefault();setOverviewFocus(next,true);
+});
 function sharedCount(a,b){
   let count=0;
   const smaller=a.size<=b.size?a:b;
