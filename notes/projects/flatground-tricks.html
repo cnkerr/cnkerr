@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no">
 <meta name="description" content="A sortable digital compendium of 800 flatground tricks performed by Jamie Griffin.">
+<link rel="canonical" href="https://cnkerr.com/notes/projects/flatground-tricks.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="A Compendium of Flatground Tricks">
+<meta property="og:description" content="A sortable digital compendium of 800 flatground tricks performed by Jamie Griffin.">
+<meta property="og:url" content="https://cnkerr.com/notes/projects/flatground-tricks.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="A Compendium of Flatground Tricks">
+<meta name="twitter:description" content="A sortable digital compendium of 800 flatground tricks performed by Jamie Griffin.">
 <title>A Compendium of Flatground Tricks — Christian N. Kerr</title>
 <style>
 :root{
@@ -46,7 +54,7 @@ button:focus-visible,.trickname:focus-visible,.cell:focus-visible,summary:focus-
       <div class="controls">
         <div class="row" aria-label="Filter by stance"><span class="label">STANCE</span><button class="pill active stanceBtn" data-stance="All" type="button">ALL</button><button class="pill stanceBtn" data-stance="Regular" type="button">REG</button><button class="pill stanceBtn" data-stance="Switch" type="button">SWITCH</button><button class="pill stanceBtn" data-stance="Nollie" type="button">NOLLIE</button><button class="pill stanceBtn" data-stance="Fakie" type="button">FAKIE</button></div>
         <details class="filterMenu" id="filterMenu"><summary id="filterSummary" title="Refine visible tricks">FILTERS</summary><div class="filterPanel"><div id="filterGroups"></div><button class="filterClear" id="filterClear" type="button" hidden>CLEAR FILTERS</button></div></details><div class="activeReadout" id="activeReadout" hidden aria-live="polite"><span class="activeText" id="activeText"></span></div>
-        <div class="controlSpacer"></div><div class="searchGroup"><input id="search" class="search" type="search" placeholder="SEARCH..." aria-label="Search trick names"><button class="clear" id="clear" type="button" hidden>CLEAR</button><span class="count" id="matchCount">800 / 800</span></div>
+        <div class="controlSpacer"></div><div class="searchGroup"><input id="search" class="search" type="search" placeholder="SEARCH..." aria-label="Search trick names"><button class="clear" id="clear" type="button" hidden>CLEAR</button><span class="count" id="matchCount" aria-live="polite" aria-atomic="true">800 / 800</span></div>
       </div>
       <div class="listhead"><div aria-hidden="true"></div><div><button id="sortHead" class="sortHead" type="button" aria-label="Sort descending by trick number" title="Reverse trick-number order"><span>#</span><span class="sortArrow" id="sortArrow">↑</span></button></div><div>TRICK</div></div>
     </div>
@@ -164,6 +172,20 @@ const SIBLING_KEY_ALIASES={
   "pressure kickflip body varial":"pressure kickflip frontside body varial",
   "bigspin under double flip":"backside bigspin under double flip"
 };
+const SEARCH_TERM_ALIASES=[
+  [/\btre(?:\s+flip)?\b/g,"360 flip"],
+  [/\blaser\b/g,"lazer"],
+  [/\bshove[ -]?it\b/g,"shuv"],
+  [/\bshuv[ -]?it\b/g,"shuv"],
+  [/\bkick\s+flip\b/g,"kickflip"],
+  [/\bheel\s+flip\b/g,"heelflip"],
+  [/\bbodyvarial\b/g,"body varial"]
+];
+function normalizeSearchText(value){
+  let text=String(value||"").toLowerCase().replace(/\s+/g," ").trim();
+  for(const [pattern,replacement] of SEARCH_TERM_ALIASES)text=text.replace(pattern,replacement);
+  return text;
+}
 function siblingGroupKey(key){
   const seen=new Set();
   while(SIBLING_KEY_ALIASES[key]&&!seen.has(key)){seen.add(key);key=SIBLING_KEY_ALIASES[key]}
@@ -183,7 +205,6 @@ for(const d of DATA){
   d.playbackStart=Math.max(0,d.seconds-1);
   const next=DATA[d.num];
   d.playbackEnd=next&&next.part===d.part?next.seconds+1:null;
-  d.searchName=d.name.toLowerCase();
   d.modifierSet=new Set(d.modifiers);
 
   const hasFamilyOverride=Object.prototype.hasOwnProperty.call(RELATED_FAMILY_OVERRIDES,d.num);
@@ -206,11 +227,13 @@ for(const d of DATA){
   d.videoId=youtubeId(d.url);
 
   d.siblingGroupKey=siblingGroupKey(d.siblingKey);
+  const siblingAliases=Object.keys(SIBLING_KEY_ALIASES).filter(key=>siblingGroupKey(key)===d.siblingGroupKey);
+  d.searchName=normalizeSearchText([d.name,d.siblingKey,d.siblingGroupKey,...siblingAliases].join(" "));
   if(!siblingGroups.has(d.siblingGroupKey))siblingGroups.set(d.siblingGroupKey,[]);
   siblingGroups.get(d.siblingGroupKey).push(d);
 }
 const state={stances:new Set(),trickTypes:new Set(),modifiers:new Set(),query:"",terms:[],order:"asc",selected:null,initialTrick:null};
-let visibleRows=DATA,overviewCells=[];
+let visibleRows=DATA,overviewCells=[],overviewFocusIndex=0;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]),pad=n=>String(n).padStart(3,"0"),roman=n=>["","I","II","III","IV","V","VI","VII","VIII","IX","X"][n]||String(n);
 function youtubeId(url){try{return new URL(url).searchParams.get("v")||""}catch{return ""}}
 function containsAll(set,required){for(const x of required)if(!set.has(x))return false;return true}
@@ -256,7 +279,36 @@ function render(syncURL=true){
   for(let i=0;i<overviewCells.length;i++){const c=overviewCells[i],d=DATA[i];c.classList.toggle("filtered",!matched[d.num]);c.classList.toggle("selected",state.selected===d.num)}
   updateModalNav();if(syncURL)writeUrlState();
 }
-function renderOverview(){$("#overview").innerHTML=DATA.map(d=>`<button class="cell" data-num="${d.num}" title="#${pad(d.num)} ${esc(d.name)}" style="background:${stanceColors[d.stance]}" type="button" aria-label="#${pad(d.num)} ${esc(d.name)}"></button>`).join("");overviewCells=$$("#overview .cell")}
+function renderOverview(){
+  $("#overview").innerHTML=DATA.map((d,i)=>`<button class="cell" data-num="${d.num}" title="#${pad(d.num)} ${esc(d.name)}" style="background:${stanceColors[d.stance]}" type="button" aria-label="#${pad(d.num)} ${esc(d.name)}" tabindex="${i===overviewFocusIndex?0:-1}"></button>`).join("");
+  overviewCells=$("#overview .cell");
+}
+function focusOverviewCell(index){
+  index=Math.max(0,Math.min(DATA.length-1,index));
+  overviewFocusIndex=index;
+  overviewCells.forEach((cell,i)=>cell.tabIndex=i===index?0:-1);
+  overviewCells[index]?.focus();
+}
+$("#overview").addEventListener("focusin",e=>{
+  const cell=e.target.closest(".cell");if(!cell)return;
+  overviewFocusIndex=Math.max(0,(+cell.dataset.num)-1);
+  overviewCells.forEach((item,i)=>item.tabIndex=i===overviewFocusIndex?0:-1);
+});
+$("#overview").addEventListener("keydown",e=>{
+  const cell=e.target.closest(".cell");if(!cell)return;
+  const i=(+cell.dataset.num)-1;
+  const cols=matchMedia("(max-width:760px)").matches?50:100;
+  const col=i%cols;
+  let next=i;
+  if(e.key==="ArrowLeft"&&col>0)next=i-1;
+  else if(e.key==="ArrowRight"&&col<cols-1&&i<DATA.length-1)next=i+1;
+  else if(e.key==="ArrowUp")next=i-cols;
+  else if(e.key==="ArrowDown")next=i+cols;
+  else if(e.key==="Home")next=0;
+  else if(e.key==="End")next=DATA.length-1;
+  else return;
+  e.preventDefault();focusOverviewCell(next);
+});
 function toggleStance(st){if(st==="All")state.stances.clear();else state.stances.has(st)?state.stances.delete(st):state.stances.add(st);syncStanceUI();render()}
 $(".controls").addEventListener("click",e=>{const b=e.target.closest(".stanceBtn");if(b)toggleStance(b.dataset.stance)});
 $("#filterGroups").addEventListener("change",e=>{
@@ -267,7 +319,7 @@ $("#filterGroups").addEventListener("change",e=>{
 $("#filterClear").addEventListener("click",()=>{state.trickTypes.clear();state.modifiers.clear();renderFilterMenu();render()});
 $("#activeReadout").addEventListener("click",e=>{const b=e.target.closest(".activeTag");if(!b)return;const set=b.dataset.filterType==="type"?state.trickTypes:state.modifiers;set.delete(b.dataset.filterValue);renderFilterMenu();render()});
 document.addEventListener("pointerdown",e=>{const m=$("#filterMenu");if(m.open&&!m.contains(e.target))m.removeAttribute("open")});
-let searchFrame=0;$("#search").addEventListener("input",e=>{state.query=e.target.value.trim().toLowerCase();state.terms=state.query.split(/\s+/).filter(Boolean);if(!searchFrame)searchFrame=requestAnimationFrame(()=>{searchFrame=0;render()})});$("#search").addEventListener("keydown",e=>{if(e.key==="Escape"){e.currentTarget.value="";state.query="";state.terms=[];if(searchFrame){cancelAnimationFrame(searchFrame);searchFrame=0}render();e.currentTarget.blur()}});$("#sortHead").addEventListener("click",()=>{state.order=state.order==="asc"?"desc":"asc";render()});
+let searchFrame=0;$("#search").addEventListener("input",e=>{state.query=e.target.value.trim().toLowerCase();state.terms=normalizeSearchText(state.query).split(/\s+/).filter(Boolean);if(!searchFrame)searchFrame=requestAnimationFrame(()=>{searchFrame=0;render()})});$("#search").addEventListener("keydown",e=>{if(e.key==="Escape"){e.currentTarget.value="";state.query="";state.terms=[];if(searchFrame){cancelAnimationFrame(searchFrame);searchFrame=0}render();e.currentTarget.blur()}});$("#sortHead").addEventListener("click",()=>{state.order=state.order==="asc"?"desc":"asc";render()});
 function resetAll(){state.stances.clear();state.trickTypes.clear();state.modifiers.clear();state.query="";state.terms=[];state.order="asc";$("#search").value="";syncStanceUI();renderFilterMenu();$("#filterMenu").removeAttribute("open");render()}$("#clear").addEventListener("click",resetAll);
 $("#list").addEventListener("click",e=>{const b=e.target.closest(".trickname");if(b)openTrick(+b.dataset.num)});$("#overview").addEventListener("click",e=>{const b=e.target.closest(".cell");if(b)openTrick(+b.dataset.num)});
 function sharedCount(a,b){
@@ -376,10 +428,10 @@ function mountClip(d){
     }}});
   }).catch(()=>{});
 }
-function openTrick(num){
+function openTrick(num,historyMode="push"){
   const d=tricksByNumber.get(num);if(!d)return;setSelected(d.num);$("#barTitle").textContent=`#${pad(d.num)}`;
   mountClip(d);
-  $("#trickLabel").textContent=d.name;$("#metaNum").textContent=`#${pad(d.num)}`;$("#sourceLine").textContent=`PART ${roman(d.part)} · ${d.timestamp}`;renderSiblings(d);renderRelated(d);if(!$("#dialog").open)$("#dialog").showModal();writeUrlState();
+  $("#trickLabel").textContent=d.name;$("#metaNum").textContent=`#${pad(d.num)}`;$("#sourceLine").textContent=`PART ${roman(d.part)} · ${d.timestamp}`;renderSiblings(d);renderRelated(d);if(!$("#dialog").open)$("#dialog").showModal();if(historyMode!=="none")writeUrlState(historyMode,historyMode==="push");
 }
 function openInfo(){
   const dlg=$("#infoDialog");
@@ -392,9 +444,22 @@ $("#infoClose").addEventListener("click",()=>$("#infoDialog").close());
 $("#infoDialog").addEventListener("click",event=>{
   if(event.target===$("#infoDialog"))$("#infoDialog").close();
 });
-$("#siblings").addEventListener("click",e=>{const a=e.target.closest("a[data-num]");if(a){e.preventDefault();openTrick(+a.dataset.num)}});$("#related").addEventListener("click",e=>{const a=e.target.closest("a[data-num]");if(a){e.preventDefault();openTrick(+a.dataset.num)}});$("#prevTrick").addEventListener("click",()=>stepModal(-1));$("#nextTrick").addEventListener("click",()=>stepModal(1));$("#close").addEventListener("click",()=>$("#dialog").close());$("#dialog").addEventListener("click",e=>{if(e.target===$("#dialog"))$("#dialog").close()});$("#dialog").addEventListener("close",()=>{clearClipPlayer();setSelected(null);writeUrlState()});document.addEventListener("keydown",e=>{if(!$("#dialog").open)return;if(e.key==="ArrowLeft"){e.preventDefault();stepModal(-1)}else if(e.key==="ArrowRight"){e.preventDefault();stepModal(1)}});
+$("#siblings").addEventListener("click",e=>{const a=e.target.closest("a[data-num]");if(a){e.preventDefault();openTrick(+a.dataset.num)}});
+$("#related").addEventListener("click",e=>{const a=e.target.closest("a[data-num]");if(a){e.preventDefault();openTrick(+a.dataset.num)}});
+$("#prevTrick").addEventListener("click",()=>stepModal(-1));
+$("#nextTrick").addEventListener("click",()=>stepModal(1));
+function closeTrick(){
+  if(history.state?.flatground&&history.state?.pushedTrick){history.back();return}
+  if($("#dialog").open)$("#dialog").close();
+  setSelected(null);writeUrlState("replace",false);
+}
+$("#close").addEventListener("click",closeTrick);
+$("#dialog").addEventListener("click",e=>{if(e.target===$("#dialog"))closeTrick()});
+$("#dialog").addEventListener("cancel",e=>{e.preventDefault();closeTrick()});
+$("#dialog").addEventListener("close",()=>{clearClipPlayer();setSelected(null)});
+document.addEventListener("keydown",e=>{if(!$("#dialog").open)return;if(e.key==="ArrowLeft"){e.preventDefault();stepModal(-1)}else if(e.key==="ArrowRight"){e.preventDefault();stepModal(1)}});
 const handleRelatedLayoutChange=()=>{if(state.selected)renderRelated(tricksByNumber.get(state.selected))};if(narrowMQ.addEventListener)narrowMQ.addEventListener("change",handleRelatedLayoutChange);else narrowMQ.addListener(handleRelatedLayoutChange);
-function writeUrlState(){
+function writeUrlState(mode="replace",pushedTrick=false){
   const url=new URL(location.href);
   const params=new URLSearchParams();
 
@@ -406,10 +471,13 @@ function writeUrlState(){
 
   url.search=params.toString();
   url.hash=state.selected?`trick-${state.selected}`:"";
-  history.replaceState(null,"",url);
+  const historyState={flatground:true,pushedTrick:Boolean(pushedTrick)};
+  if(mode==="push")history.pushState(historyState,"",url);
+  else history.replaceState(historyState,"",url);
 }
 
 function readUrlState(){
+  state.stances.clear();state.trickTypes.clear();state.modifiers.clear();
   const url=new URL(location.href);
   const params=url.searchParams;
   const validStances=new Set(STANCES);
@@ -427,13 +495,24 @@ function readUrlState(){
   }
 
   state.query=(params.get("q")||"").trim().toLowerCase();
-  state.terms=state.query.split(/\s+/).filter(Boolean);
+  state.terms=normalizeSearchText(state.query).split(/\s+/).filter(Boolean);
   state.order=params.get("order")==="desc"?"desc":"asc";
 
   const match=url.hash.match(/^#trick-(\d+)$/);
   state.initialTrick=match?Number(match[1]):null;
 }
 const showIntro=new URLSearchParams(location.search).get("intro")!=="0";
+function syncInterfaceFromLocation(){
+  readUrlState();
+  const target=state.initialTrick&&tricksByNumber.has(state.initialTrick)?state.initialTrick:null;
+  state.selected=target;
+  $("#search").value=state.query;
+  syncStanceUI();
+  renderFilterMenu();
+  render(false);
+  if(target)openTrick(target,"none");
+  else if($("#dialog").open)$("#dialog").close();
+}
 readUrlState();
 $("#search").value=state.query;
 syncStanceUI();
@@ -442,12 +521,13 @@ renderOverview();
 render(false);
 
 const initialTrick=state.initialTrick&&tricksByNumber.has(state.initialTrick)?state.initialTrick:null;
-if(!initialTrick)writeUrlState();
+history.replaceState({flatground:true,pushedTrick:false},"",location.href);
+window.addEventListener("popstate",syncInterfaceFromLocation);
 if(initialTrick&&showIntro){
   const info=$("#infoDialog");
-  info.addEventListener("close",()=>openTrick(initialTrick),{once:true});
+  info.addEventListener("close",()=>openTrick(initialTrick,"none"),{once:true});
 }
 if(showIntro)openInfo();
-else if(initialTrick)openTrick(initialTrick);
+else if(initialTrick)openTrick(initialTrick,"none");
 </script>
 </body></html>
