@@ -43,7 +43,7 @@ for (let i = 0; i < data.length; i++) {
   if (!d.siblingKey || typeof d.siblingKey !== "string") fail(`Missing sibling key at #${d.num}`);
 }
 
-const aliasMatch = htmlSource.match(/const SIBLING_KEY_ALIASES=(\{[\s\S]*?\});\nfunction siblingGroupKey/);
+const aliasMatch = htmlSource.match(/const SIBLING_KEY_ALIASES=(\{[\s\S]*?\});\nconst SEARCH_TERM_ALIASES=/);
 if (!aliasMatch) fail("Could not parse SIBLING_KEY_ALIASES from HTML");
 const aliases = JSON.parse(aliasMatch[1]);
 const canonicalSiblingKey = key => {
