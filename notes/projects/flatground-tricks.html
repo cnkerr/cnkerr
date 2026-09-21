@@ -231,7 +231,7 @@ $("#activeReadout").addEventListener("click",e=>{const b=e.target.closest(".acti
 document.addEventListener("pointerdown",e=>{const m=$("#filterMenu");if(m.open&&!m.contains(e.target))m.removeAttribute("open")});
 let searchFrame=0;$("#search").addEventListener("input",e=>{state.query=e.target.value.trim().toLowerCase();state.terms=state.query.split(/\s+/).filter(Boolean);if(!searchFrame)searchFrame=requestAnimationFrame(()=>{searchFrame=0;render()})});$("#search").addEventListener("keydown",e=>{if(e.key==="Escape"){e.currentTarget.value="";state.query="";state.terms=[];if(searchFrame){cancelAnimationFrame(searchFrame);searchFrame=0}render();e.currentTarget.blur()}});$("#sortHead").addEventListener("click",()=>{state.order=state.order==="asc"?"desc":"asc";render()});
 function resetAll(){state.stances.clear();state.trickTypes.clear();state.modifiers.clear();state.query="";state.terms=[];state.order="asc";$("#search").value="";syncStanceUI();renderFilterMenu();$("#filterMenu").removeAttribute("open");render()}$("#clear").addEventListener("click",resetAll);
-$("#list").addEventListener("click",e=>{const b=e.target.closest(".trickname");if(b)openTrick(+b.dataset.num)});$("#overview").addEventListener("click",e=>{const b=e.target.closest(".cell");if(b)openTrick(+b.dataset.num)});
+$("#list").addEventListener("click",e=>{const b=e.target.closest(".trickname");if(b)openTrick(+b.dataset.num,"push")});$("#overview").addEventListener("click",e=>{const b=e.target.closest(".cell");if(b)openTrick(+b.dataset.num,"push")});
 function sharedCount(a,b){
   let count=0;
   const smaller=a.size<=b.size?a:b;
@@ -293,7 +293,7 @@ function renderRelated(trick){
     :'<div class="related">—</div>';
 }
 function updateModalNav(){if(!state.selected){$("#prevTrick").disabled=$("#nextTrick").disabled=true;return}const i=visibleRows.findIndex(x=>x.num===state.selected);$("#prevTrick").disabled=i<=0;$("#nextTrick").disabled=i<0||i>=visibleRows.length-1}
-function stepModal(dir){const i=visibleRows.findIndex(x=>x.num===state.selected),n=i+dir;if(n>=0&&n<visibleRows.length)openTrick(visibleRows[n].num)}
+function stepModal(dir){const i=visibleRows.findIndex(x=>x.num===state.selected),n=i+dir;if(n>=0&&n<visibleRows.length)openTrick(visibleRows[n].num,"replace")}
 function setSelected(num){const prev=state.selected;if(prev===num)return;if(prev!=null){const r=$("#list .trickrow[data-num='"+prev+"']");if(r)r.classList.remove("isSelected");const c=overviewCells[prev-1];if(c)c.classList.remove("selected")}state.selected=num;if(num!=null){const r=$("#list .trickrow[data-num='"+num+"']");if(r)r.classList.add("isSelected");const c=overviewCells[num-1];if(c)c.classList.add("selected")}updateModalNav()}
 let clipPlayer=null,clipPlayerToken=0;
 let youtubeApiPromise=null;
@@ -338,10 +338,10 @@ function mountClip(d){
     }}});
   }).catch(()=>{});
 }
-function openTrick(num){
+function openTrick(num,historyMode="replace"){
   const d=tricksByNumber.get(num);if(!d)return;setSelected(d.num);$("#barTitle").textContent=`#${pad(d.num)}`;
   mountClip(d);
-  $("#trickLabel").textContent=d.name;$("#metaNum").textContent=`#${pad(d.num)}`;$("#sourceLine").textContent=`PART ${roman(d.part)} · ${d.timestamp}`;renderSiblings(d);renderRelated(d);if(!$("#dialog").open)$("#dialog").showModal();writeUrlState();
+  $("#trickLabel").textContent=d.name;$("#metaNum").textContent=`#${pad(d.num)}`;$("#sourceLine").textContent=`PART ${roman(d.part)} · ${d.timestamp}`;renderSiblings(d);renderRelated(d);if(!$("#dialog").open)$("#dialog").showModal();if(historyMode!=="none")writeUrlState(historyMode);
 }
 function openInfo(){
   const dlg=$("#infoDialog");
@@ -354,9 +354,9 @@ $("#infoClose").addEventListener("click",()=>$("#infoDialog").close());
 $("#infoDialog").addEventListener("click",event=>{
   if(event.target===$("#infoDialog"))$("#infoDialog").close();
 });
-$("#siblings").addEventListener("click",e=>{const a=e.target.closest("a[data-num]");if(a){e.preventDefault();openTrick(+a.dataset.num)}});$("#related").addEventListener("click",e=>{const a=e.target.closest("a[data-num]");if(a){e.preventDefault();openTrick(+a.dataset.num)}});$("#prevTrick").addEventListener("click",()=>stepModal(-1));$("#nextTrick").addEventListener("click",()=>stepModal(1));$("#close").addEventListener("click",()=>$("#dialog").close());$("#dialog").addEventListener("click",e=>{if(e.target===$("#dialog"))$("#dialog").close()});$("#dialog").addEventListener("close",()=>{clearClipPlayer();setSelected(null);writeUrlState()});document.addEventListener("keydown",e=>{if(!$("#dialog").open)return;if(e.key==="ArrowLeft"){e.preventDefault();stepModal(-1)}else if(e.key==="ArrowRight"){e.preventDefault();stepModal(1)}});
+$("#siblings").addEventListener("click",e=>{const a=e.target.closest("a[data-num]");if(a){e.preventDefault();openTrick(+a.dataset.num,"replace")}});$("#related").addEventListener("click",e=>{const a=e.target.closest("a[data-num]");if(a){e.preventDefault();openTrick(+a.dataset.num,"replace")}});$("#prevTrick").addEventListener("click",()=>stepModal(-1));$("#nextTrick").addEventListener("click",()=>stepModal(1));let historySyncing=false;function closeTrick(){if(history.state&&history.state.flatgroundModalEntry){history.back();return}$("#dialog").close()}$("#close").addEventListener("click",closeTrick);$("#dialog").addEventListener("click",e=>{if(e.target===$("#dialog"))closeTrick()});$("#dialog").addEventListener("cancel",e=>{if(history.state&&history.state.flatgroundModalEntry){e.preventDefault();history.back()}});$("#dialog").addEventListener("close",()=>{clearClipPlayer();setSelected(null);if(!historySyncing)writeUrlState("replace",{modalEntry:false})});document.addEventListener("keydown",e=>{if(!$("#dialog").open)return;if(e.key==="ArrowLeft"){e.preventDefault();stepModal(-1)}else if(e.key==="ArrowRight"){e.preventDefault();stepModal(1)}});
 const handleRelatedLayoutChange=()=>{if(state.selected)renderRelated(tricksByNumber.get(state.selected))};if(narrowMQ.addEventListener)narrowMQ.addEventListener("change",handleRelatedLayoutChange);else narrowMQ.addListener(handleRelatedLayoutChange);
-function writeUrlState(){
+function writeUrlState(mode="replace",options={}){
   const url=new URL(location.href);
   const params=new URLSearchParams();
 
@@ -368,10 +368,19 @@ function writeUrlState(){
 
   url.search=params.toString();
   url.hash=state.selected?`trick-${state.selected}`:"";
-  history.replaceState(null,"",url);
+
+  const current=history.state&&typeof history.state==="object"?history.state:{};
+  const modalEntry=options.modalEntry!==undefined?options.modalEntry:(mode==="push"?!!state.selected:!!current.flatgroundModalEntry);
+  const payload={...current,flatground:true,flatgroundModalEntry:modalEntry};
+  if(mode==="push")history.pushState(payload,"",url);
+  else history.replaceState(payload,"",url);
 }
 
 function readUrlState(){
+  state.stances.clear();
+  state.trickTypes.clear();
+  state.modifiers.clear();
+
   const url=new URL(location.href);
   const params=url.searchParams;
   const validStances=new Set(STANCES);
@@ -395,6 +404,24 @@ function readUrlState(){
   const match=url.hash.match(/^#trick-(\d+)$/);
   state.initialTrick=match?Number(match[1]):null;
 }
+
+function syncFromUrl(){
+  historySyncing=true;
+  readUrlState();
+  state.selected=null;
+  $("#search").value=state.query;
+  syncStanceUI();
+  renderFilterMenu();
+  render(false);
+
+  const target=state.initialTrick&&tricksByNumber.has(state.initialTrick)?state.initialTrick:null;
+  if(target)openTrick(target,"none");
+  else if($("#dialog").open)$("#dialog").close();
+  else setSelected(null);
+  historySyncing=false;
+}
+window.addEventListener("popstate",syncFromUrl);
+
 const showIntro=new URLSearchParams(location.search).get("intro")!=="0";
 readUrlState();
 $("#search").value=state.query;
@@ -404,12 +431,12 @@ renderOverview();
 render(false);
 
 const initialTrick=state.initialTrick&&tricksByNumber.has(state.initialTrick)?state.initialTrick:null;
-if(!initialTrick)writeUrlState();
+writeUrlState("replace",{modalEntry:false});
 if(initialTrick&&showIntro){
   const info=$("#infoDialog");
-  info.addEventListener("close",()=>openTrick(initialTrick),{once:true});
+  info.addEventListener("close",()=>openTrick(initialTrick,"none"),{once:true});
 }
 if(showIntro)openInfo();
-else if(initialTrick)openTrick(initialTrick);
+else if(initialTrick)openTrick(initialTrick,"none");
 </script>
 </body></html>
