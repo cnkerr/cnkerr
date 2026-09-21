@@ -1,0 +1,31 @@
+name: Validate Flatground Tricks data
+
+on:
+  pull_request:
+    paths:
+      - "notes/projects/flatground-tricks.html"
+      - "notes/projects/flatground-tricks-data.js"
+      - "notes/projects/flatground-tricks-data.csv"
+      - "scripts/validate-flatground-tricks.mjs"
+      - ".github/workflows/validate-flatground.yml"
+  push:
+    branches: [main]
+    paths:
+      - "notes/projects/flatground-tricks.html"
+      - "notes/projects/flatground-tricks-data.js"
+      - "notes/projects/flatground-tricks-data.csv"
+      - "scripts/validate-flatground-tricks.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate data, timestamps, siblings, and CSV
+        run: node scripts/validate-flatground-tricks.mjs
