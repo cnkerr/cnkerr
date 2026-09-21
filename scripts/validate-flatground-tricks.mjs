@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import vm from "node:vm";
 
 const dataPath = new URL("../notes/projects/flatground-tricks-data.js", import.meta.url);
 const csvPath = new URL("../notes/projects/flatground-tricks-data.csv", import.meta.url);
@@ -11,6 +12,16 @@ const htmlSource = fs.readFileSync(htmlPath, "utf8");
 const dataMatch = dataSource.match(/window\.FLATGROUND_TRICKS_DATA=(\[[\s\S]*\]);\s*$/);
 if (!dataMatch) throw new Error("Could not parse flatground-tricks-data.js");
 const data = JSON.parse(dataMatch[1]);
+
+// Syntax-check both browser scripts without executing DOM-dependent code.
+try { new vm.Script(dataSource, { filename: "flatground-tricks-data.js" }); }
+catch (error) { throw new Error(`Data script syntax error: ${error.message}`); }
+const inlineScripts = [...htmlSource.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(match => match[1]).filter(Boolean);
+if (!inlineScripts.length) throw new Error("No inline application script found");
+for (const [index, source] of inlineScripts.entries()) {
+  try { new vm.Script(source, { filename: `flatground-tricks-inline-${index + 1}.js` }); }
+  catch (error) { throw new Error(`Inline script syntax error: ${error.message}`); }
+}
 
 const fail = message => { throw new Error(message); };
 const allowedStances = new Set(["Regular","Switch","Nollie","Fakie"]);
@@ -46,6 +57,20 @@ for (let i = 0; i < data.length; i++) {
 const aliasMatch = htmlSource.match(/const SIBLING_KEY_ALIASES=(\{[\s\S]*?\});\nconst SEARCH_TERM_ALIASES=/);
 if (!aliasMatch) fail("Could not parse SIBLING_KEY_ALIASES from HTML");
 const aliases = JSON.parse(aliasMatch[1]);
+const siblingKeys = new Set(data.map(d => d.siblingKey));
+for (const [source, target] of Object.entries(aliases)) {
+  if (!siblingKeys.has(source)) fail(`Orphaned sibling alias source: ${source}`);
+  if (!siblingKeys.has(target) && !Object.prototype.hasOwnProperty.call(aliases, target)) fail(`Orphaned sibling alias target: ${target}`);
+}
+for (const start of Object.keys(aliases)) {
+  const seen = new Set();
+  let key = start;
+  while (aliases[key]) {
+    if (seen.has(key)) fail(`Sibling alias cycle starting at: ${start}`);
+    seen.add(key);
+    key = aliases[key];
+  }
+}
 const canonicalSiblingKey = key => {
   const seen = new Set();
   while (aliases[key] && !seen.has(key)) {
@@ -77,5 +102,12 @@ const expectedCsv = [
   ...data.map(d => [d.num,d.name,d.stance,d.part,formatTimestamp(d.seconds)])
 ].map(row => row.map(csvEscape).join(",")).join("\n") + "\n";
 if (csvSource !== expectedCsv) fail("CSV does not match canonical data source");
+
+const externalDataTag = '<script src="./flatground-tricks-data.js"></script>';
+const externalIndex = htmlSource.indexOf(externalDataTag);
+const inlineIndex = htmlSource.indexOf("<script>", externalIndex + externalDataTag.length);
+if (externalIndex < 0 || inlineIndex < 0 || externalIndex > inlineIndex) fail("Canonical data script must load before application script");
+if (/const AUDITED_ONSETS=/.test(htmlSource)) fail("Legacy AUDITED_ONSETS is still embedded");
+if (/const DATA=\[\{/.test(htmlSource)) fail("Legacy embedded DATA array is still present");
 
 console.log(`Flatground Tricks validation passed: ${data.length} tricks, ${siblingStances.size} sibling groups.`);
