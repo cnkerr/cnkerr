@@ -228,7 +228,7 @@ for(const d of DATA){
   d.siblingGroupKey=siblingGroupKey(d.siblingKey);
   const siblingAliases=Object.keys(SIBLING_KEY_ALIASES).filter(key=>siblingGroupKey(key)===d.siblingGroupKey);
   d.searchName=normalizeSearchText([d.name,d.siblingKey,d.siblingGroupKey,...siblingAliases].join(" "));
-  d.relatedWords=new Set(d.searchName.split(/\s+/).filter(word=>word&&!RELATED_WORD_STOP.has(word)));
+  d.relatedWords=new Set(d.name.toLowerCase().split(/\s+/).filter(word=>word&&!RELATED_WORD_STOP.has(word)));
   if(!siblingGroups.has(d.siblingGroupKey))siblingGroups.set(d.siblingGroupKey,[]);
   siblingGroups.get(d.siblingGroupKey).push(d);
 }
