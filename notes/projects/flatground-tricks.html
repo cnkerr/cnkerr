@@ -133,6 +133,17 @@ function siblingGroupKey(key){
 const STANCES=["Regular","Switch","Nollie","Fakie"],stanceColors={Regular:"var(--reg)",Fakie:"var(--fakie)",Nollie:"var(--nollie)",Switch:"var(--switch)"};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],tricksByNumber=new Map(DATA.map(d=>[d.num,d])),siblingGroups=new Map();
 const RELATED_WORD_STOP=new Set(["fakie","nollie","switch","frontside","backside","180","360","540","720","double","triple","quadruple"]);
+function searchAliases(name){
+  const aliases=[];
+  if(name.includes("360 flip"))aliases.push("tre treflip tre flip");
+  if(name.includes("lazer"))aliases.push("laser");
+  if(/\bshuv\b/.test(name))aliases.push("pop shove-it shove it");
+  if(/\bheel\b/.test(name)&&!name.includes("heelflip"))aliases.push(name.replace(/\bheel\b/g,"heelflip"));
+  if(name.includes("body varial"))aliases.push("bodyvarial");
+  if(name.includes("front foot"))aliases.push("frontfoot");
+  if(name.includes("back foot")||name.includes("backfoot"))aliases.push("backfoot");
+  return aliases.join(" ");
+}
 function formatTimestamp(seconds){
   const minutes=Math.floor(seconds/60);
   const remainder=(seconds-minutes*60).toFixed(1).padStart(4,"0");
@@ -146,6 +157,7 @@ for(const d of DATA){
   d.playbackStart=Math.max(0,onset-1);
   d.playbackEnd=d.num%100===0?null:DATA[d.num].captionSeconds+1;
   d.searchName=d.name.toLowerCase();
+  d.searchText=`${d.searchName} ${searchAliases(d.searchName)}`.trim();
   d.modifierSet=new Set(d.modifiers);
 
   const hasFamilyOverride=Object.prototype.hasOwnProperty.call(RELATED_FAMILY_OVERRIDES,d.num);
@@ -180,7 +192,7 @@ function matchesFilters(d){
   if(state.stances.size&&!state.stances.has(d.stance))return false;
   if(!containsAll(d.typeSet,state.trickTypes))return false;
   if(!containsAll(d.modifierSet,state.modifiers))return false;
-  for(const t of state.terms)if(!d.searchName.includes(t))return false;
+  for(const t of state.terms)if(!d.searchText.includes(t))return false;
   return true;
 }
 function getVisibleRows(){const rows=DATA.filter(matchesFilters);return state.order==="desc"?rows.reverse():rows}
