@@ -224,12 +224,11 @@ for(const d of DATA){
   for(const family of d.relatedFamilies)d.typeSet.add(`family:${family}`);
   for(const type of d.relatedTypes)if(type&&type!=="None")d.typeSet.add(type);
 
-  d.relatedWords=new Set(d.searchName.split(/\s+/).filter(word=>word&&!RELATED_WORD_STOP.has(word)));
   d.videoId=youtubeId(d.url);
-
   d.siblingGroupKey=siblingGroupKey(d.siblingKey);
   const siblingAliases=Object.keys(SIBLING_KEY_ALIASES).filter(key=>siblingGroupKey(key)===d.siblingGroupKey);
   d.searchName=normalizeSearchText([d.name,d.siblingKey,d.siblingGroupKey,...siblingAliases].join(" "));
+  d.relatedWords=new Set(d.searchName.split(/\s+/).filter(word=>word&&!RELATED_WORD_STOP.has(word)));
   if(!siblingGroups.has(d.siblingGroupKey))siblingGroups.set(d.siblingGroupKey,[]);
   siblingGroups.get(d.siblingGroupKey).push(d);
 }
@@ -455,7 +454,7 @@ function mountClip(d){
 function openTrick(num,historyMode="push"){
   const d=tricksByNumber.get(num);if(!d)return;setSelected(d.num);$("#barTitle").textContent=`#${pad(d.num)}`;
   mountClip(d);
-  $("#trickLabel").textContent=d.name;$("#metaNum").textContent=`#${pad(d.num)}`;$("#sourceLine").textContent=`PART ${roman(d.part)} · ${d.timestamp}`;renderSiblings(d);renderRelated(d);if(!$("#dialog").open)$("#dialog").showModal();if(historyMode!=="none")writeUrlState(historyMode,historyMode==="push");
+  $("#trickLabel").textContent=d.name;$("#metaNum").textContent=`#${pad(d.num)}`;$("#sourceLine").textContent=`PART ${roman(d.part)} · ${d.timestamp}`;renderSiblings(d);renderRelated(d);if(!$("#dialog").open)$("#dialog").showModal();if(historyMode!=="none"){const depth=historyMode==="push"?(history.state?.trickDepth||0)+1:0;writeUrlState(historyMode,depth);}
 }
 function openInfo(){
   const dlg=$("#infoDialog");
@@ -473,9 +472,10 @@ $("#related").addEventListener("click",e=>{const a=e.target.closest("a[data-num]
 $("#prevTrick").addEventListener("click",()=>stepModal(-1));
 $("#nextTrick").addEventListener("click",()=>stepModal(1));
 function closeTrick(){
-  if(history.state?.flatground&&history.state?.pushedTrick){history.back();return}
+  const depth=history.state?.flatground?Number(history.state.trickDepth)||0:0;
+  if(depth>0){history.go(-depth);return}
   if($("#dialog").open)$("#dialog").close();
-  setSelected(null);writeUrlState("replace",false);
+  setSelected(null);writeUrlState("replace",0);
 }
 $("#close").addEventListener("click",closeTrick);
 $("#dialog").addEventListener("click",e=>{if(e.target===$("#dialog"))closeTrick()});
@@ -483,7 +483,7 @@ $("#dialog").addEventListener("cancel",e=>{e.preventDefault();closeTrick()});
 $("#dialog").addEventListener("close",()=>{clearClipPlayer();setSelected(null)});
 document.addEventListener("keydown",e=>{if(!$("#dialog").open)return;if(e.key==="ArrowLeft"){e.preventDefault();stepModal(-1)}else if(e.key==="ArrowRight"){e.preventDefault();stepModal(1)}});
 const handleRelatedLayoutChange=()=>{if(state.selected)renderRelated(tricksByNumber.get(state.selected))};if(narrowMQ.addEventListener)narrowMQ.addEventListener("change",handleRelatedLayoutChange);else narrowMQ.addListener(handleRelatedLayoutChange);
-function writeUrlState(mode="replace",pushedTrick=false){
+function writeUrlState(mode="replace",trickDepth=0){
   const url=new URL(location.href);
   const params=new URLSearchParams();
 
@@ -495,7 +495,7 @@ function writeUrlState(mode="replace",pushedTrick=false){
 
   url.search=params.toString();
   url.hash=state.selected?`trick-${state.selected}`:"";
-  const historyState={flatground:true,pushedTrick:Boolean(pushedTrick)};
+  const historyState={flatground:true,trickDepth:Number(trickDepth)||0};
   if(mode==="push")history.pushState(historyState,"",url);
   else history.replaceState(historyState,"",url);
 }
@@ -545,7 +545,7 @@ renderOverview();
 render(false);
 
 const initialTrick=state.initialTrick&&tricksByNumber.has(state.initialTrick)?state.initialTrick:null;
-history.replaceState({flatground:true,pushedTrick:false},"",location.href);
+history.replaceState({flatground:true,trickDepth:0},"",location.href);
 window.addEventListener("popstate",syncInterfaceFromLocation);
 if(initialTrick&&showIntro){
   const info=$("#infoDialog");
