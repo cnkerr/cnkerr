@@ -5,7 +5,6 @@ on:
     paths:
       - "notes/projects/flatground-tricks.html"
       - "notes/projects/flatground-tricks-source.json"
-      - "notes/projects/flatground-tricks-source.json"
       - "notes/projects/flatground-tricks-data.js"
       - "notes/projects/flatground-tricks-data.csv"
       - "scripts/validate-flatground-tricks.mjs"
@@ -15,9 +14,11 @@ on:
     branches: [main]
     paths:
       - "notes/projects/flatground-tricks.html"
+      - "notes/projects/flatground-tricks-source.json"
       - "notes/projects/flatground-tricks-data.js"
       - "notes/projects/flatground-tricks-data.csv"
       - "scripts/validate-flatground-tricks.mjs"
+      - "scripts/flatground-sync.mjs"
 
 permissions:
   contents: read
@@ -35,6 +36,7 @@ jobs:
       - name: Browser smoke test
         shell: bash
         run: |
+          COUNT="$(node -e 'const d=require("./notes/projects/flatground-tricks-source.json"); process.stdout.write(String(d.length))')"
           python3 -m http.server 8765 >/tmp/flatground-http.log 2>&1 &
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
@@ -42,8 +44,8 @@ jobs:
           BROWSER="$(command -v google-chrome || command -v chromium-browser || command -v chromium || true)"
           test -n "$BROWSER"
           "$BROWSER" --headless --no-sandbox --disable-gpu --virtual-time-budget=5000             --dump-dom "http://127.0.0.1:8765/notes/projects/flatground-tricks.html?intro=0" > /tmp/flatground-default.html
-          grep -q 'data-num="800"' /tmp/flatground-default.html
-          grep -q 'id="matchCount" aria-live="polite" aria-atomic="true">800 / 800<' /tmp/flatground-default.html
+          grep -q "data-num=\"$COUNT\"" /tmp/flatground-default.html
+          grep -q "id=\"matchCount\" aria-live=\"polite\" aria-atomic=\"true\">$COUNT / $COUNT<" /tmp/flatground-default.html
           grep -q 'data-num="1".*tabindex="0"' /tmp/flatground-default.html
           grep -q 'data-num="2".*tabindex="-1"' /tmp/flatground-default.html
           "$BROWSER" --headless --no-sandbox --disable-gpu --virtual-time-budget=5000             --dump-dom "http://127.0.0.1:8765/notes/projects/flatground-tricks.html?intro=0&q=laser" > /tmp/flatground-search.html
