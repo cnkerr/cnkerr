@@ -5,10 +5,8 @@ on:
     paths:
       - "notes/projects/flatground-tricks.html"
       - "notes/projects/flatground-tricks-source.csv"
-      - "notes/projects/flatground-tricks-source.csv"
       - "notes/projects/flatground-tricks-data.js"
       - "notes/projects/flatground-tricks-data.csv"
-      - "scripts/update-flatground-data.mjs"
       - "scripts/update-flatground-data.mjs"
       - "scripts/validate-flatground-tricks.mjs"
       - ".github/workflows/validate-flatground.yml"
@@ -16,8 +14,10 @@ on:
     branches: [main]
     paths:
       - "notes/projects/flatground-tricks.html"
+      - "notes/projects/flatground-tricks-source.csv"
       - "notes/projects/flatground-tricks-data.js"
       - "notes/projects/flatground-tricks-data.csv"
+      - "scripts/update-flatground-data.mjs"
       - "scripts/validate-flatground-tricks.mjs"
 
 permissions:
@@ -42,11 +42,12 @@ jobs:
           SERVER_PID=$!
           trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
           sleep 1
+          COUNT="$(node -e 'const fs=require("fs");const s=fs.readFileSync("notes/projects/flatground-tricks-data.js","utf8");const m=s.match(/FLATGROUND_TRICKS_DATA=(\[[\s\S]*\]);/);process.stdout.write(String(JSON.parse(m[1]).length))')"
           BROWSER="$(command -v google-chrome || command -v chromium-browser || command -v chromium || true)"
           test -n "$BROWSER"
           "$BROWSER" --headless --no-sandbox --disable-gpu --virtual-time-budget=5000             --dump-dom "http://127.0.0.1:8765/notes/projects/flatground-tricks.html?intro=0" > /tmp/flatground-default.html
-          grep -q 'data-num="800"' /tmp/flatground-default.html
-          grep -q 'id="matchCount" aria-live="polite" aria-atomic="true">800 / 800<' /tmp/flatground-default.html
+          grep -q "data-num=\"$COUNT\"" /tmp/flatground-default.html
+          grep -q "id=\"matchCount\" aria-live=\"polite\" aria-atomic=\"true\">$COUNT / $COUNT<" /tmp/flatground-default.html
           grep -q 'data-num="1".*tabindex="0"' /tmp/flatground-default.html
           grep -q 'data-num="2".*tabindex="-1"' /tmp/flatground-default.html
           "$BROWSER" --headless --no-sandbox --disable-gpu --virtual-time-budget=5000             --dump-dom "http://127.0.0.1:8765/notes/projects/flatground-tricks.html?intro=0&q=laser" > /tmp/flatground-search.html
