@@ -242,3 +242,34 @@ test("live player survives installment boundary navigation", async ({ page }) =>
   await page.locator("#nextTrick").click();
   await assertPlayer("PART III", "N4sgk0PLhQ0");
 });
+
+
+test("live representative YouTube clips actually begin playback", async ({ page, browserName }) => {
+  test.skip(BASE_ROOT !== "https://cnkerr.com", "Live YouTube playback diagnostic");
+  test.skip(browserName === "firefox", "Live matrix does not run Firefox");
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  for (const num of [1, 101, 201]) {
+    await page.goto(`${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0#trick-${num}`, { waitUntil: "domcontentloaded" });
+    const frame = page.frameLocator("#clipPlayer");
+    const player = frame.locator(".html5-video-player");
+    await expect(player).toHaveCount(1, { timeout: 15000 });
+
+    const play = frame.locator(".ytp-large-play-button");
+    if (await play.count()) await play.click({ force:true });
+    else await frame.locator("video").click({ force:true });
+
+    await page.waitForTimeout(2500);
+    const error = frame.locator(".ytp-error-content-wrap");
+    if (await error.count()) await expect(error).not.toBeVisible();
+
+    const media = frame.locator("video");
+    await expect(media).toHaveCount(1, { timeout: 15000 });
+    const state = await media.evaluate(v => ({ currentTime:v.currentTime, paused:v.paused, readyState:v.readyState, error:v.error && {code:v.error.code,message:v.error.message} }));
+    const text = (await frame.locator("body").innerText()).slice(0,500);
+    console.log(JSON.stringify({num,browserName,state,text}));
+    expect(text).not.toMatch(/video unavailable|an error occurred|playback on other websites has been disabled/i);
+    expect(state.error).toBeFalsy();
+    expect(state.readyState).toBeGreaterThan(0);
+  }
+});
