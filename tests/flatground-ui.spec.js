@@ -244,8 +244,42 @@ test("live player survives installment boundary navigation", async ({ page }) =>
 });
 
 
-test("live representative YouTube clips actually begin playback", async ({ page, browserName }) => {
+test("live representative YouTube clips report playable API state", async ({ page, browserName }) => {
   test.skip(BASE_ROOT !== "https://cnkerr.com", "Live YouTube playback diagnostic");
+  test.skip(browserName === "firefox", "Live matrix does not run Firefox");
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  for (const num of [1, 101, 201]) {
+    await page.goto(`${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0#trick-${num}`, { waitUntil: "domcontentloaded" });
+    await expect(page.locator("#clipPlayer")).toBeVisible();
+    await page.waitForFunction(() => window.YT && window.YT.Player, null, { timeout:15000 });
+    await page.waitForFunction(() => {
+      try { return Boolean(eval("clipPlayer") && typeof eval("clipPlayer").getPlayerState === "function"); }
+      catch { return false; }
+    }, null, { timeout:15000 });
+
+    await page.evaluate(() => {
+      window.__flatgroundYTDiag = { errors:[], states:[] };
+      const p = eval("clipPlayer");
+      p.addEventListener("onError", event => window.__flatgroundYTDiag.errors.push(event.data));
+      p.addEventListener("onStateChange", event => window.__flatgroundYTDiag.states.push(event.data));
+      p.playVideo();
+    });
+    await page.waitForTimeout(3000);
+    const result = await page.evaluate(() => {
+      const p = eval("clipPlayer");
+      return {
+        state:p.getPlayerState(),
+        time:p.getCurrentTime(),
+        errors:window.__flatgroundYTDiag.errors,
+        states:window.__flatgroundYTDiag.states
+      };
+    });
+    console.log(JSON.stringify({num,browserName,result}));
+    expect(result.errors, `YouTube error for trick #${num}: ${JSON.stringify(result)}`).toEqual([]);
+    expect([1,2,3,5]).toContain(result.state);
+  }
+});
   test.skip(browserName === "firefox", "Live matrix does not run Firefox");
   await page.setViewportSize({ width: 1280, height: 900 });
 
