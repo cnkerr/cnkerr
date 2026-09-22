@@ -186,3 +186,97 @@ for (const vp of [
     await expect(page.locator("#close")).toBeVisible();
   });
 }
+
+
+test("live YouTube players initialize for representative parts", async ({ page }) => {
+  test.skip(BASE_ROOT !== "https://cnkerr.com", "Live YouTube diagnostic");
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  for (const num of [1, 101, 201]) {
+    await page.goto(`${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0#trick-${num}`, { waitUntil: "domcontentloaded" });
+    await expect(page.locator("#dialog")).toHaveJSProperty("open", true);
+    const iframe = page.locator("#clipPlayer");
+    await expect(iframe).toBeVisible();
+    await expect(iframe).toHaveAttribute("src", /youtube\.com\/embed\//);
+
+    const frame = page.frameLocator("#clipPlayer");
+    await expect(frame.locator("body")).toBeVisible({ timeout: 15000 });
+    const error = frame.locator(".ytp-error-content-wrap");
+    const player = frame.locator(".html5-video-player");
+    await expect(player).toHaveCount(1, { timeout: 15000 });
+    if (await error.count()) await expect(error).not.toBeVisible();
+
+    const text = (await frame.locator("body").innerText()).slice(0, 500);
+    expect(text).not.toMatch(/video unavailable|an error occurred|playback on other websites has been disabled/i);
+    console.log(JSON.stringify({ num, iframeSrc: await iframe.getAttribute("src"), frameText: text }));
+  }
+});
+
+
+test("live player survives installment boundary navigation", async ({ page }) => {
+  test.skip(BASE_ROOT !== "https://cnkerr.com", "Live YouTube diagnostic");
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(`${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0#trick-100`, { waitUntil: "domcontentloaded" });
+
+  const assertPlayer = async (partText, id) => {
+    await expect(page.locator("#sourceLine")).toContainText(partText);
+    const iframe = page.locator("#clipPlayer");
+    await expect(iframe).toHaveAttribute("src", new RegExp(id));
+    const frame = page.frameLocator("#clipPlayer");
+    await expect(frame.locator(".html5-video-player")).toHaveCount(1, { timeout: 15000 });
+    const text = (await frame.locator("body").innerText()).slice(0,500);
+    expect(text).not.toMatch(/video unavailable|an error occurred|playback on other websites has been disabled/i);
+    console.log(JSON.stringify({partText,id,text}));
+  };
+
+  await assertPlayer("PART I", "8bxg4YCo2RE");
+  await page.locator("#nextTrick").click();
+  await assertPlayer("PART II", "mN6_vgbRD7Y");
+  await page.locator("#prevTrick").click();
+  await assertPlayer("PART I", "8bxg4YCo2RE");
+
+  await page.goto(`${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0#trick-200`, { waitUntil: "domcontentloaded" });
+  await assertPlayer("PART II", "mN6_vgbRD7Y");
+  await page.locator("#nextTrick").click();
+  await assertPlayer("PART III", "N4sgk0PLhQ0");
+});
+
+
+test("live representative YouTube clips report playable API state", async ({ page, browserName }) => {
+  test.skip(BASE_ROOT !== "https://cnkerr.com", "Live YouTube playback diagnostic");
+  test.skip(browserName === "firefox", "Live matrix does not run Firefox");
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  for (const num of [1, 101, 201]) {
+    await page.goto(`${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0#trick-${num}`, { waitUntil: "domcontentloaded" });
+    await expect(page.locator("#clipPlayer")).toBeVisible();
+    await page.waitForFunction(() => window.YT && window.YT.Player, null, { timeout:15000 });
+    await page.waitForFunction(() => {
+      try { return Boolean(eval("clipPlayer") && typeof eval("clipPlayer").getPlayerState === "function"); }
+      catch { return false; }
+    }, null, { timeout:15000 });
+
+    await page.evaluate(() => {
+      window.__flatgroundYTDiag = { errors:[], states:[] };
+      const p = eval("clipPlayer");
+      p.addEventListener("onError", event => window.__flatgroundYTDiag.errors.push(event.data));
+      p.addEventListener("onStateChange", event => window.__flatgroundYTDiag.states.push(event.data));
+      p.playVideo();
+    });
+    await page.waitForTimeout(3000);
+    const result = await page.evaluate(() => {
+      const p = eval("clipPlayer");
+      return {
+        state:p.getPlayerState(),
+        time:p.getCurrentTime(),
+        errors:window.__flatgroundYTDiag.errors,
+        states:window.__flatgroundYTDiag.states
+      };
+    });
+    console.log(JSON.stringify({num,browserName,result}));
+    expect(result.errors, `YouTube error for trick #${num}: ${JSON.stringify(result)}`).toEqual([]);
+    expect([1,2,3,5]).toContain(result.state);
+  }
+});

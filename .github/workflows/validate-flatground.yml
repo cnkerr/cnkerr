@@ -9,6 +9,7 @@ on:
       - "notes/projects/flatground-tricks-data.csv"
       - "scripts/validate-flatground-tricks.mjs"
       - "scripts/flatground-sync.mjs"
+      - "scripts/diagnose-flatground-video-embeds.mjs"
       - ".github/workflows/validate-flatground.yml"
   push:
     branches: [main]
@@ -33,6 +34,8 @@ jobs:
           node-version: 22
       - name: Verify generated files and validate data
         run: node scripts/flatground-sync.mjs --check
+      - name: Diagnose YouTube source embeds
+        run: node scripts/diagnose-flatground-video-embeds.mjs
       - name: Exercise Part IX ingestion in disposable copy
         shell: bash
         run: |
