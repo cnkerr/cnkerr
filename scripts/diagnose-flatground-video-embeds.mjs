@@ -13,6 +13,11 @@ for (const [part,url] of byPart) {
   const embedUrl = `https://www.youtube.com/embed/${id}?start=1&end=5&rel=0&enablejsapi=1&playsinline=1&origin=https%3A%2F%2Fcnkerr.com`;
   const embed = await fetch(embedUrl,{headers:{"user-agent":"Mozilla/5.0"}});
   const body = await embed.text();
+  const lengthSeconds = Number((body.match(/"lengthSeconds"\\s*:\\s*"?(\\d+)"?/)||[])[1] || 0);
+  const approxDurationMs = Number((body.match(/"approxDurationMs"\\s*:\\s*"?(\\d+)"?/)||[])[1] || 0);
+  const duration = lengthSeconds || (approxDurationMs ? approxDurationMs/1000 : 0);
+  const partRows = source.filter(d=>d.part===part);
+  const maxOnset = Math.max(...partRows.map(d=>d.seconds));
 
   const statuses=[...body.matchAll(/"status"\s*:\s*"([^"]+)"/g)].map(m=>m[1]).slice(0,10);
   const reasons=[...body.matchAll(/"reason"\s*:\s*"([^"]+)"/g)].map(m=>m[1]).slice(0,5);
