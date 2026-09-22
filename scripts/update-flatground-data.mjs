@@ -101,6 +101,18 @@ function checkOutputs(data){
 }
 
 const args=process.argv.slice(2);
+const templateIndex=args.indexOf("--template");
+if(templateIndex>=0){
+  const part=Number(args[templateIndex+1]);
+  if(!Number.isInteger(part)||part<9||part>10) throw new Error("--template requires part 9 or 10");
+  const start=(part-1)*100+1;
+  const rows=[SOURCE_COLUMNS];
+  for(let num=start;num<start+100;num++) rows.push([num,"","",part,"","","","","",""]);
+  const out=path.resolve(process.cwd(),`flatground-part-${part}-template.csv`);
+  fs.writeFileSync(out,toCsv(rows));
+  console.log(`Created ${out} with rows #${start}–#${start+99}.`);
+  process.exit(0);
+}
 const write=args.includes("--write");
 const check=args.includes("--check") || !write;
 const batchIndex=args.indexOf("--batch");
