@@ -5,6 +5,7 @@ const sourcePath = new URL("../notes/projects/flatground-tricks-source.json", im
 const dataPath = new URL("../notes/projects/flatground-tricks-data.js", import.meta.url);
 const csvPath = new URL("../notes/projects/flatground-tricks-data.csv", import.meta.url);
 const htmlPath = new URL("../notes/projects/flatground-tricks.html", import.meta.url);
+const socialPath = new URL("../notes/projects/flatground-tricks-social.png", import.meta.url);
 
 const sourceData = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
 const dataSource = fs.readFileSync(dataPath, "utf8");
@@ -116,5 +117,15 @@ const inlineIndex = htmlSource.indexOf("<script>", externalIndex + externalDataT
 if (externalIndex < 0 || inlineIndex < 0 || externalIndex > inlineIndex) fail("Canonical data script must load before application script");
 if (/const AUDITED_ONSETS=/.test(htmlSource)) fail("Legacy AUDITED_ONSETS is still embedded");
 if (/const DATA=\[\{/.test(htmlSource)) fail("Legacy embedded DATA array is still present");
+
+if (!fs.existsSync(socialPath)) fail("Missing social preview image");
+const png = fs.readFileSync(socialPath);
+const pngSignature = "89504e470d0a1a0a";
+if (png.subarray(0,8).toString("hex") !== pngSignature) fail("Social preview is not a valid PNG");
+const socialWidth = png.readUInt32BE(16);
+const socialHeight = png.readUInt32BE(20);
+if (socialWidth !== 1200 || socialHeight !== 630) fail(`Social preview must be 1200x630, found ${socialWidth}x${socialHeight}`);
+if (!htmlSource.includes('property="og:image" content="https://cnkerr.com/notes/projects/flatground-tricks-social.png"')) fail("Missing og:image metadata");
+if (!htmlSource.includes('name="twitter:image" content="https://cnkerr.com/notes/projects/flatground-tricks-social.png"')) fail("Missing twitter:image metadata");
 
 console.log(`Flatground Tricks validation passed: ${data.length} tricks across ${expectedParts} parts, ${siblingStances.size} sibling groups.`);
