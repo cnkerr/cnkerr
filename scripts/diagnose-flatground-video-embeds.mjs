@@ -23,5 +23,5 @@ for (const [part,url] of byPart) {
     unplayable:/UNPLAYABLE/.test(body),
     error:/\"status\"\s*:\s*\"ERROR\"/.test(body)
   };
-  console.log(JSON.stringify({part,id,title,oembed:oembed.status,embed:embed.status,bytes:body.length,statuses,reasons,marker}));
+  console.log(JSON.stringify({part,id,title,oembed:oembed.status,embed:embed.status,bytes:body.length,duration,maxOnset,secondsRemaining:duration?duration-maxOnset:null,statuses,reasons,marker}));
 }
