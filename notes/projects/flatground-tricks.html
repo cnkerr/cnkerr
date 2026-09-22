@@ -281,7 +281,7 @@ function render(syncURL=true){
 }
 function renderOverview(){
   $("#overview").innerHTML=DATA.map((d,i)=>`<button class="cell" data-num="${d.num}" title="#${pad(d.num)} ${esc(d.name)}" style="background:${stanceColors[d.stance]}" type="button" aria-label="#${pad(d.num)} ${esc(d.name)}" tabindex="${i===overviewFocusIndex?0:-1}"></button>`).join("");
-  overviewCells=$("#overview .cell");
+  overviewCells=$$("#overview .cell");
 }
 function focusOverviewCell(index){
   index=Math.max(0,Math.min(DATA.length-1,index));

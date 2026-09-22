@@ -1,0 +1,48 @@
+name: Flatground Tricks UI QA
+
+on:
+  pull_request:
+    paths:
+      - "notes/projects/flatground-tricks.html"
+      - "notes/projects/flatground-tricks-data.js"
+      - "notes/projects/flatground-tricks-data.csv"
+      - "tests/flatground-ui.spec.js"
+      - ".github/workflows/flatground-ui-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start local site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/flatground-http.log 2>&1 &
+          echo $! > /tmp/flatground-http.pid
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:4173/notes/projects/flatground-tricks.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/flatground-http.log
+          exit 1
+      - name: Run browser QA
+        run: npx playwright test tests/flatground-ui.spec.js --browser=chromium --reporter=line
+      - name: Upload QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flatground-ui-qa-screenshots
+          path: qa-artifacts/
+          if-no-files-found: ignore
+          retention-days: 7
