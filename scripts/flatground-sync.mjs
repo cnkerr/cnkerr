@@ -22,9 +22,18 @@ if (appendIndex >= 0) {
   if (!batchArg) throw new Error("Usage: node scripts/flatground-sync.mjs --append path/to/part-9.json");
   const batchPath = path.resolve(process.cwd(), batchArg);
   const batch = JSON.parse(fs.readFileSync(batchPath, "utf8"));
-  if (!Array.isArray(batch) || !batch.length) throw new Error("Append batch must be a non-empty JSON array");
+  if (!Array.isArray(batch) || batch.length !== 100) throw new Error("Append batch must contain exactly 100 tricks");
   const expectedStart = data.length + 1;
+  const expectedPart = Math.floor(data.length / 100) + 1;
   if (batch[0]?.num !== expectedStart) throw new Error(`Batch must begin at trick #${expectedStart}`);
+  for (let i = 0; i < batch.length; i++) {
+    const d = batch[i];
+    const expectedNum = expectedStart + i;
+    if (d.num !== expectedNum) throw new Error(`Append batch numbering error: expected #${expectedNum}, found #${d.num}`);
+    if (d.part !== expectedPart) throw new Error(`Append batch must use Part ${expectedPart}; trick #${d.num} says Part ${d.part}`);
+    if (!Number.isFinite(d.seconds) || d.seconds < 0) throw new Error(`Invalid timestamp at #${d.num}`);
+    if (i && d.seconds <= batch[i-1].seconds) throw new Error(`Append timestamps must increase strictly; check #${d.num}`);
+  }
   data = [...data, ...batch];
 }
 
@@ -75,6 +84,12 @@ if (checkOnly) {
   process.exit(0);
 }
 
-for (const [file, content] of outputs) fs.writeFileSync(file, content);
-execFileSync(process.execPath, [path.join(root, "scripts/validate-flatground-tricks.mjs")], { stdio: "inherit" });
+const originals = new Map(outputs.map(([file]) => [file, fs.readFileSync(file, "utf8")]));
+try {
+  for (const [file, content] of outputs) fs.writeFileSync(file, content);
+  execFileSync(process.execPath, [path.join(root, "scripts/validate-flatground-tricks.mjs")], { stdio: "inherit" });
+} catch (error) {
+  for (const [file, content] of originals) fs.writeFileSync(file, content);
+  throw error;
+}
 console.log(`Flatground files synchronized: ${count} tricks across ${Math.ceil(count/100)} parts.`);
