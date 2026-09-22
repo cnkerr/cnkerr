@@ -186,3 +186,29 @@ for (const vp of [
     await expect(page.locator("#close")).toBeVisible();
   });
 }
+
+
+test("live YouTube players initialize for representative parts", async ({ page }) => {
+  test.skip(BASE_ROOT !== "https://cnkerr.com", "Live YouTube diagnostic");
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  for (const num of [1, 101, 201]) {
+    await page.goto(`${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0#trick-${num}`, { waitUntil: "domcontentloaded" });
+    await expect(page.locator("#dialog")).toHaveJSProperty("open", true);
+    const iframe = page.locator("#clipPlayer");
+    await expect(iframe).toBeVisible();
+    await expect(iframe).toHaveAttribute("src", /youtube\.com\/embed\//);
+
+    const frame = page.frameLocator("#clipPlayer");
+    await expect(frame.locator("body")).toBeVisible({ timeout: 15000 });
+    const error = frame.locator(".ytp-error-content-wrap");
+    const player = frame.locator(".html5-video-player");
+    await expect(player).toHaveCount(1, { timeout: 15000 });
+    if (await error.count()) await expect(error).not.toBeVisible();
+
+    const text = (await frame.locator("body").innerText()).slice(0, 500);
+    expect(text).not.toMatch(/video unavailable|an error occurred|playback on other websites has been disabled/i);
+    console.log(JSON.stringify({ num, iframeSrc: await iframe.getAttribute("src"), frameText: text }));
+  }
+});
