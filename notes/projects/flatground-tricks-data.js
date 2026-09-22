@@ -1,4 +1,4 @@
-/* Canonical audited data for A Compendium of Flatground Tricks. One record per line for reviewable diffs. */
+/* GENERATED FILE. Edit flatground-tricks-source.csv, then run scripts/update-flatground-data.mjs. */
 window.FLATGROUND_TRICKS_DATA=[
 {"num":1,"name":"ollie","family":"Ollie / Spins","subfamily":"None","modifiers":[],"stance":"Regular","siblingKey":"ollie","part":1,"seconds":84,"url":"https://www.youtube.com/watch?v=8bxg4YCo2RE"},
 {"num":2,"name":"fakie ollie","family":"Ollie / Spins","subfamily":"None","modifiers":[],"stance":"Fakie","siblingKey":"ollie","part":1,"seconds":86,"url":"https://www.youtube.com/watch?v=8bxg4YCo2RE"},
