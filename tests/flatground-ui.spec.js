@@ -1,13 +1,14 @@
 const { test, expect } = require("@playwright/test");
 const fs = require("fs");
 
-const BASE = "http://127.0.0.1:4173/notes/projects/flatground-tricks.html?intro=0";
+const BASE = process.env.BASE_URL || "http://127.0.0.1:4173/notes/projects/flatground-tricks.html?intro=0";
+const BASE_ORIGIN = new URL(BASE).origin;
 fs.mkdirSync("qa-artifacts", { recursive: true });
 
 async function quietExternalTraffic(page) {
   await page.route("**/*", route => {
     const url = new URL(route.request().url());
-    if (url.hostname === "127.0.0.1" || url.hostname === "localhost") return route.continue();
+    if (url.origin === BASE_ORIGIN || url.hostname === "127.0.0.1" || url.hostname === "localhost") return route.continue();
     return route.abort();
   });
 }
@@ -119,7 +120,7 @@ test("info links and raw-data endpoint are valid", async ({ page, request }) => 
   await expect(raw).toHaveAttribute("download", "flatground-tricks-data.csv");
   await expect(page.locator(".projectFooter a")).toHaveAttribute("href", "https://www.youtube.com/@_jamiegriffin");
 
-  const response = await request.get("http://127.0.0.1:4173/notes/projects/flatground-tricks-data.csv");
+  const response = await request.get(new URL("/notes/projects/flatground-tricks-data.csv", BASE_ORIGIN).href);
   expect(response.ok()).toBeTruthy();
   const text = await response.text();
   expect(text.trim().split("\n")).toHaveLength(801);
