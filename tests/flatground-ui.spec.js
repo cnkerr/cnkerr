@@ -166,6 +166,21 @@ for (const vp of [
     await page.locator("#infoBtn").click();
     await expect(page.locator("#infoDialog")).toHaveJSProperty("open", true);
     await expectNoHorizontalOverflow(page);
+    const rawData = page.locator(".dataDownload");
+    await rawData.scrollIntoViewIfNeeded();
+    await expect(rawData).toBeVisible();
+    const rawBox = await rawData.boundingBox();
+    expect(rawBox.y).toBeGreaterThanOrEqual(0);
+    expect(rawBox.y + rawBox.height).toBeLessThanOrEqual(vp.height + 1);
     await page.screenshot({ path: `qa-artifacts/${vp.name}-info.png` });
+
+    await page.locator("#infoClose").click();
+    await page.locator("#clear").click();
+    await page.locator("#list .trickname").first().click();
+    await expect(page.locator("#dialog")).toHaveJSProperty("open", true);
+    await expectNoHorizontalOverflow(page);
+    await page.locator("#related").scrollIntoViewIfNeeded();
+    await expect(page.locator("#related")).toBeVisible();
+    await expect(page.locator("#close")).toBeVisible();
   });
 }
