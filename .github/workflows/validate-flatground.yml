@@ -4,9 +4,12 @@ on:
   pull_request:
     paths:
       - "notes/projects/flatground-tricks.html"
+      - "notes/projects/flatground-tricks-source.json"
+      - "notes/projects/flatground-tricks-source.json"
       - "notes/projects/flatground-tricks-data.js"
       - "notes/projects/flatground-tricks-data.csv"
       - "scripts/validate-flatground-tricks.mjs"
+      - "scripts/flatground-sync.mjs"
       - ".github/workflows/validate-flatground.yml"
   push:
     branches: [main]
@@ -27,8 +30,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Validate data, timestamps, siblings, and CSV
-        run: node scripts/validate-flatground-tricks.mjs
+      - name: Verify generated files and validate data
+        run: node scripts/flatground-sync.mjs --check
       - name: Browser smoke test
         shell: bash
         run: |
