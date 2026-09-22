@@ -33,6 +33,32 @@ jobs:
           node-version: 22
       - name: Verify generated files and validate data
         run: node scripts/flatground-sync.mjs --check
+      - name: Exercise Part IX ingestion in disposable copy
+        shell: bash
+        run: |
+          TMP="$(mktemp -d)"
+          cp -a . "$TMP/repo"
+          cd "$TMP/repo"
+          node - <<'NODE' > /tmp/flatground-part9-test.json
+          const rows = Array.from({length:100}, (_,i) => ({
+            num:801+i,
+            name:`qa future trick ${801+i}`,
+            family:"Ollie / Spins",
+            subfamily:"None",
+            modifiers:[],
+            stance:["Regular","Switch","Nollie","Fakie"][i%4],
+            siblingKey:`qa future trick ${801+i}`,
+            part:9,
+            seconds:i+1,
+            url:"https://www.youtube.com/watch?v=8bxg4YCo2RE"
+          }));
+          process.stdout.write(JSON.stringify(rows,null,2));
+          NODE
+          node scripts/flatground-sync.mjs --append /tmp/flatground-part9-test.json
+          node -e 'const d=require("./notes/projects/flatground-tricks-source.json"); if(d.length!==900) process.exit(1)'
+          grep -q '900 / 900' notes/projects/flatground-tricks.html
+          test "$(wc -l < notes/projects/flatground-tricks-data.csv)" -eq 901
+          node scripts/flatground-sync.mjs --check
       - name: Browser smoke test
         shell: bash
         run: |
