@@ -1,13 +1,15 @@
 const { test, expect } = require("@playwright/test");
 const fs = require("fs");
 
-const BASE = "http://127.0.0.1:4173/notes/projects/flatground-tricks.html?intro=0";
+const BASE_ROOT = process.env.FLATGROUND_BASE_ROOT || "http://127.0.0.1:4173";
+const BASE = `${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0`;
+const ALLOWED_HOST = new URL(BASE_ROOT).hostname;
 fs.mkdirSync("qa-artifacts", { recursive: true });
 
 async function quietExternalTraffic(page) {
   await page.route("**/*", route => {
     const url = new URL(route.request().url());
-    if (url.hostname === "127.0.0.1" || url.hostname === "localhost") return route.continue();
+    if (url.hostname === ALLOWED_HOST || url.hostname === "127.0.0.1" || url.hostname === "localhost") return route.continue();
     return route.abort();
   });
 }
@@ -119,7 +121,7 @@ test("info links and raw-data endpoint are valid", async ({ page, request }) => 
   await expect(raw).toHaveAttribute("download", "flatground-tricks-data.csv");
   await expect(page.locator(".projectFooter a")).toHaveAttribute("href", "https://www.youtube.com/@_jamiegriffin");
 
-  const response = await request.get("http://127.0.0.1:4173/notes/projects/flatground-tricks-data.csv");
+  const response = await request.get(`${BASE_ROOT}/notes/projects/flatground-tricks-data.csv`);
   expect(response.ok()).toBeTruthy();
   const text = await response.text();
   expect(text.trim().split("\n")).toHaveLength(801);

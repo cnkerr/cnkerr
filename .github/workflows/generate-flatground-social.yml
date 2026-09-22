@@ -1,0 +1,58 @@
+name: Generate Flatground social image
+
+on:
+  push:
+    branches: [main, flatground-next-hardening]
+    paths:
+      - "notes/projects/flatground-tricks-share.html"
+      - "notes/projects/flatground-tricks-data.js"
+      - ".github/workflows/generate-flatground-social.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Render social card
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/social-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          sleep 1
+          node - <<'NODE'
+          const { chromium } = require("playwright");
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const page=await browser.newPage({viewport:{width:1200,height:630},deviceScaleFactor:1});
+            await page.goto("http://127.0.0.1:4173/notes/projects/flatground-tricks-share.html",{waitUntil:"networkidle"});
+            await page.screenshot({path:"notes/projects/flatground-tricks-social.png"});
+            await browser.close();
+          })();
+          NODE
+      - name: Upload preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: flatground-social-preview
+          path: notes/projects/flatground-tricks-social.png
+          retention-days: 7
+      - name: Commit social image
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add notes/projects/flatground-tricks-social.png
+          git diff --cached --quiet && exit 0
+          git commit -m "Regenerate Flatground social image"
+          git push origin HEAD:${{ github.ref_name }}

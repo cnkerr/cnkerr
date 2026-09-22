@@ -1,10 +1,13 @@
 import fs from "node:fs";
 import vm from "node:vm";
 
+const sourcePath = new URL("../notes/projects/flatground-tricks-source.json", import.meta.url);
 const dataPath = new URL("../notes/projects/flatground-tricks-data.js", import.meta.url);
 const csvPath = new URL("../notes/projects/flatground-tricks-data.csv", import.meta.url);
 const htmlPath = new URL("../notes/projects/flatground-tricks.html", import.meta.url);
+const socialPath = new URL("../notes/projects/flatground-tricks-social.png", import.meta.url);
 
+const sourceData = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
 const dataSource = fs.readFileSync(dataPath, "utf8");
 const csvSource = fs.readFileSync(csvPath, "utf8");
 const htmlSource = fs.readFileSync(htmlPath, "utf8");
@@ -24,12 +27,15 @@ for (const [index, source] of inlineScripts.entries()) {
 }
 
 const fail = message => { throw new Error(message); };
+if (JSON.stringify(data) !== JSON.stringify(sourceData)) fail("Generated JS does not match canonical source JSON");
 const allowedStances = new Set(["Regular","Switch","Nollie","Fakie"]);
 const allowedFamilies = new Set(["Casper / Hospital","Feather","Forward / Dolphin","Heelflips","Impossible","Kickback","Kickflips","Ollie / Spins","Shuv-its"]);
 const allowedSubfamilies = new Set(["360 Flip / Tre","Big Heel","Bigflip","Biggerspin","Bigspin","Casper","Forward","Gazelle","Hardflip","Heelflip","Hospital","Inward Heel","Kickflip","Lazer","Monster","None","Shuv-it","Varial Flip","Varial Heel"]);
 const allowedModifiers = new Set(["180","360","540","720","Anti","Backfoot","Backside","Body Varial","Cancel","Crossfoot","Double","Front Foot","Frontside","Half","Late","Old School","Pressure","Quadruple","Rewind","Semi","Triple","Underflip"]);
 
-if (data.length !== 800) fail(`Expected 800 tricks, found ${data.length}`);
+if (data.length < 800 || data.length > 1000) fail(`Expected between 800 and 1000 tricks, found ${data.length}`);
+if (data.length % 100 !== 0) fail(`Expected trick count in complete 100-trick installments, found ${data.length}`);
+const expectedParts = data.length / 100;
 
 const numbers = new Set();
 const partLast = new Map();
@@ -41,7 +47,9 @@ for (let i = 0; i < data.length; i++) {
   numbers.add(d.num);
   if (!d.name || typeof d.name !== "string") fail(`Missing name at #${d.num}`);
   if (!allowedStances.has(d.stance)) fail(`Invalid stance at #${d.num}: ${d.stance}`);
-  if (!Number.isInteger(d.part) || d.part < 1 || d.part > 8) fail(`Invalid part at #${d.num}: ${d.part}`);
+  if (!Number.isInteger(d.part) || d.part < 1 || d.part > expectedParts) fail(`Invalid part at #${d.num}: ${d.part}`);
+  const expectedPart = Math.floor(i / 100) + 1;
+  if (d.part !== expectedPart) fail(`Expected trick #${d.num} in Part ${expectedPart}, found Part ${d.part}`);
   if (!Number.isFinite(d.seconds) || d.seconds < 0) fail(`Invalid caption onset at #${d.num}`);
   const previous = partLast.get(d.part);
   if (previous != null && d.seconds <= previous) fail(`Non-increasing timestamp in Part ${d.part} at #${d.num}`);
@@ -110,4 +118,14 @@ if (externalIndex < 0 || inlineIndex < 0 || externalIndex > inlineIndex) fail("C
 if (/const AUDITED_ONSETS=/.test(htmlSource)) fail("Legacy AUDITED_ONSETS is still embedded");
 if (/const DATA=\[\{/.test(htmlSource)) fail("Legacy embedded DATA array is still present");
 
-console.log(`Flatground Tricks validation passed: ${data.length} tricks, ${siblingStances.size} sibling groups.`);
+if (!fs.existsSync(socialPath)) fail("Missing social preview image");
+const png = fs.readFileSync(socialPath);
+const pngSignature = "89504e470d0a1a0a";
+if (png.subarray(0,8).toString("hex") !== pngSignature) fail("Social preview is not a valid PNG");
+const socialWidth = png.readUInt32BE(16);
+const socialHeight = png.readUInt32BE(20);
+if (socialWidth !== 1200 || socialHeight !== 630) fail(`Social preview must be 1200x630, found ${socialWidth}x${socialHeight}`);
+if (!htmlSource.includes('property="og:image" content="https://cnkerr.com/notes/projects/flatground-tricks-social.png"')) fail("Missing og:image metadata");
+if (!htmlSource.includes('name="twitter:image" content="https://cnkerr.com/notes/projects/flatground-tricks-social.png"')) fail("Missing twitter:image metadata");
+
+console.log(`Flatground Tricks validation passed: ${data.length} tricks across ${expectedParts} parts, ${siblingStances.size} sibling groups.`);
