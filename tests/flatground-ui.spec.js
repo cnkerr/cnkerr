@@ -212,3 +212,33 @@ test("live YouTube players initialize for representative parts", async ({ page }
     console.log(JSON.stringify({ num, iframeSrc: await iframe.getAttribute("src"), frameText: text }));
   }
 });
+
+
+test("live player survives installment boundary navigation", async ({ page }) => {
+  test.skip(BASE_ROOT !== "https://cnkerr.com", "Live YouTube diagnostic");
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(`${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0#trick-100`, { waitUntil: "domcontentloaded" });
+
+  const assertPlayer = async (partText, id) => {
+    await expect(page.locator("#sourceLine")).toContainText(partText);
+    const iframe = page.locator("#clipPlayer");
+    await expect(iframe).toHaveAttribute("src", new RegExp(id));
+    const frame = page.frameLocator("#clipPlayer");
+    await expect(frame.locator(".html5-video-player")).toHaveCount(1, { timeout: 15000 });
+    const text = (await frame.locator("body").innerText()).slice(0,500);
+    expect(text).not.toMatch(/video unavailable|an error occurred|playback on other websites has been disabled/i);
+    console.log(JSON.stringify({partText,id,text}));
+  };
+
+  await assertPlayer("PART I", "8bxg4YCo2RE");
+  await page.locator("#nextTrick").click();
+  await assertPlayer("PART II", "mN6_vgbRD7Y");
+  await page.locator("#prevTrick").click();
+  await assertPlayer("PART I", "8bxg4YCo2RE");
+
+  await page.goto(`${BASE_ROOT}/notes/projects/flatground-tricks.html?intro=0#trick-200`, { waitUntil: "domcontentloaded" });
+  await assertPlayer("PART II", "mN6_vgbRD7Y");
+  await page.locator("#nextTrick").click();
+  await assertPlayer("PART III", "N4sgk0PLhQ0");
+});
