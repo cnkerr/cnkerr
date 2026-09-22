@@ -15,8 +15,13 @@ permissions:
 
 jobs:
   browser-qa:
+    name: Local QA — ${{ matrix.browser }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,11 +30,10 @@ jobs:
       - name: Install Playwright
         run: |
           npm install --no-save @playwright/test@1.55.0
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps ${{ matrix.browser }}
       - name: Start local site
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/flatground-http.log 2>&1 &
-          echo $! > /tmp/flatground-http.pid
           for i in {1..30}; do
             curl -fsS http://127.0.0.1:4173/notes/projects/flatground-tricks.html >/dev/null && exit 0
             sleep 1
@@ -37,12 +41,34 @@ jobs:
           cat /tmp/flatground-http.log
           exit 1
       - name: Run browser QA
-        run: npx playwright test tests/flatground-ui.spec.js --browser=chromium --reporter=line
+        run: npx playwright test tests/flatground-ui.spec.js --browser=${{ matrix.browser }} --reporter=line
       - name: Upload QA screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: flatground-ui-qa-screenshots
+          name: flatground-ui-qa-${{ matrix.browser }}
           path: qa-artifacts/
           if-no-files-found: ignore
           retention-days: 7
+
+  live-smoke:
+    name: Live site — ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Run live browser QA
+        env:
+          BASE_URL: https://cnkerr.com/notes/projects/flatground-tricks.html?intro=0
+        run: npx playwright test tests/flatground-ui.spec.js --browser=${{ matrix.browser }} --reporter=line
