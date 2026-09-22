@@ -129,3 +129,12 @@ The browser suite covers filtering, search aliases, URL state, Back/Forward navi
 - The stance overview is functional data visualization, not decoration. Never recolor or rearrange its cells for visual effect.
 - Keep the interface light and database-like; avoid adding cards, thumbnails, animation, or framework complexity without a demonstrated usability benefit.
 - The project remains intentionally framework-free.
+
+
+## Social preview
+
+The share card source is `flatground-tricks-share.html`. The committed `flatground-tricks-social.png` is generated from it at 1200 × 630.
+
+When the share-card source or generated browser data changes on `main`, GitHub Actions re-renders the PNG and commits the updated asset automatically. The production page references that PNG through Open Graph and Twitter metadata.
+
+Do not hand-edit the PNG.
