@@ -4,8 +4,12 @@ on:
   pull_request:
     paths:
       - "notes/projects/flatground-tricks.html"
+      - "notes/projects/flatground-tricks-source.csv"
+      - "notes/projects/flatground-tricks-source.csv"
       - "notes/projects/flatground-tricks-data.js"
       - "notes/projects/flatground-tricks-data.csv"
+      - "scripts/update-flatground-data.mjs"
+      - "scripts/update-flatground-data.mjs"
       - "scripts/validate-flatground-tricks.mjs"
       - ".github/workflows/validate-flatground.yml"
   push:
@@ -27,6 +31,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Check generated data is current
+        run: node scripts/update-flatground-data.mjs --check
       - name: Validate data, timestamps, siblings, and CSV
         run: node scripts/validate-flatground-tricks.mjs
       - name: Browser smoke test
