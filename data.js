@@ -587,6 +587,13 @@ aboutSlides: [
 
     notes: [
         {
+            id: "mud-miami",
+            title: "MUD:MIAMI",
+            date: "2026-10-16",
+            type: "Video",
+            youtube: "xC3ArPcUCDc"
+        },
+        {
             id: "flatground-tricks",
             title: "A Compendium of Jamie Griffin’s Flatground Tricks",
             date: "2026-09-18",
