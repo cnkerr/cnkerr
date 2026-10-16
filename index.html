@@ -2368,7 +2368,7 @@ function typeLabel(n){
 
         if (yt){
           yt = yt.replace(/[^a-zA-Z0-9_-]/g, "");
-          file = "https://www.youtube-nocookie.com/embed/" + yt + "?rel=0";
+          file = "https://www.youtube-nocookie.com/embed/" + yt + "?rel=0&playsinline=1";
         } else {
           file = String((n && n.file) ? n.file : "").trim();
         }
@@ -2390,7 +2390,7 @@ function typeLabel(n){
           if (yt){
             if (blogView) blogView.classList.add("isVideo");
             blogContent.innerHTML =
-              '<div class="blogMediaFrame isVideoFrame"><iframe src="' + esc(fUrl) + '" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
+              '<div class="blogMediaFrame isVideoFrame"><iframe width="1280" height="720" src="' + esc(fUrl) + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
                       } else if (ext === "pdf"){
             if (blogView) blogView.classList.add("isPdf");
 
