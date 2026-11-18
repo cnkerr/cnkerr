@@ -82,6 +82,8 @@ test("sandboxed blog introduction opens the working interactive Compendium", asy
     await expect(popup).toHaveURL(/\/notes\/projects\/flatground-tricks\.html\?intro=0/);
     await expect(popup.locator("#matchCount")).toHaveText("800 / 800");
     await popup.locator("#search").fill("kickflip");
+    // Search rerenders in requestAnimationFrame, not synchronously with input.
+    await expect(popup.locator("#matchCount")).not.toHaveText("800 / 800");
     await expect(popup.locator("#list .trickrow").first()).toBeVisible();
     const count = await popup.locator("#list .trickrow").count();
     expect(count).toBeGreaterThan(0);
