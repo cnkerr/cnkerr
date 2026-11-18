@@ -1560,8 +1560,9 @@ body.modalOpen{ overflow:hidden; }
     try{
       var params = new URLSearchParams(location.search);
       var preserved = params.get("p");
-      if (!preserved) return;
+      if (!preserved || !/^\/(?!\/)/.test(preserved)) return;
       var target = new URL(preserved, location.origin);
+      if (target.origin !== location.origin) return;
       history.replaceState(null, "", target.pathname + target.search + target.hash);
     }catch(_){}
   })();
@@ -1573,6 +1574,17 @@ body.modalOpen{ overflow:hidden; }
       return String(s == null ? "" : s).replace(/[&<>"']/g, function(m){
         return ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[m];
       });
+    }
+
+    // Resolve links against the site's base and reject executable/non-web schemes.
+    // Data is authored locally, but URL validation prevents accidental unsafe links.
+    function safeWebUrl(value){
+      var raw = String(value == null ? "" : value).trim();
+      if (!raw) return "";
+      try {
+        var parsed = new URL(raw, document.baseURI);
+        return (parsed.protocol === "http:" || parsed.protocol === "https:") ? parsed.href : "";
+      }catch(_){ return ""; }
     }
 
     function normDashText(s){
@@ -1769,7 +1781,7 @@ body.modalOpen{ overflow:hidden; }
 
       slideIndex = (n + slides.length) % slides.length;
       var s = slides[slideIndex] || {};
-      var src = String(s.src || "").trim();
+      var src = safeWebUrl(s.src);
       var caption = String(s.caption || "").trim();
 
       if (!src){
@@ -1900,7 +1912,7 @@ body.modalOpen{ overflow:hidden; }
         for (var i=0;i<items.length;i++){
           var it = items[i] || {};
           var title = esc(normDashText(it.title || ""));
-          var href = it.url ? String(it.url) : "";
+          var href = safeWebUrl(it.url);
           var titleHtml = href
             ? ('<a href="' + esc(href) + '" target="_blank" rel="noopener">' + title + '</a>')
             : title;
@@ -1920,7 +1932,7 @@ body.modalOpen{ overflow:hidden; }
           var it2 = items[j] || {};
           var raw = esc(normDashText(it2.title || ""));
           var inner = it2.italic ? ("<em>" + raw + "</em>") : raw;
-          var href2 = it2.url ? String(it2.url) : "";
+          var href2 = safeWebUrl(it2.url);
           var titleHtml2 = href2
             ? ('<a href="' + esc(href2) + '" target="_blank" rel="noopener">' + inner + '</a>')
             : inner;
@@ -1939,7 +1951,7 @@ body.modalOpen{ overflow:hidden; }
         for (var e=0;e<items.length;e++){
           var itE = items[e] || {};
           var titleE = esc(normDashText(itE.title || ""));
-          var hrefE = itE.url ? String(itE.url) : "";
+          var hrefE = safeWebUrl(itE.url);
           var titleHtmlE = hrefE
             ? ('<a href="' + esc(hrefE) + '" target="_blank" rel="noopener">' + titleE + '</a>')
             : titleE;
@@ -1960,7 +1972,7 @@ body.modalOpen{ overflow:hidden; }
         for (var d=0;d<items.length;d++){
           var itD = items[d] || {};
           var titleD = esc(normDashText(itD.title || ""));
-          var hrefD = itD.url ? String(itD.url) : "";
+          var hrefD = safeWebUrl(itD.url);
           var titleHtmlD = hrefD
             ? ('<a href="' + esc(hrefD) + '" target="_blank" rel="noopener">' + titleD + '</a>')
             : titleD;
@@ -1981,7 +1993,7 @@ body.modalOpen{ overflow:hidden; }
       for (var k=0;k<items.length;k++){
         var it3 = items[k] || {};
         var titleQuoted = '<span class="q">' + esc(normDashText(it3.title || "")) + '</span>';
-        var href3 = it3.url ? String(it3.url) : "";
+        var href3 = safeWebUrl(it3.url);
         var titleHtml3 = href3
           ? ('<a href="' + esc(href3) + '" target="_blank" rel="noopener">' + titleQuoted + '</a>')
           : titleQuoted;
@@ -2225,30 +2237,24 @@ function typeLabel(n){
     // PDF.js (lazy) — used only for PDF blog posts to avoid iOS toolbar
     // =========================================================
     var _pdfjsLoading = null;
-    var _pdfjsReady = false;
+    var _pdfjsLib = null;
     var _pdfjsRenderToken = 0;
 
     function ensurePdfJsLoaded(){
-      if (_pdfjsReady && window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+      if (_pdfjsLib) return Promise.resolve(_pdfjsLib);
       if (_pdfjsLoading) return _pdfjsLoading;
 
-      _pdfjsLoading = new Promise(function(resolve, reject){
-        // Load PDF.js core
-        var s = document.createElement("script");
-        s.src = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.min.js";
-        s.async = true;
-        s.onload = function(){
-          try{
-            if (!window.pdfjsLib) throw new Error("pdfjsLib missing after load");
-            // Load worker (same version)
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-              "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.worker.min.js";
-            _pdfjsReady = true;
-            resolve(window.pdfjsLib);
-          }catch(e){ reject(e); }
-        };
-        s.onerror = function(){ reject(new Error("Failed to load pdf.min.js")); };
-        document.head.appendChild(s);
+      // PDF.js v4 is an ES module; the old .js/global loader never initialized.
+      // Pin a version with CVE-2024-4367 fixed, and keep native-PDF fallback.
+      _pdfjsLoading = import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.2.67/build/pdf.min.mjs").then(function(pdfjs){
+        if (!pdfjs || typeof pdfjs.getDocument !== "function") throw new Error("PDF.js module unavailable");
+        pdfjs.GlobalWorkerOptions.workerSrc =
+          "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.2.67/build/pdf.worker.min.mjs";
+        _pdfjsLib = pdfjs;
+        return pdfjs;
+      }).catch(function(error){
+        _pdfjsLoading = null; // retry on the next PDF instead of caching a failure
+        throw error;
       });
 
       return _pdfjsLoading;
@@ -2270,14 +2276,15 @@ function typeLabel(n){
       status.textContent = "Loading PDF…";
       frameEl.appendChild(status);
 
-      // IMPORTANT: encode spaces safely
-      var safeUrl = String(url || "").replace(/\\s/g, "%20");
+      // new URL() already percent-encodes spaces in file paths.
+      var safeUrl = safeWebUrl(url);
+      if (!safeUrl) return Promise.reject(new Error("Unsafe PDF URL"));
 
       return ensurePdfJsLoaded().then(function(pdfjs){
         if (myToken !== _pdfjsRenderToken) return;
 
         // Some servers require CORS; pdf.js uses fetch/XHR — if it fails, caller can fallback.
-        return pdfjs.getDocument({ url: safeUrl, withCredentials: false }).promise.then(function(pdf){
+        return pdfjs.getDocument({ url: safeUrl, withCredentials: false, isEvalSupported: false }).promise.then(function(pdf){
           if (myToken !== _pdfjsRenderToken) return;
           clearNode(frameEl);
 
@@ -2360,6 +2367,7 @@ function typeLabel(n){
 
       // content
       if (blogContent){
+        ++_pdfjsRenderToken; // abort rendering into a view that has since changed
         blogContent.innerHTML = "";
         clearBlogViewClasses();
 
@@ -2377,9 +2385,12 @@ function typeLabel(n){
           if (blogView) blogView.classList.add("isOther");
           blogContent.innerHTML = "<p>(No file attached.)</p>";
                   } else {
-          var fUrl = file;
-          try{ fUrl = new URL(file, document.baseURI).toString(); }
-          catch(_){ fUrl = encodeURI(file); }
+          var fUrl = safeWebUrl(file);
+          if (!fUrl){
+            blogContent.textContent = "Unsupported media URL.";
+            setBlogMode("entry");
+            return;
+          }
 
           var lower = fUrl.toLowerCase();
 
@@ -2405,7 +2416,7 @@ function typeLabel(n){
               // Fallback: native iframe if PDF.js cannot load or PDF fetch is blocked.
               var pdfUrl = fUrl;
               if (pdfUrl.indexOf("#") === -1) pdfUrl = pdfUrl + "#view=FitH";
-              if (blogContent){
+              if (blogContent && frame && frame.isConnected && blogCurrentURL === fUrl){
                 blogContent.innerHTML =
                   '<div class="blogMediaFrame isPdfFrame"><iframe src="' + esc(pdfUrl) + '" loading="lazy" scrolling="yes" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
               }
@@ -2414,7 +2425,7 @@ function typeLabel(n){
             if (blogView) blogView.classList.add("isHtml");
             // Render HTML in an iframe so it can scroll naturally and fill the viewer.
             blogContent.innerHTML =
-              '<div class="blogMediaFrame isHtmlFrame"><iframe src="' + esc(fUrl) + '" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
+              '<div class="blogMediaFrame isHtmlFrame"><iframe src="' + esc(fUrl) + '" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="' + esc(ttl) + '"></iframe></div>';
                       } else if (/(png|jpe?g|gif|webp|bmp|svg)/i.test(ext)){
             if (blogView) blogView.classList.add("isImg");
             blogContent.innerHTML = '<div class="blogMediaFrame isImgFrame"><img src="' + esc(fUrl) + '" alt="' + esc(ttl) + '" loading="lazy" decoding="async" /></div>';
@@ -2788,7 +2799,19 @@ function typeLabel(n){
 
       if (aboutText){
         if (hasHTML){
-          aboutText.innerHTML = rawHTML;
+          // The only authored HTML here is a preformatted ASCII portrait.
+          // Rebuild that element with textContent; never adopt arbitrary markup.
+          var template = document.createElement("template");
+          template.innerHTML = rawHTML;
+          var sourcePre = template.content.querySelector("pre.ascii");
+          if (sourcePre && template.content.querySelectorAll("*").length === 1){
+            var safePre = document.createElement("pre");
+            safePre.className = "ascii ascii-mono";
+            safePre.textContent = sourcePre.textContent;
+            aboutText.replaceChildren(safePre);
+          } else {
+            aboutText.textContent = rawHTML;
+          }
         } else {
           aboutText.textContent = "> " + (rawText || "(empty)");
         }
