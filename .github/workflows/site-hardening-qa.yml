@@ -1,0 +1,61 @@
+name: Site security and functionality QA
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "data.js"
+      - "404.html"
+      - "tests/site-hardening.spec.js"
+      - "tests/site-large-media.spec.js"
+      - "tests/site-security.test.mjs"
+      - ".github/workflows/site-hardening-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-security:
+    name: Parse and validate site security rules
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run security regression tests
+        run: node --test tests/site-security.test.mjs
+
+  browser-smoke:
+    name: Browser functionality · ${{ matrix.browser }}
+    runs-on: ubuntu-24.04
+    # The browser image has Chromium, WebKit and OS dependencies preinstalled.
+    # Avoid slow/unreliable apt installs on GitHub-hosted runners.
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install test runner and local static server
+        run: npm install --no-save @playwright/test@1.55.0 http-server@14.1.1
+      - name: Start local site
+        run: |
+          ./node_modules/.bin/http-server . -a 127.0.0.1 -p 4173 -c-1 >/tmp/site-security-http.log 2>&1 &
+          echo $! >/tmp/site-security-http.pid
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/site-security-http.log
+          exit 1
+      - name: Test navigation, big PDFs, mobile and Compendium interactions
+        run: npx playwright test tests/site-hardening.spec.js tests/site-large-media.spec.js --browser=${{ matrix.browser }} --reporter=line
