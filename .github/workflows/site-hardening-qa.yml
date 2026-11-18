@@ -1,0 +1,58 @@
+name: Site security and functionality QA
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "data.js"
+      - "404.html"
+      - "tests/site-hardening.spec.js"
+      - "tests/site-security.test.mjs"
+      - ".github/workflows/site-hardening-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-security:
+    name: Parse and validate site security rules
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run security regression tests
+        run: node --test tests/site-security.test.mjs
+
+  browser-smoke:
+    name: Browser functionality · ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Start local site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/site-security-http.log 2>&1 &
+          echo $! >/tmp/site-security-http.pid
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/site-security-http.log
+          exit 1
+      - name: Test navigation, About dialog, blog PDF and embeds
+        run: npx playwright test tests/site-hardening.spec.js --browser=${{ matrix.browser }} --reporter=line
