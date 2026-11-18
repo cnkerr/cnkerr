@@ -37,18 +37,18 @@ test("About dialog retains the ASCII portrait with no raw element injection", as
 test("Blog PDFs display in-window with PDF.js or the native fallback", async ({ page }) => {
   await page.goto("http://127.0.0.1:4173/");
   await page.locator("#linkNotes").click();
-  await expect(page).toHaveURL(/\\/blog$/);
+  await expect(page).toHaveURL(/\/blog$/);
   await page.locator('a[data-blog-key="tarzan-two-set"]').click();
-  await expect(page).toHaveURL(/\\/blog\\/tarzan-two-set$/);
+  await expect(page).toHaveURL(/\/blog\/tarzan-two-set$/);
   await expect(page.locator("#blogTitle")).toContainText("Tarzan");
 
   const preview = page.locator(".blogMediaFrame.isPdfFrame iframe, .blogMediaFrame.isPdfJsFrame canvas");
   await expect(preview.first()).toBeVisible({ timeout: 20000 });
   const fallback = page.locator(".blogMediaFrame.isPdfFrame iframe");
-  if (await fallback.count()) await expect(fallback).toHaveAttribute("src", /tarzan\\.pdf/);
+  if (await fallback.count()) await expect(fallback).toHaveAttribute("src", /tarzan\.pdf/);
 
   await page.locator("#blogList").click();
-  await expect(page).toHaveURL(/\\/blog$/);
+  await expect(page).toHaveURL(/\/blog$/);
   await expect(page.locator("#blogListWrap")).toBeVisible();
 });
 
