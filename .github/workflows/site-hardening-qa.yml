@@ -29,7 +29,8 @@ jobs:
 
   browser-smoke:
     name: Browser functionality · ${{ matrix.browser }}
-    runs-on: ubuntu-latest
+    # Playwright 1.55 ships browsers for Ubuntu 24.04, not the 26.04 latest image.
+    runs-on: ubuntu-24.04
     timeout-minutes: 18
     strategy:
       fail-fast: false
