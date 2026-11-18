@@ -51,7 +51,7 @@ jobs:
         run: |
           ./node_modules/.bin/http-server . -a 127.0.0.1 -p 4173 -c-1 >/tmp/site-security-http.log 2>&1 &
           echo $! >/tmp/site-security-http.pid
-          for i in {1..30}; do
+          for i in $(seq 1 30); do
             curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0
             sleep 1
           done
