@@ -30,9 +30,12 @@ jobs:
 
   browser-smoke:
     name: Browser functionality · ${{ matrix.browser }}
-    # Playwright 1.55 ships browsers for Ubuntu 24.04, not the 26.04 latest image.
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    # The browser image has Chromium, WebKit and OS dependencies preinstalled.
+    # Avoid slow/unreliable apt installs on GitHub-hosted runners.
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
+    timeout-minutes: 18
     strategy:
       fail-fast: false
       matrix:
@@ -42,13 +45,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install Playwright
-        run: |
-          npm install --no-save @playwright/test@1.55.0
-          npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Install test runner and local static server
+        run: npm install --no-save @playwright/test@1.55.0 http-server@14.1.1
       - name: Start local site
         run: |
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/site-security-http.log 2>&1 &
+          ./node_modules/.bin/http-server . -a 127.0.0.1 -p 4173 -c-1 >/tmp/site-security-http.log 2>&1 &
           echo $! >/tmp/site-security-http.pid
           for i in {1..30}; do
             curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0
