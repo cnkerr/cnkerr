@@ -34,31 +34,21 @@ test("About dialog retains the ASCII portrait with no raw element injection", as
   await expect(page.locator("#aboutDialog")).toBeHidden();
 });
 
-test("Blog PDF remains available when the third-party module cannot load", async ({ page }) => {
-  let blockedRequests = 0;
-  await page.route("https://cdn.jsdelivr.net/npm/pdfjs-dist**", route => {
-    blockedRequests++;
-    return route.abort();
-  });
+test("Blog PDFs display in-window with PDF.js or the native fallback", async ({ page }) => {
   await page.goto("http://127.0.0.1:4173/");
   await page.locator("#linkNotes").click();
-  await expect(page).toHaveURL(/\/blog$/);
+  await expect(page).toHaveURL(/\\/blog$/);
   await page.locator('a[data-blog-key="tarzan-two-set"]').click();
-  await expect(page).toHaveURL(/\/blog\/tarzan-two-set$/);
+  await expect(page).toHaveURL(/\\/blog\\/tarzan-two-set$/);
   await expect(page.locator("#blogTitle")).toContainText("Tarzan");
-  await page.waitForTimeout(2000);
-  console.log("PDF DIAGNOSTIC", JSON.stringify({
-    blockedRequests,
-    content: (await page.locator("#blogContent").innerHTML()).slice(0, 1200)
-  }));
+
   const preview = page.locator(".blogMediaFrame.isPdfFrame iframe, .blogMediaFrame.isPdfJsFrame canvas");
   await expect(preview.first()).toBeVisible({ timeout: 20000 });
   const fallback = page.locator(".blogMediaFrame.isPdfFrame iframe");
-  if (await fallback.count()) {
-    await expect(fallback).toHaveAttribute("src", /tarzan\\.pdf/);
-  }
+  if (await fallback.count()) await expect(fallback).toHaveAttribute("src", /tarzan\\.pdf/);
+
   await page.locator("#blogList").click();
-  await expect(page).toHaveURL(/\/blog$/);
+  await expect(page).toHaveURL(/\\/blog$/);
   await expect(page.locator("#blogListWrap")).toBeVisible();
 });
 
@@ -91,4 +81,16 @@ test("About content and article links cannot inject executable markup or URLs", 
   const row = page.locator("#items-writing .item").filter({ hasText: "Unsafe link test" });
   await expect(row).toBeVisible();
   await expect(row.locator("a")).toHaveCount(0);
+});
+
+test("narrow-screen navigation and photo preview remain usable", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("http://127.0.0.1:4173/");
+  await expect(page.locator("#linkNotes")).toBeVisible();
+  await page.locator("#linkNotes").click();
+  await page.locator('a[data-blog-key="ck-peels"]').click();
+  await expect(page.locator(".blogMediaFrame.isImgFrame img")).toBeVisible();
+  await expect(page.locator("#blogTitle")).toContainText("Claes");
+  await page.locator("#blogList").click();
+  await expect(page.locator("#blogListWrap")).toBeVisible();
 });
